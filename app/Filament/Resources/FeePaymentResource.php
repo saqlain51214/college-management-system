@@ -1,0 +1,178 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Enums\FeeTypeEnum;
+use App\Enums\PaymentMethodEnum;
+use App\Enums\PaymentStatusEnum;
+use App\Filament\Resources\FeePaymentResource\Pages;
+use App\Models\AcademicYear;
+use App\Models\FeePayment;
+use App\Models\FeeStructure;
+use App\Models\Student;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Support\Str;
+
+class FeePaymentResource extends Resource
+{
+    protected static ?string $model = FeePayment::class;
+
+    protected static ?string $navigationIcon  = 'heroicon-o-credit-card';
+    protected static ?string $navigationGroup = 'Students & Admissions';
+    protected static ?string $navigationLabel = 'Fee Payments';
+    protected static ?int    $navigationSort  = 4;
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Section::make('Challan / Payment Details')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Select::make('student_id')
+                        ->label('Student')
+                        ->options(fn() => Student::where('is_active', true)->orderBy('name')
+                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' — ' . $s->name]))
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+
+                    Forms\Components\TextInput::make('challan_number')
+                        ->label('Challan Number')
+                        ->required()
+                        ->unique(table: 'fee_payments', column: 'challan_number',
+                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?FeePayment $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        ->default(fn() => 'CHN-' . strtoupper(Str::random(8)))
+                        ->maxLength(50),
+
+                    Forms\Components\Select::make('fee_type')
+                        ->label('Fee Type')
+                        ->options(FeeTypeEnum::options())
+                        ->default(FeeTypeEnum::Tuition->value)
+                        ->required(),
+
+                    Forms\Components\Select::make('semester_number')
+                        ->label('Semester')
+                        ->options(collect(range(1, 8))->mapWithKeys(fn($n) => [$n => "Semester $n"])->all())
+                        ->placeholder('N/A'),
+
+                    Forms\Components\Select::make('academic_year_id')
+                        ->label('Academic Year')
+                        ->options(fn() => AcademicYear::active()->orderByDesc('start_date')->pluck('name', 'id'))
+                        ->searchable(),
+
+                    Forms\Components\Select::make('fee_structure_id')
+                        ->label('Fee Structure (Optional)')
+                        ->options(fn() => FeeStructure::active()->pluck('title', 'id'))
+                        ->searchable()
+                        ->placeholder('Select if applicable'),
+
+                    Forms\Components\TextInput::make('amount_due')->label('Amount Due (PKR)')->numeric()->required()->prefix('Rs.'),
+                    Forms\Components\TextInput::make('amount_paid')->label('Amount Paid (PKR)')->numeric()->default(0)->prefix('Rs.'),
+                    Forms\Components\TextInput::make('fine_amount')->label('Late Fine (PKR)')->numeric()->default(0)->prefix('Rs.'),
+                    Forms\Components\TextInput::make('discount_amount')->label('Discount (PKR)')->numeric()->default(0)->prefix('Rs.'),
+
+                    Forms\Components\Select::make('payment_status')
+                        ->label('Payment Status')
+                        ->options(PaymentStatusEnum::options())
+                        ->default(PaymentStatusEnum::Pending->value)
+                        ->required(),
+
+                    Forms\Components\Select::make('payment_method')
+                        ->label('Payment Method')
+                        ->options(PaymentMethodEnum::options())
+                        ->placeholder('Select Method'),
+
+                    Forms\Components\DatePicker::make('due_date')->label('Due Date')->displayFormat('d M Y')->native(false),
+                    Forms\Components\DatePicker::make('payment_date')->label('Payment Date')->displayFormat('d M Y')->native(false),
+
+                    Forms\Components\TextInput::make('transaction_id')->label('Transaction / Reference ID')->maxLength(100)->placeholder('Bank reference / transaction number'),
+                    Forms\Components\TextInput::make('bank_name')->label('Bank Name')->maxLength(100)->placeholder('e.g. HBL, MCB'),
+
+                    Forms\Components\Textarea::make('remarks')->label('Remarks')->rows(2)->columnSpanFull(),
+                ]),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('challan_number')->label('Challan No.')->searchable()->badge()->color('gray'),
+                Tables\Columns\TextColumn::make('student.roll_number')->label('Roll No.')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('student.name')->label('Student')->searchable()->wrap(),
+                Tables\Columns\TextColumn::make('fee_type')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => $state instanceof FeeTypeEnum ? $state->label() : $state)
+                    ->color(fn($state) => $state instanceof FeeTypeEnum ? $state->color() : 'gray'),
+                Tables\Columns\TextColumn::make('semester_number')->label('Sem')->prefix('S')->placeholder('—'),
+                Tables\Columns\TextColumn::make('amount_due')->label('Due')->money('PKR')->sortable(),
+                Tables\Columns\TextColumn::make('amount_paid')->label('Paid')->money('PKR')->sortable(),
+                Tables\Columns\TextColumn::make('payment_status')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => $state instanceof PaymentStatusEnum ? $state->label() : $state)
+                    ->color(fn($state) => $state instanceof PaymentStatusEnum ? $state->color() : 'gray'),
+                Tables\Columns\TextColumn::make('due_date')->label('Due Date')->date('d M Y')->sortable()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('payment_date')->label('Paid On')->date('d M Y')->sortable()->placeholder('—'),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('payment_status')->options(PaymentStatusEnum::options()),
+                Tables\Filters\SelectFilter::make('fee_type')->options(FeeTypeEnum::options()),
+                Tables\Filters\TrashedFilter::make(),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('printChallan')
+                    ->label('Print Challan')
+                    ->icon('heroicon-o-printer')
+                    ->color('info')
+                    ->iconButton()
+                    ->url(fn(FeePayment $r) => route('pdf.challan', $r))
+                    ->openUrlInNewTab(),
+                Tables\Actions\Action::make('markPaid')
+                    ->label('Mark Paid')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->iconButton()
+                    ->requiresConfirmation()
+                    ->visible(fn(FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid)
+                    ->action(fn(FeePayment $r) => $r->update([
+                        'payment_status' => PaymentStatusEnum::Paid->value,
+                        'payment_date'   => now()->toDateString(),
+                        'amount_paid'    => $r->amount_due,
+                    ])),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
+            ])
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
+            ->defaultSort('created_at', 'desc')
+            ->paginated([10, 25, 50, 100])
+            ->striped();
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        try {
+            return (string) FeePayment::where('payment_status', PaymentStatusEnum::Overdue->value)->count() ?: null;
+        } catch (\Exception) {
+            return null;
+        }
+    }
+
+    public static function getNavigationBadgeColor(): ?string { return 'danger'; }
+
+    public static function getPages(): array
+    {
+        return [
+            'index'  => Pages\ListFeePayments::route('/'),
+            'create' => Pages\CreateFeePayment::route('/create'),
+            'edit'   => Pages\EditFeePayment::route('/{record}/edit'),
+        ];
+    }
+}
