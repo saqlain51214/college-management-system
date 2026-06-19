@@ -81,7 +81,7 @@ class AdmissionInquiryResource extends Resource
                 Infolists\Components\TextEntry::make('qualification')->formatStateUsing(fn($state)=>ucfirst($state??'')),
                 Infolists\Components\IconEntry::make('declare_true')->label('Declaration')->boolean(),
                 Infolists\Components\TextEntry::make('status')->badge()
-                    ->color(fn($r)=>match($r->status){
+                    ->color(fn ($state) => match ($state) {
                         'new'=>'info','contacted'=>'warning','enrolled'=>'success','rejected'=>'danger',default=>'gray'
                     }),
                 Infolists\Components\TextEntry::make('created_at')->label('Submitted')->dateTime('d M Y, H:i'),
@@ -89,7 +89,15 @@ class AdmissionInquiryResource extends Resource
                 Infolists\Components\TextEntry::make('academic_details')
                     ->label('Academic Details')
                     ->columnSpanFull()
-                    ->formatStateUsing(fn ($state) => json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)),
+                    ->state(function ($record): string {
+                        $details = $record->academic_details;
+
+                        if (blank($details)) {
+                            return '';
+                        }
+
+                        return json_encode($details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '';
+                    }),
                 Infolists\Components\TextEntry::make('message')->columnSpanFull(),
             ]),
         ]);

@@ -24,4 +24,8 @@ return [
         'student_support_email' => env('STUDENT_SUPPORT_EMAIL', env('MAIL_FROM_ADDRESS')),
         'send_student_welcome_email' => (bool) env('SEND_STUDENT_WELCOME_EMAIL', true),
     ],
+
+    'logs' => [
+        'activity_retention_days' => (int) env('ACTIVITY_LOG_RETENTION_DAYS', 60),
+    ],
 ];
