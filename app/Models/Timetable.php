@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Timetable extends Model
 {
     protected $fillable = [
-        'academic_program_id','semester','course_id','teacher_id',
-        'day_of_week','start_time','end_time','room','is_active',
+        'academic_program_id', 'academic_year_id', 'semester', 'semester_number',
+        'course_id', 'teacher_id', 'day_of_week', 'start_time', 'end_time',
+        'room', 'section', 'is_active',
     ];
 
     protected $casts = ['is_active' => 'boolean'];
@@ -17,7 +18,7 @@ class Timetable extends Model
     public function teacher(): BelongsTo         { return $this->belongsTo(Teacher::class); }
 
     public function scopeActive($query)          { return $query->where('is_active', true); }
-    public function scopeForProgram($q, ?int $id) { return $id !== null ? $q->where('academic_program_id', $id) : $q; }
+    public function scopeForProgram($q, ?int $id) { return $id !== null ? $q->where('academic_program_id', $id) : $q->whereNull('id'); }
     public function scopeForSemester($q, int $s) { return $q->where('semester', $s); }
 
     public function getDayLabelAttribute(): string

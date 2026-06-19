@@ -16,8 +16,8 @@ class NewsArticleResource extends Resource
     protected static ?string $model = NewsArticle::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-newspaper';
-    protected static ?string $navigationGroup = 'System';
-    protected static ?string $navigationLabel = 'News & Updates';
+    protected static ?string $navigationGroup = 'Website Management';
+    protected static ?string $navigationLabel = 'News';
     protected static ?int    $navigationSort  = 1;
 
     public static function form(Form $form): Form
@@ -43,7 +43,7 @@ class NewsArticleResource extends Resource
                     Forms\Components\Toggle::make('is_published')->label('Published')->default(false)->onColor('success'),
                     Forms\Components\Toggle::make('is_featured')->label('Featured')->default(false)->onColor('warning'),
 
-                    Forms\Components\FileUpload::make('featured_image')->label('Featured Image')->image()->directory('news')->maxSize(2048)->columnSpanFull(),
+                    Forms\Components\FileUpload::make('featured_image')->label('Featured Image')->image()->disk('public')->directory('news')->maxSize(2048)->columnSpanFull(),
                     Forms\Components\Textarea::make('excerpt')->label('Excerpt / Summary')->rows(2)->maxLength(500)->columnSpanFull(),
                     Forms\Components\RichEditor::make('content')->label('Full Content')
                         ->toolbarButtons(['bold','italic','underline','bulletList','orderedList','link','h2','h3','blockquote','undo','redo'])
@@ -99,5 +99,3 @@ class NewsArticleResource extends Resource
         ];
     }
 }
-
-

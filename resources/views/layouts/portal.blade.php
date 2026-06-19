@@ -15,7 +15,7 @@
     @media (min-width: 1024px) { .main-pl { padding-left: 260px; } }
   </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased" x-data="{ sidebarOpen: false }">
+<body class="portal-theme font-sans antialiased min-h-screen" x-data="{ sidebarOpen: false }">
 
 {{-- Mobile overlay --}}
 <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"
@@ -27,8 +27,7 @@
 </div>
 
 {{-- ──────────── SIDEBAR ──────────── --}}
-<aside class="sidebar-w fixed top-0 left-0 bottom-0 flex flex-col z-40 transition-transform duration-300 ease-in-out"
-       style="background: #1e3a5f;"
+<aside class="sidebar-w portal-shell-sidebar fixed top-0 left-0 bottom-0 flex flex-col z-40 transition-transform duration-300 ease-in-out"
        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
 
   {{-- Logo --}}
@@ -118,19 +117,19 @@
 <div class="main-pl min-h-screen flex flex-col">
 
   {{-- Topbar --}}
-  <header class="sticky top-0 z-20 bg-white flex-shrink-0" style="border-bottom: 1px solid #e5e7eb">
+  <header class="sticky top-0 z-20 portal-topbar flex-shrink-0">
     <div class="flex items-center justify-between px-4 sm:px-6 h-16">
       {{-- Hamburger + Title --}}
       <div class="flex items-center gap-4">
         <button @click="sidebarOpen = !sidebarOpen"
-                class="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+                class="lg:hidden p-2 rounded-lg text-slate-400 hover:bg-white/5 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
         <div>
-          <h1 class="font-semibold text-gray-800" style="font-size:15px">@yield('title', 'Dashboard')</h1>
-          <p class="text-xs text-gray-400 hidden sm:block">
+          <h1 class="font-semibold text-slate-50" style="font-size:15px">@yield('title', 'Dashboard')</h1>
+          <p class="text-xs text-slate-400 hidden sm:block">
             {{ auth('student')->user()->academicProgram?->name ?? 'Program' }}
             &bull; Semester {{ auth('student')->user()->current_semester ?? '—' }}
           </p>
@@ -139,8 +138,8 @@
       {{-- Date + Avatar --}}
       <div class="flex items-center gap-3">
         <div class="text-right hidden sm:block">
-          <div class="text-xs font-medium text-gray-600">{{ now()->format('l') }}</div>
-          <div class="text-[11px] text-gray-400">{{ now()->format('d M Y') }}</div>
+          <div class="text-xs font-medium text-slate-300">{{ now()->format('l') }}</div>
+          <div class="text-[11px] text-slate-500">{{ now()->format('d M Y') }}</div>
         </div>
         <a href="{{ route('portal.profile') }}"
            class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm"
@@ -153,25 +152,26 @@
 
   {{-- Flash messages --}}
   @if(session('success'))
-  <div class="mx-4 sm:mx-6 mt-4 px-4 py-3 rounded-xl text-sm font-medium text-green-800"
-       style="background: #f0fdf4; border: 1px solid #bbf7d0">
+  <div class="mx-4 sm:mx-6 mt-4 px-4 py-3 rounded-xl text-sm font-medium text-emerald-200"
+       style="background: rgba(22,163,74,0.14); border: 1px solid rgba(34,197,94,0.22)">
     {{ session('success') }}
   </div>
   @endif
   @if(session('error'))
-  <div class="mx-4 sm:mx-6 mt-4 px-4 py-3 rounded-xl text-sm font-medium text-red-800"
-       style="background: #fef2f2; border: 1px solid #fecaca">
+  <div class="mx-4 sm:mx-6 mt-4 px-4 py-3 rounded-xl text-sm font-medium text-rose-200"
+       style="background: rgba(239,68,68,0.14); border: 1px solid rgba(248,113,113,0.22)">
     {{ session('error') }}
   </div>
   @endif
 
   {{-- Page content --}}
   <main class="flex-1 p-4 sm:p-6 lg:p-8">
-    @yield('content')
+    <div class="max-w-7xl mx-auto">
+      @yield('content')
+    </div>
   </main>
 
-  <footer class="bg-white text-xs text-gray-400 text-center py-3 px-6 flex-shrink-0"
-          style="border-top: 1px solid #f3f4f6">
+  <footer class="portal-footer text-xs text-slate-500 text-center py-3 px-6 flex-shrink-0">
     &copy; {{ date('Y') }} Jinnah School &amp; Degree College Astore &mdash; Student Portal
   </footer>
 </div>

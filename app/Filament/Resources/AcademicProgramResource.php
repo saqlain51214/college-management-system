@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AdmissionCategoryEnum;
 use App\Enums\DegreeTypeEnum;
 use App\Filament\Resources\AcademicProgramResource\Pages;
 use App\Helpers\ValidationHelper;
@@ -150,10 +151,21 @@ class AcademicProgramResource extends Resource
                                 $type = DegreeTypeEnum::from($state);
                                 $set('duration_years',  $type->defaultDuration());
                                 $set('total_semesters', $type->defaultSemesters());
+                                $set('admission_category', AcademicProgram::inferAdmissionCategory(null, null, null, $type)->value);
                             }
                         })
                         ->validationMessages([
                             'required' => 'Please select a degree type.',
+                        ]),
+
+                    Forms\Components\Select::make('admission_category')
+                        ->label('Admission Category')
+                        ->options(AdmissionCategoryEnum::options())
+                        ->required()
+                        ->native(false)
+                        ->helperText('Controls where this programme appears in the online admission form.')
+                        ->validationMessages([
+                            'required' => 'Please select where this programme should appear in admissions.',
                         ]),
 
                     Forms\Components\TextInput::make('duration_years')
@@ -310,6 +322,16 @@ class AcademicProgramResource extends Resource
                     ->formatStateUsing(fn($state) => $state instanceof DegreeTypeEnum ? $state->shortLabel() : $state)
                     ->color(fn($state) => $state instanceof DegreeTypeEnum ? $state->color() : 'gray'),
 
+                Tables\Columns\TextColumn::make('admission_category')
+                    ->label('Admission')
+                    ->badge()
+                    ->formatStateUsing(fn (AcademicProgram $record) => $record->admission_category_label)
+                    ->color(fn ($state) => match ($state?->value ?? $state) {
+                        AdmissionCategoryEnum::Intermediate->value => 'success',
+                        AdmissionCategoryEnum::Undergraduate->value => 'info',
+                        default => 'gray',
+                    }),
+
                 Tables\Columns\TextColumn::make('duration_label')
                     ->label('Duration')
                     ->state(fn(AcademicProgram $r) => "{$r->duration_years}yr / {$r->total_semesters}sem"),
@@ -346,6 +368,9 @@ class AcademicProgramResource extends Resource
 
                 Tables\Filters\SelectFilter::make('degree_type')
                     ->options(DegreeTypeEnum::options()),
+
+                Tables\Filters\SelectFilter::make('admission_category')
+                    ->options(AdmissionCategoryEnum::options()),
 
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active Status')

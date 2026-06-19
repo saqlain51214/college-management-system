@@ -16,8 +16,8 @@ class AnnouncementResource extends Resource
     protected static ?string $model = Announcement::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-megaphone';
-    protected static ?string $navigationGroup = 'LMS Portal';
-    protected static ?string $navigationLabel = 'Announcements';
+    protected static ?string $navigationGroup = 'Website Management';
+    protected static ?string $navigationLabel = 'Notices';
     protected static ?int    $navigationSort  = 1;
 
     public static function form(Form $form): Form
@@ -51,7 +51,7 @@ class AnnouncementResource extends Resource
                     Forms\Components\Toggle::make('is_published')->label('Published')->default(true)->onColor('success'),
                     Forms\Components\Toggle::make('send_email')->label('Send Email Notification')->default(false)->onColor('info'),
 
-                    Forms\Components\FileUpload::make('attachment')->label('Attachment')->directory('announcements')->maxSize(5120)->columnSpanFull(),
+                    Forms\Components\FileUpload::make('attachment')->label('Attachment')->disk('public')->directory('announcements')->maxSize(5120)->columnSpanFull(),
 
                     Forms\Components\RichEditor::make('content')->label('Content')->required()->columnSpanFull()
                         ->toolbarButtons(['bold', 'italic', 'underline', 'bulletList', 'orderedList', 'link', 'h2', 'h3']),

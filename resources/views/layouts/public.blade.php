@@ -1,389 +1,339 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Jinnah School & Degree College Astore') — JDCA</title>
     <meta name="description" content="@yield('meta_description', 'Jinnah School & Degree College Astore (JDCA) — Quality education in Gilgit-Baltistan, Pakistan.')">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Playfair+Display:wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    @php
+        $pageVisibility = \App\Models\WebsitePage::query()->pluck('is_published', 'slug')->all();
+        $pageVisible = fn (string $slug): bool => ! array_key_exists($slug, $pageVisibility) || (bool) $pageVisibility[$slug];
+        $showAboutMenu = $pageVisible('about');
+        $showAcademicsMenu = $pageVisible('programs');
+        $showAdmissionsMenu = $pageVisible('admissions');
+        $showStudentLifeMenu = $pageVisible('news');
+        $fontStacks = [
+            'open-sans' => '"Open Sans", ui-sans-serif, system-ui, sans-serif',
+            'inter' => '"Inter", ui-sans-serif, system-ui, sans-serif',
+            'nunito' => '"Nunito", ui-sans-serif, system-ui, sans-serif',
+            'lato' => '"Lato", ui-sans-serif, system-ui, sans-serif',
+            'playfair-display' => '"Playfair Display", Georgia, ui-serif, serif',
+            'merriweather' => '"Merriweather", Georgia, ui-serif, serif',
+            'lora' => '"Lora", Georgia, ui-serif, serif',
+            'source-serif-4' => '"Source Serif 4", Georgia, ui-serif, serif',
+        ];
+        $siteBrand = \App\Models\CollegeSetting::get('website_theme_brand', '#6B2D39');
+        $siteBrandDark = \App\Models\CollegeSetting::get('website_theme_brand_dark', '#5a2430');
+        $siteGold = \App\Models\CollegeSetting::get('website_theme_gold', '#c4973a');
+        $siteFooterBg = \App\Models\CollegeSetting::get('website_theme_footer_bg', '#1A1A1A');
+        $siteBodyBg = \App\Models\CollegeSetting::get('website_theme_body_bg', '#F8FAFC');
+        $siteSurface = \App\Models\CollegeSetting::get('website_theme_surface', '#F1F5F9');
+        $siteSansFontKey = \App\Models\CollegeSetting::get('website_font_sans', 'open-sans');
+        $siteDisplayFontKey = \App\Models\CollegeSetting::get('website_font_display', 'playfair-display');
+        $siteSansFont = $fontStacks[$siteSansFontKey] ?? $fontStacks['open-sans'];
+        $siteDisplayFont = $fontStacks[$siteDisplayFontKey] ?? $fontStacks['playfair-display'];
+        $siteFooterAbout = \App\Models\CollegeSetting::get('website_footer_about', 'Intermediate and college programmes in Astore, Gilgit-Baltistan, aligned with national standards, student welfare, and pathways to universities across Pakistan.');
+        $siteFooterCopyright = \App\Models\CollegeSetting::get('website_footer_copyright', 'Jinnah School & Degree College Astore. All rights reserved.');
+    @endphp
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Lora:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Source+Serif+4:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="{{ asset('assets/css/site.css') }}">
 
+    @stack('styles')
     <style>
         :root {
-            --c-primary:    #6B2D39;
-            --c-primary-dk: #5A2430;
-            --c-gold:       #C4973A;
-            --c-ink:        #1A1A1A;
-            --c-surface:    #F5F5F5;
+            --site-brand: {{ $siteBrand }};
+            --site-brand-dark: {{ $siteBrandDark }};
+            --site-gold: {{ $siteGold }};
+            --site-footer-bg: {{ $siteFooterBg }};
+            --site-body-bg: {{ $siteBodyBg }};
+            --site-surface: {{ $siteSurface }};
+            --site-header-offset: 6rem;
+            --font-sans: {!! $siteSansFont !!};
+            --font-display: {!! $siteDisplayFont !!};
+            --color-brand: {{ $siteBrand }};
+            --color-brand-dark: {{ $siteBrandDark }};
+            --color-gold: {{ $siteGold }};
+            --color-gold-dark: #a07830;
+            --color-surface: {{ $siteBodyBg }};
+            --color-surface-alt: {{ $siteSurface }};
         }
-
-        *, *::before, *::after { box-sizing: border-box; }
-        [x-cloak] { display: none !important; }
-
-        html { scroll-padding-top: 5rem; }
-
-        body {
-            margin: 0;
-            font-family: 'Open Sans', sans-serif;
-            color: var(--c-ink);
-            background-color: var(--c-surface);
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-
-        body ::selection { background: rgba(107,45,57,.20); }
-
-        .font-display { font-family: 'Playfair Display', Georgia, serif; }
-
-        /* ── Scroll reveal ── */
-        .reveal {
-            opacity: 0;
-            transform: translateY(32px);
-            transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
-        }
-        .reveal.from-left  { transform: translateX(-40px); }
-        .reveal.from-right { transform: translateX(40px); }
-        .reveal.is-visible { opacity: 1 !important; transform: none !important; }
-        .reveal.d1 { transition-delay: .08s; }
-        .reveal.d2 { transition-delay: .16s; }
-        .reveal.d3 { transition-delay: .24s; }
-        .reveal.d4 { transition-delay: .32s; }
-        .reveal.d5 { transition-delay: .40s; }
-        .reveal.d6 { transition-delay: .48s; }
-
-        /* ── Hero entry animations ── */
-        @keyframes heroUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        .h-anim-1 { animation: heroUp .65s ease both; }
-        .h-anim-2 { animation: heroUp .65s .10s ease both; }
-        .h-anim-3 { animation: heroUp .65s .20s ease both; }
-        .h-anim-4 { animation: heroUp .65s .32s ease both; }
-        .h-anim-5 { animation: heroUp .65s .44s ease both; }
-
-        /* ── Card hover lift ── */
-        .lift-card {
-            transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease;
-        }
-        .lift-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(0,0,0,.10); }
-
-        /* ── Section gradient divider bar ── */
-        .section-bar {
-            display: block;
-            height: 4px; width: 56px;
-            border-radius: 9999px;
-            background: linear-gradient(90deg, var(--c-primary), var(--c-primary-dk));
-        }
-
-        /* ── Flash ── */
-        @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
-        .flash-msg { animation: slideDown .3s ease-out; }
-
-        /* ── Footer links ── */
-        .footer-link { transition: color .18s; }
-        .footer-link:hover { color: var(--c-gold); }
-
-        /* ── Nav active underline ── */
-        .nav-active {
-            position: relative;
-        }
-        .nav-active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px; left: 0; right: 0;
-            height: 2px;
-            background: var(--c-primary);
-            border-radius: 1px;
-        }
+        .site-body { background-color: var(--site-body-bg); }
+        .site-topbar { background-color: var(--site-brand); }
+        .site-footer { background-color: var(--site-footer-bg); }
+        .site-brand-gradient { background: linear-gradient(135deg, var(--site-brand), var(--site-brand-dark)); }
+        .site-gold-gradient { background: linear-gradient(135deg, var(--site-gold), #a07830); }
+        .site-brand-text { color: var(--site-brand); }
     </style>
-
-    @yield('head')
-    @stack('styles')
 </head>
 
-<body>
+<body class="site-body bg-surface font-sans text-stone-800 antialiased overflow-x-hidden">
 
-{{-- ═══════════════════════════════════════
-     HEADER  (sticky — no offset hack needed)
-     ═══════════════════════════════════════ --}}
-<header class="sticky top-0 z-50" x-data="{ open: false }">
+<a href="#main"
+   class="absolute left-[-9999px] top-0 z-[300] whitespace-nowrap rounded-md bg-white px-4 py-2 text-sm font-semibold text-brand shadow-lg transition-none focus:left-4 focus:top-4 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand">Skip to main content</a>
 
-    {{-- Top info bar (sm+) --}}
-    <div class="hidden sm:block text-xs text-white/90" style="background: var(--c-primary);">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between h-9">
-            <div class="flex items-center gap-5">
-                <a href="tel:+923129776585" class="flex items-center gap-1.5 transition hover:text-white">
-                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                    </svg>
-                    +92 312 9776585
-                </a>
-                <span class="opacity-30">|</span>
-                <a href="mailto:jinnahschooldegreecollege@gmail.com" class="flex items-center gap-1.5 transition hover:text-white">
-                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                    jinnahschooldegreecollege@gmail.com
-                </a>
+<div id="site-preloader"
+     class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-gradient-to-br from-brand via-brand to-brand-dark transition-opacity duration-500 ease-out motion-reduce:duration-150"
+     role="status" aria-live="polite" aria-busy="true">
+    <p class="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">JDCA</p>
+    <div
+        class="mt-8 h-10 w-10 rounded-full border-[3px] border-white/25 border-t-white motion-reduce:animate-none motion-reduce:border-white/60 animate-spin"
+        aria-hidden="true"></div>
+    <span class="sr-only">Loading</span>
+</div>
+
+<header id="siteHeader" class="fixed inset-x-0 top-0 z-50 text-white">
+    <div class="site-topbar px-4 py-2 text-[11px] sm:text-xs">
+        <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 sm:px-2">
+            <div class="min-w-0 flex flex-1 flex-wrap items-center gap-x-3 gap-y-1 text-white/95 sm:gap-x-4">
+                <a href="tel:{{ preg_replace('/\s+/', '', $college->phone ?? '') }}" class="transition hover:text-white">{{ $college->phone ?? '+92 312 9776585' }}</a>
+                <span class="hidden text-white/40 sm:inline" aria-hidden="true">|</span>
+                <a href="mailto:{{ $college->email ?? '' }}" class="transition hover:text-white">{{ $college->email ?? 'jinnahschooldegreecollege@gmail.com' }}</a>
             </div>
-            <a href="{{ route('admissions') }}" class="font-semibold transition hover:text-white">Apply Now</a>
+            <div class="flex items-center gap-4">
+                <a href="{{ route('portal.login') }}" class="hidden transition hover:text-white sm:inline">Student Portal</a>
+            </div>
         </div>
     </div>
-
-    {{-- Main nav bar --}}
-    <div class="border-b border-white/10 text-white"
-         style="background: rgba(30,12,12,.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 flex items-center justify-between h-14 sm:h-16 gap-4">
-
-            {{-- Logo --}}
-            <a href="{{ route('home') }}" class="flex items-center gap-2.5 shrink-0 min-w-0">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-xs font-bold sm:h-10 sm:w-10 sm:text-sm"
-                      style="color: var(--c-primary);">JDCA</span>
-                <div class="hidden sm:block min-w-0">
-                    <p class="font-display font-semibold text-white text-base leading-tight truncate">Jinnah School &amp; Degree College</p>
-                    <p class="text-white/50 text-[10px] leading-tight">Astore, Gilgit-Baltistan</p>
-                </div>
+    <div class="border-b border-white/15 bg-black/30 backdrop-blur-md">
+        <div class="mx-auto grid min-w-0 max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 sm:px-6 sm:py-3.5 sm:gap-4 xl:grid-cols-[auto_minmax(0,1fr)_auto]">
+            <a href="{{ route('home') }}" class="flex min-w-0 max-w-[70vw] items-center gap-2 sm:max-w-none">
+                <span class="site-gold-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-lg shadow-gold/30 text-sm font-black tracking-tighter text-white sm:h-11 sm:w-11 sm:text-base" aria-hidden="true">{{ $college->short_name ?? 'JDCA' }}</span>
+                <span class="truncate font-display text-lg font-semibold tracking-tight sm:text-xl">{{ $college->college_name ?? 'Jinnah School & Degree College' }}</span>
             </a>
 
-            {{-- Desktop nav --}}
-            @php
-                $navLinks = [
-                    ['Home','home'],['About','about'],['Programs','programs'],
-                    ['Faculty','faculty'],['Admissions','admissions'],
-                    ['News','news'],['Notices','notices'],['Results','results'],['Contact','contact'],
-                ];
-            @endphp
-            <ul class="hidden lg:flex items-center gap-0.5 list-none text-sm flex-1 justify-center">
-                @foreach($navLinks as [$label,$routeName])
-                <li>
-                    <a href="{{ route($routeName) }}"
-                       class="block rounded-md px-2 py-1.5 text-white/80 transition hover:bg-white/10 hover:text-white whitespace-nowrap
-                              {{ request()->routeIs($routeName) || request()->routeIs($routeName.'.*') ? '!text-white font-semibold nav-active' : '' }}">
-                        {{ $label }}
-                    </a>
-                </li>
-                @endforeach
+            <ul class="hidden min-w-0 list-none items-center justify-end gap-1 text-[12px] xl:flex xl:flex-nowrap xl:gap-2 2xl:gap-3" role="menubar">
+                <li><a href="{{ route('home') }}" class="nav-link">Home</a></li>
+
+                @if($showAboutMenu)
+                    <li class="group relative">
+                        <a href="{{ route('about') }}" class="nav-link flex items-center gap-0.5">
+                            <span>About Us</span>
+                            <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+                        </a>
+                        <ul class="invisible absolute left-0 z-50 mt-0 w-56 origin-top -translate-y-1 scale-95 list-none rounded-xl bg-white py-2 text-stone-800 opacity-0 shadow-xl shadow-stone-900/10 pointer-events-none transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
+                            <li><a href="{{ route('about') }}" class="dropdown-link">About Overview</a></li>
+                            @if($pageVisible('about-history'))
+                                <li><a href="{{ route('about.history') }}" class="dropdown-link">History & Location</a></li>
+                            @endif
+                            @if($pageVisible('about-mission'))
+                                <li><a href="{{ route('about.mission') }}" class="dropdown-link">Mission & Vision</a></li>
+                            @endif
+                            @if($pageVisible('faculty'))
+                                <li><a href="{{ route('faculty') }}" class="dropdown-link">Faculty & Leadership</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                @if($showAcademicsMenu)
+                    <li class="group relative">
+                        <a href="{{ route('programs') }}" class="nav-link flex items-center gap-0.5">
+                            <span>Academics</span>
+                            <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+                        </a>
+                        <ul class="invisible absolute left-0 z-50 mt-0 w-56 origin-top -translate-y-1 scale-95 list-none rounded-xl bg-white py-2 text-stone-800 opacity-0 shadow-xl shadow-stone-900/10 pointer-events-none transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
+                            <li><a href="{{ route('programs') }}" class="dropdown-link">All Programs</a></li>
+                            @if($pageVisible('gallery'))
+                                <li><a href="{{ route('gallery') }}" class="dropdown-link">Campus Gallery</a></li>
+                            @endif
+                            @if($pageVisible('timetable'))
+                                <li><a href="{{ route('timetable') }}" class="dropdown-link">Timetable</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                @if($showAdmissionsMenu)
+                    <li class="group relative">
+                        <a href="{{ route('admissions') }}" class="nav-link flex items-center gap-0.5">
+                            <span>Admission</span>
+                            <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+                        </a>
+                        <ul class="invisible absolute left-0 z-50 mt-0 w-56 origin-top -translate-y-1 scale-95 list-none rounded-xl bg-white py-2 text-stone-800 opacity-0 shadow-xl shadow-stone-900/10 pointer-events-none transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
+                            <li><a href="{{ route('admissions') }}" class="dropdown-link">Admission Procedure</a></li>
+                            <li><a href="{{ route('admissions') }}#online-application" class="dropdown-link">Apply Online</a></li>
+                            @if($pageVisible('contact'))
+                                <li><a href="{{ route('contact') }}" class="dropdown-link">Contact Admissions</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                @if($showStudentLifeMenu)
+                    <li class="group relative">
+                        <a href="{{ route('news') }}" class="nav-link flex items-center gap-0.5">
+                            <span>Student Life</span>
+                            <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+                        </a>
+                        <ul class="invisible absolute left-0 z-50 mt-0 w-56 origin-top -translate-y-1 scale-95 list-none rounded-xl bg-white py-2 text-stone-800 opacity-0 shadow-xl shadow-stone-900/10 pointer-events-none transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
+                            <li><a href="{{ route('news') }}" class="dropdown-link">News & Updates</a></li>
+                            @if($pageVisible('events'))
+                                <li><a href="{{ route('events') }}" class="dropdown-link">Events & Activities</a></li>
+                            @endif
+                            @if($pageVisible('notices'))
+                                <li><a href="{{ route('notices') }}" class="dropdown-link">Notices & Circulars</a></li>
+                            @endif
+                            @if($pageVisible('results'))
+                                <li><a href="{{ route('results') }}" class="dropdown-link">Exam Results</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+                @if($pageVisible('contact'))
+                    <li><a href="{{ route('contact') }}" class="nav-link">Contact Us</a></li>
+                @endif
             </ul>
 
-            {{-- Right: Apply + hamburger --}}
-            <div class="flex shrink-0 items-center gap-2">
-                <a href="{{ route('admissions') }}"
-                   class="hidden lg:inline-flex items-center rounded-md bg-white px-4 py-1.5 text-sm font-semibold transition hover:bg-white/90"
-                   style="color: var(--c-primary);">
-                    Apply online
-                </a>
-                <button @click="open = !open"
-                        class="lg:hidden flex items-center justify-center w-9 h-9 rounded-md transition hover:bg-white/10 text-white"
-                        :aria-expanded="open.toString()" aria-label="Toggle menu">
-                    <svg x-show="!open" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                    <svg x-show="open" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
+            <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
+                @if($showAdmissionsMenu)
+                    <a href="{{ route('admissions') }}"
+                       class="site-gold-gradient hidden rounded-md px-3 py-2 text-xs font-semibold text-white shadow-md shadow-gold/30 transition hover:shadow-lg hover:shadow-gold/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand xl:inline-flex xl:shrink-0 xl:text-sm">Apply Now</a>
+                @endif
+                <button type="button" id="menuToggle"
+                        class="flex items-center gap-2 rounded-lg p-2 xl:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand"
+                        aria-expanded="false" aria-controls="mobileMenu" aria-label="Open navigation menu">
+                    <div id="hamburger" class="flex h-[18px] w-6 flex-col justify-center gap-1.5" aria-hidden="true">
+                        <span id="hb1" class="block h-0.5 w-full origin-center rounded bg-white transition-all duration-300"></span>
+                        <span id="hb2" class="block h-0.5 w-full rounded bg-white transition-all duration-300"></span>
+                        <span id="hb3" class="block h-0.5 w-full origin-center rounded bg-white transition-all duration-300"></span>
+                    </div>
                 </button>
             </div>
-
         </div>
 
-        {{-- Mobile menu --}}
-        <nav x-show="open" x-cloak
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 -translate-y-1"
-             x-transition:enter-end="opacity-100 translate-y-0"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100 translate-y-0"
-             x-transition:leave-end="opacity-0 -translate-y-1"
-             class="lg:hidden border-t border-white/10"
-             style="background: var(--c-primary);">
-            <div class="mx-auto max-w-6xl px-4 py-3 space-y-0.5">
-                @foreach($navLinks as [$label,$routeName])
-                <a href="{{ route($routeName) }}" @click="open = false"
-                   class="block rounded-lg px-4 py-2.5 text-sm text-white/90 transition hover:bg-white/10 hover:text-white
-                          {{ request()->routeIs($routeName) ? '!text-white font-semibold bg-white/15' : '' }}">
-                    {{ $label }}
-                </a>
-                @endforeach
-                <div class="pt-2 pb-1">
-                    <a href="{{ route('admissions') }}" @click="open = false"
-                       class="flex items-center justify-center w-full rounded-lg bg-white px-6 py-3 text-sm font-semibold"
-                       style="color: var(--c-primary);">
-                        Apply Now — Admissions 2025
-                    </a>
-                </div>
+        <nav id="mobileMenu"
+             class="absolute left-0 right-0 top-full z-40 hidden max-h-[min(85dvh,36rem)] overflow-y-auto overscroll-contain bg-brand pb-[env(safe-area-inset-bottom,0px)] shadow-lg shadow-stone-900/25 xl:hidden"
+             aria-label="Mobile navigation">
+            <div class="mx-auto max-w-6xl px-4">
+                <ul class="flex list-none flex-col gap-0.5 py-3 text-white">
+                    <li><a href="{{ route('home') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Home</a></li>
+                    @if($showAboutMenu)
+                        <li><a href="{{ route('about') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">About Us</a></li>
+                    @endif
+                    @if($showAcademicsMenu)
+                        <li><a href="{{ route('programs') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Academics</a></li>
+                    @endif
+                    @if($showAdmissionsMenu)
+                        <li><a href="{{ route('admissions') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Admission</a></li>
+                    @endif
+                    @if($showStudentLifeMenu)
+                        <li><a href="{{ route('news') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Student Life</a></li>
+                    @endif
+                    <li><a href="{{ route('portal.login') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Student Portal</a></li>
+                    @if($pageVisible('contact'))
+                        <li><a href="{{ route('contact') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Contact Us</a></li>
+                    @endif
+                </ul>
             </div>
         </nav>
     </div>
-
 </header>
 
-{{-- Flash messages --}}
-@if(session('success') || session('error') || session('warning') || $errors->any())
-<div class="mx-auto max-w-6xl px-4 sm:px-6 pt-4 space-y-3">
-    @if(session('success'))
-    <div class="flash-msg flex items-start gap-3 p-4 rounded-xl bg-green-50 border border-green-200 text-green-800 text-sm shadow-sm" x-data="{ show: true }" x-show="show">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span class="flex-1">{{ session('success') }}</span>
-        <button @click="show=false" class="text-green-400 hover:text-green-700 transition"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-    </div>
-    @endif
-    @if(session('error'))
-    <div class="flash-msg flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm shadow-sm" x-data="{ show: true }" x-show="show">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span class="flex-1">{{ session('error') }}</span>
-        <button @click="show=false" class="text-red-400 hover:text-red-700 transition"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-    </div>
-    @endif
-    @if(session('warning'))
-    <div class="flash-msg flex items-start gap-3 p-4 rounded-xl bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm shadow-sm" x-data="{ show: true }" x-show="show">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        <span class="flex-1">{{ session('warning') }}</span>
-        <button @click="show=false" class="text-yellow-400 hover:text-yellow-700 transition"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-    </div>
-    @endif
-    @if($errors->any())
-    <div class="flash-msg flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm shadow-sm" x-data="{ show: true }" x-show="show">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <div class="flex-1">
-            <p class="font-semibold mb-1">Please fix the following errors:</p>
-            <ul class="list-disc list-inside space-y-0.5 text-red-700">
-                @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
-            </ul>
-        </div>
-        <button @click="show=false" class="text-red-400 hover:text-red-700 transition"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-    </div>
-    @endif
-</div>
-@endif
-
-{{-- ═══════════════════════════════════════
-     MAIN CONTENT
-     ═══════════════════════════════════════ --}}
-<main>
+<main id="main" tabindex="-1"
+      class="site-main outline-none [&_h1]:font-display [&_h2]:font-display [&_h3]:font-sans [&_h4]:font-sans [&_h1]:tracking-tight [&_h2]:tracking-tight [&_h3]:tracking-tight [&_h4]:tracking-tight">
     @yield('content')
 </main>
 
-{{-- ═══════════════════════════════════════
-     FOOTER
-     ═══════════════════════════════════════ --}}
-<footer style="background: var(--c-ink);" class="text-gray-300">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 pt-14 pb-10">
-        <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-
-            {{-- Brand --}}
-            <div>
-                <div class="flex items-center gap-3 mb-5">
-                    <div class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--c-primary);">
-                        <span class="text-white font-bold text-xs">JDCA</span>
-                    </div>
-                    <div>
-                        <p class="font-semibold text-sm text-white leading-snug">Jinnah School &amp; Degree</p>
-                        <p class="text-xs text-gray-500">College Astore, GB</p>
-                    </div>
-                </div>
-                <p class="text-sm text-gray-400 leading-relaxed mb-4">Committed to quality education in Gilgit-Baltistan since 2010. Empowering students with knowledge and vision.</p>
-                <p class="text-xs text-gray-500 mb-5">Affiliated with <span class="font-semibold" style="color: var(--c-gold);">KIU, Gilgit-Baltistan</span></p>
-                <div class="flex items-center gap-3">
-                    <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" class="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-700 hover:bg-blue-600 transition">
-                        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    </a>
-                    <a href="https://twitter.com" target="_blank" rel="noopener" aria-label="Twitter" class="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-700 hover:bg-sky-500 transition">
-                        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    </a>
-                    <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube" class="w-9 h-9 rounded-lg flex items-center justify-center bg-gray-700 hover:bg-red-600 transition">
-                        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                    </a>
-                </div>
+<footer class="site-footer px-4 py-14 text-white sm:px-6 sm:py-16">
+    <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+        <div class="text-left">
+            <div class="mb-4 flex items-center gap-2">
+                <span class="site-gold-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-lg shadow-gold/30 text-sm font-black tracking-tighter text-white" aria-hidden="true">{{ $college->short_name ?? 'JDCA' }}</span>
+                <span class="font-display text-xl font-semibold">{{ $college->college_name ?? 'Jinnah School & Degree College' }}</span>
             </div>
-
-            {{-- Quick Links --}}
-            <div>
-                <h3 class="text-white font-bold text-xs uppercase tracking-widest mb-5 pb-2 border-b border-gray-700/80">Quick Links</h3>
-                <ul class="space-y-2.5 list-none">
-                    @foreach([['Home','home'],['About Us','about'],['Programs','programs'],['Faculty','faculty'],['Admissions','admissions'],['News','news'],['Notices','notices'],['Results','results'],['Contact','contact']] as [$l,$r])
-                    <li><a href="{{ route($r) }}" class="footer-link flex items-center gap-2 text-sm text-gray-400">
-                        <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>{{ $l }}</a></li>
-                    @endforeach
-                </ul>
-            </div>
-
-            {{-- Programs --}}
-            <div>
-                <h3 class="text-white font-bold text-xs uppercase tracking-widest mb-5 pb-2 border-b border-gray-700/80">Programs</h3>
-                <ul class="space-y-2.5 list-none">
-                    @php $footerPrograms = isset($programs) && $programs->count() ? $programs : \App\Models\AcademicProgram::query()->limit(6)->get(); @endphp
-                    @foreach($footerPrograms->take(6) as $fp)
-                    <li><a href="{{ route('programs') }}" class="footer-link flex items-center gap-2 text-sm text-gray-400">
-                        <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                        {{ $fp->name ?? 'Program' }}</a></li>
-                    @endforeach
-                </ul>
-            </div>
-
-            {{-- Contact --}}
-            <div>
-                <h3 class="text-white font-bold text-xs uppercase tracking-widest mb-5 pb-2 border-b border-gray-700/80">Contact Us</h3>
-                <ul class="space-y-4 mb-6 list-none">
-                    <li class="flex items-start gap-3">
-                        <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--c-gold)"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <span class="text-sm text-gray-400 leading-relaxed">Astore, Gilgit-Baltistan, Pakistan</span>
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--c-gold)"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                        <a href="tel:+923129776585" class="footer-link text-sm text-gray-400">+92 312 9776585</a>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--c-gold)"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        <a href="mailto:jinnahschooldegreecollege@gmail.com" class="footer-link text-sm text-gray-400 break-all">jinnahschooldegreecollege@gmail.com</a>
-                    </li>
-                </ul>
-                <div class="border-t border-gray-700 pt-4 space-y-2.5">
-                    <a href="{{ route('portal.login') }}" class="flex items-center gap-2 text-sm font-semibold" style="color:var(--c-gold)">
-                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        Student Portal
-                    </a>
-                    <a href="{{ route('filament.admin.auth.login') }}" class="footer-link flex items-center gap-2 text-sm text-gray-400">
-                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                        Staff Login
-                    </a>
-                </div>
-            </div>
-
+            <p class="text-sm leading-relaxed text-stone-400">
+                {{ $siteFooterAbout }}
+            </p>
+        </div>
+        <div class="text-left">
+            <p class="mb-4 font-display text-xl font-semibold text-white">About & Academics</p>
+            <ul class="space-y-2.5 text-sm text-stone-400">
+                <li><a href="{{ route('home') }}" class="transition hover:text-white">Home</a></li>
+                @if($pageVisible('about'))
+                    <li><a href="{{ route('about') }}" class="transition hover:text-white">About Us</a></li>
+                @endif
+                @if($pageVisible('programs'))
+                    <li><a href="{{ route('programs') }}" class="transition hover:text-white">Programs</a></li>
+                @endif
+                @if($pageVisible('faculty'))
+                    <li><a href="{{ route('faculty') }}" class="transition hover:text-white">Faculty Profile</a></li>
+                @endif
+            </ul>
+        </div>
+        <div class="text-left">
+            <p class="mb-4 font-display text-xl font-semibold text-white">Quick Links</p>
+            <ul class="space-y-2.5 text-sm text-stone-400">
+                @if($pageVisible('admissions'))
+                    <li><a href="{{ route('admissions') }}" class="transition hover:text-white">Admissions</a></li>
+                @endif
+                @if($pageVisible('news'))
+                    <li><a href="{{ route('news') }}" class="transition hover:text-white">News & Updates</a></li>
+                @endif
+                @if($pageVisible('events'))
+                    <li><a href="{{ route('events') }}" class="transition hover:text-white">Events & Activities</a></li>
+                @endif
+                @if($pageVisible('notices'))
+                    <li><a href="{{ route('notices') }}" class="transition hover:text-white">Notices</a></li>
+                @endif
+                @if($pageVisible('results'))
+                    <li><a href="{{ route('results') }}" class="transition hover:text-white">Results</a></li>
+                @endif
+                <li><a href="{{ route('portal.login') }}" class="transition hover:text-white">Student Portal</a></li>
+            </ul>
+        </div>
+        <div class="text-left">
+            <p class="mb-4 font-display text-xl font-semibold text-white">Contact</p>
+            <ul class="space-y-2.5 text-sm text-stone-400">
+                <li>{{ $college->address ?? 'Astore, Gilgit-Baltistan, Pakistan' }}</li>
+                <li><a href="tel:{{ preg_replace('/\s+/', '', $college->phone ?? '') }}" class="transition hover:text-white">{{ $college->phone ?? '+92 312 9776585' }}</a></li>
+                <li><a href="mailto:{{ $college->email ?? '' }}" class="transition hover:text-white">{{ $college->email ?? 'jinnahschooldegreecollege@gmail.com' }}</a></li>
+                @if($pageVisible('contact'))
+                    <li><a href="{{ route('contact') }}" class="transition hover:text-white">Contact Us</a></li>
+                @endif
+            </ul>
         </div>
     </div>
-    <div class="border-t border-gray-800">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p class="text-xs text-gray-500">&copy; {{ date('Y') }} Jinnah School &amp; Degree College Astore. Affiliated with KIU, Gilgit-Baltistan.</p>
-            <p class="text-xs text-gray-600">Designed with &#10084;&#65039; for education</p>
+    <div class="mx-auto mt-12 max-w-6xl border-t border-white/10 pt-8">
+        <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <p class="text-xs text-stone-500 sm:text-sm">&copy; {{ date('Y') }} {{ $siteFooterCopyright }}</p>
+            <div class="flex flex-wrap items-center justify-center gap-4 text-stone-400" aria-label="Legal and utility links">
+                <a href="{{ route('contact') }}" class="transition hover:text-white">Privacy</a>
+                <a href="{{ route('contact') }}" class="transition hover:text-white">Terms of Service</a>
+            </div>
         </div>
     </div>
 </footer>
 
+<script src="{{ asset('assets/js/site.js') }}" defer></script>
 <script>
-(function(){
-    if('IntersectionObserver' in window){
-        var ro = new IntersectionObserver(function(e){ e.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('is-visible'); ro.unobserve(x.target); } }); },{threshold:.10});
-        document.querySelectorAll('.reveal').forEach(function(el){ ro.observe(el); });
-    } else { document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('is-visible'); }); }
+    (() => {
+        const syncSiteHeaderOffset = () => {
+            const siteHeader = document.getElementById('siteHeader');
 
-    function animCount(el){
-        var t=parseInt(el.getAttribute('data-counter'),10), s=el.getAttribute('data-suffix')||'+', d=1600, t0=performance.now();
-        (function tick(now){ var p=Math.min((now-t0)/d,1), v=1-Math.pow(1-p,3); el.textContent=Math.floor(v*t).toLocaleString()+s; if(p<1) requestAnimationFrame(tick); })(t0);
-    }
-    if('IntersectionObserver' in window){
-        var co=new IntersectionObserver(function(e){ e.forEach(function(x){ if(x.isIntersecting){ animCount(x.target); co.unobserve(x.target); } }); },{threshold:.5});
-        document.querySelectorAll('[data-counter]').forEach(function(el){ co.observe(el); });
-    }
-})();
+            if (! siteHeader) {
+                return;
+            }
+
+            document.documentElement.style.setProperty('--site-header-offset', `${siteHeader.offsetHeight}px`);
+        };
+
+        document.addEventListener('DOMContentLoaded', syncSiteHeaderOffset);
+        window.addEventListener('load', syncSiteHeaderOffset);
+        window.addEventListener('resize', syncSiteHeaderOffset);
+
+        const siteHeader = document.getElementById('siteHeader');
+
+        if (siteHeader && 'ResizeObserver' in window) {
+            new ResizeObserver(syncSiteHeaderOffset).observe(siteHeader);
+        }
+    })();
 </script>
-
 @stack('scripts')
 </body>
 </html>

@@ -19,6 +19,7 @@ class AcademicProgramFactory extends Factory
             'slug'            => Str::slug($name),
             'code'            => strtoupper($this->faker->unique()->bothify('??###')),
             'degree_type'     => 'bs',
+            'admission_category' => 'undergraduate',
             'duration_years'  => 4,
             'total_semesters' => 8,
             'is_active'       => true,

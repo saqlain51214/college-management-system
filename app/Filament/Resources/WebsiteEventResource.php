@@ -16,8 +16,8 @@ class WebsiteEventResource extends Resource
     protected static ?string $model = WebsiteEvent::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-calendar-days';
-    protected static ?string $navigationGroup = 'System';
-    protected static ?string $navigationLabel = 'Events & Activities';
+    protected static ?string $navigationGroup = 'Website Management';
+    protected static ?string $navigationLabel = 'Events';
     protected static ?int    $navigationSort  = 3;
 
     public static function form(Form $form): Form
@@ -44,7 +44,7 @@ class WebsiteEventResource extends Resource
                     Forms\Components\Toggle::make('is_published')->label('Published')->default(true)->onColor('success'),
                     Forms\Components\Toggle::make('is_featured')->label('Featured on Homepage')->default(false)->onColor('warning'),
 
-                    Forms\Components\FileUpload::make('featured_image')->image()->directory('website/events')->maxSize(2048)->columnSpanFull(),
+                    Forms\Components\FileUpload::make('featured_image')->image()->disk('public')->directory('website/events')->maxSize(2048)->columnSpanFull(),
                     Forms\Components\Textarea::make('description')->label('Event Description')->rows(4)->columnSpanFull(),
                 ]),
         ]);
@@ -87,5 +87,3 @@ class WebsiteEventResource extends Resource
         ];
     }
 }
-
-

@@ -1,0 +1,46 @@
+/* MySchool College — shared polish (Tailwind handles layout; this aligns tone & anchors) */
+:root {
+  --site-brand: #6b2d39;
+  --site-brand-dark: #5a2430;
+  --site-ink: #1a1a1a;
+  --site-surface: #f5f5f5;
+}
+
+html {
+  scroll-padding-top: 7rem;
+}
+
+@media (min-width: 1280px) {
+  html {
+    scroll-padding-top: 8.5rem;
+  }
+}
+
+body.site-body {
+  text-rendering: optimizeLegibility;
+}
+
+.site-body ::selection {
+  background-color: rgba(107, 45, 57, 0.2);
+}
+
+main.site-main {
+  position: relative;
+}
+
+/* Soft depth on common content cards (Tailwind-rounded articles) */
+@media (hover: hover) and (pointer: fine) {
+  main.site-main article.rounded-xl.border[class*='border-stone-200'] {
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+
+  main.site-main article.rounded-xl.border[class*='border-stone-200']:hover {
+    box-shadow: 0 22px 48px -28px rgba(26, 26, 26, 0.14);
+    transform: translateY(-2px);
+  }
+}
+
+/* Page heroes (ink band under fixed header) */
+main.site-main > section.relative.overflow-hidden.bg-ink:first-of-type {
+  box-shadow: 0 18px 40px -20px rgba(107, 45, 57, 0.35);
+}

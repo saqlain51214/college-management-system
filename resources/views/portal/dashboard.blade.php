@@ -3,10 +3,11 @@
 @section('content')
 
 {{-- Welcome banner --}}
-<div class="rounded-2xl p-6 mb-6 relative overflow-hidden" style="background: linear-gradient(135deg, #1e3a5f 0%, #2a4f80 100%)">
+<div class="rounded-3xl p-6 sm:p-7 mb-6 relative overflow-hidden shadow-2xl" style="background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 48%, #0f172a 100%)">
+  <div class="absolute inset-0 opacity-40" style="background: radial-gradient(circle at top right, rgba(196,151,58,0.45), transparent 22%)"></div>
   <div class="relative flex flex-col sm:flex-row sm:items-start justify-between gap-4">
     <div>
-      <div class="text-sm mb-1" style="color: rgba(255,255,255,0.5)">
+      <div class="text-sm mb-1" style="color: rgba(255,255,255,0.6)">
         {{ now()->hour < 12 ? 'Good Morning' : (now()->hour < 17 ? 'Good Afternoon' : 'Good Evening') }},
       </div>
       <h2 class="text-white text-2xl font-bold">{{ $student->name }}</h2>
@@ -28,6 +29,10 @@
               style="background: rgba(196,151,58,0.25); color: #f4cc80">
           {{ $student->status instanceof \BackedEnum ? $student->status->value : ($student->status ?? 'active') }}
         </span>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <a href="{{ route('portal.results') }}" class="portal-chip">View Latest Results</a>
+        <a href="{{ route('portal.fees') }}" class="portal-chip" style="background: rgba(196,151,58,0.16); color: #fde68a; border-color: rgba(245,158,11,0.2)">Fee Summary</a>
       </div>
     </div>
     <div class="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white font-black text-2xl hidden sm:flex"
@@ -81,10 +86,10 @@
   @endphp
 
   @foreach($cards as $c)
-  <div class="bg-white rounded-2xl p-5" style="border: 1px solid {{ $c['border'] }}">
+  <div class="portal-stat-card rounded-2xl p-5">
     <div class="flex items-center justify-between mb-3">
       <span class="text-xs font-semibold uppercase tracking-wide" style="color: #9ca3af">{{ $c['label'] }}</span>
-      <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: {{ $c['bg'] }}">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: {{ $c['bg'] }}20; border: 1px solid {{ $c['color'] }}33">
         <svg class="w-5 h-5" style="color: {{ $c['color'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="{{ $c['icon'] }}"/>
         </svg>
@@ -100,7 +105,7 @@
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
   {{-- Recent Results (2/3 width) --}}
-  <div class="xl:col-span-2 bg-white rounded-2xl overflow-hidden" style="border: 1px solid #e5e7eb">
+  <div class="xl:col-span-2 portal-card rounded-2xl overflow-hidden">
     <div class="flex items-center justify-between px-6 py-4" style="border-bottom: 1px solid #f3f4f6">
       <div>
         <h3 class="font-semibold text-gray-800">Recent Exam Results</h3>
@@ -108,8 +113,7 @@
       </div>
       <a href="{{ route('portal.results') }}"
          class="text-xs font-semibold px-3 py-1.5 rounded-lg transition"
-         style="color: #1e3a5f; background: #eff6ff"
-         onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+         style="color: #dbeafe; background: rgba(59,130,246,0.14); border: 1px solid rgba(96,165,250,0.16)">
         View All →
       </a>
     </div>
@@ -173,10 +177,10 @@
   </div>
 
   {{-- Right column: Notices + Quick Actions --}}
-  <div class="space-y-5">
+    <div class="space-y-5">
 
     {{-- Notices --}}
-    <div class="bg-white rounded-2xl overflow-hidden" style="border: 1px solid #e5e7eb">
+    <div class="portal-card rounded-2xl overflow-hidden">
       <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid #f3f4f6">
         <h3 class="font-semibold text-gray-800 text-sm">Recent Notices</h3>
         <a href="{{ route('portal.notices') }}"
@@ -205,7 +209,7 @@
     </div>
 
     {{-- Quick Actions --}}
-    <div class="bg-white rounded-2xl p-5" style="border: 1px solid #e5e7eb">
+    <div class="portal-card rounded-2xl p-5">
       <h3 class="font-semibold text-gray-800 text-sm mb-3">Quick Actions</h3>
       <div class="space-y-1.5">
         @foreach([
@@ -216,7 +220,7 @@
         ] as $qa)
         <a href="{{ route($qa['route']) }}"
            class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group">
-          <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: {{ $qa['bg'] }}">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background: {{ $qa['bg'] }}20; border: 1px solid {{ $qa['ic'] }}33">
             <svg class="w-4 h-4" style="color: {{ $qa['ic'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $qa['icon'] }}"/>
             </svg>

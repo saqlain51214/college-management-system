@@ -76,7 +76,7 @@ class Student extends Model implements AuthenticatableContract
     protected function portalPassword(): Attribute
     {
         return Attribute::make(
-            set: fn(string $value) => \Illuminate\Support\Facades\Hash::make($value)
+            set: fn(?string $value) => filled($value) ? \Illuminate\Support\Facades\Hash::make($value) : null
         );
     }
 

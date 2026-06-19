@@ -6,8 +6,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AdmissionInquiry extends Model
 {
     protected $fillable = [
-        'name','father_name','email','phone','program_id',
-        'qualification','message','status','admin_notes',
+        'reference_no','name','father_name','email','phone','student_phone',
+        'entry_path','gender','campus','city','cnic','dob','address','program_id',
+        'qualification','academic_details','declare_true','message','status','admin_notes',
+    ];
+
+    protected $casts = [
+        'dob' => 'date',
+        'academic_details' => 'array',
+        'declare_true' => 'boolean',
     ];
 
     public function program(): BelongsTo { return $this->belongsTo(AcademicProgram::class, 'program_id'); }

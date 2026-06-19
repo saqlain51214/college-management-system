@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AdmissionCategoryEnum;
 use App\Enums\DegreeTypeEnum;
 use App\Enums\StatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +24,7 @@ class AcademicProgram extends Model
         'slug',
         'code',
         'degree_type',
+        'admission_category',
         'duration_years',
         'total_semesters',
         'total_credit_hours',
@@ -37,6 +39,7 @@ class AcademicProgram extends Model
 
     protected $casts = [
         'degree_type'        => DegreeTypeEnum::class,
+        'admission_category' => AdmissionCategoryEnum::class,
         'is_active'          => 'boolean',
         'show_on_website'    => 'boolean',
         'sort_order'         => 'integer',
@@ -52,6 +55,15 @@ class AcademicProgram extends Model
         static::creating(function (self $program) {
             if (empty($program->slug)) {
                 $program->slug = Str::slug($program->name);
+            }
+
+            if (empty($program->admission_category)) {
+                $program->admission_category = self::inferAdmissionCategory(
+                    $program->name,
+                    $program->short_name,
+                    $program->code,
+                    $program->degree_type
+                )->value;
             }
         });
 
@@ -91,6 +103,13 @@ class AcademicProgram extends Model
         return $query->where('department_id', $departmentId);
     }
 
+    public function scopeForAdmissionCategory($query, AdmissionCategoryEnum|string $category)
+    {
+        $value = $category instanceof AdmissionCategoryEnum ? $category->value : $category;
+
+        return $query->where('admission_category', $value);
+    }
+
     // ─── Accessors ───────────────────────────────────────────────────────────
 
     public function getStatusAttribute(): StatusEnum
@@ -103,9 +122,34 @@ class AcademicProgram extends Model
         return $this->banner_image ? asset('storage/' . $this->banner_image) : null;
     }
 
+    public function getAdmissionCategoryLabelAttribute(): string
+    {
+        return $this->admission_category?->label() ?? 'Other / Not for Online Admission';
+    }
+
     public function getDurationLabelAttribute(): string
     {
         return "{$this->duration_years} Year" . ($this->duration_years > 1 ? 's' : '')
             . " / {$this->total_semesters} Semesters";
+    }
+
+    public static function inferAdmissionCategory(
+        ?string $name,
+        ?string $shortName,
+        ?string $code,
+        DegreeTypeEnum|string|null $degreeType
+    ): AdmissionCategoryEnum {
+        $haystack = Str::lower(trim(implode(' ', array_filter([$name, $shortName, $code]))));
+
+        if ($haystack !== '' && preg_match('/\b(fa|f\.a|fsc|f\.sc|ics|i\.cs|i\.com|icom|intermediate|pre medical|pre-medical|pre engineering|pre-engineering)\b/', $haystack)) {
+            return AdmissionCategoryEnum::Intermediate;
+        }
+
+        $degreeValue = $degreeType instanceof DegreeTypeEnum ? $degreeType->value : (string) $degreeType;
+
+        return match ($degreeValue) {
+            DegreeTypeEnum::BS->value, DegreeTypeEnum::BEd->value => AdmissionCategoryEnum::Undergraduate,
+            default => AdmissionCategoryEnum::Other,
+        };
     }
 }

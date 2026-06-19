@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Helpers\CollegeHelper;
+use App\Mail\StudentPortalWelcomeMail;
 use App\Models\Department;
 use App\Models\Student;
 use App\Repositories\Interfaces\StudentRepositoryInterface;
+use Illuminate\Support\Facades\Mail;
 
 class StudentService
 {
@@ -14,7 +16,13 @@ class StudentService
     public function createStudent(array $data): Student
     {
         $data['roll_number'] = $this->generateRollNumber($data);
-        return $this->repo->create($data);
+        $student = $this->repo->create($data);
+
+        if (filled($student->email) && config('platform.notifications.send_student_welcome_email', true)) {
+            Mail::to($student->email)->queue(new StudentPortalWelcomeMail($student));
+        }
+
+        return $student;
     }
 
     public function updateStudent(Student $student, array $data): Student

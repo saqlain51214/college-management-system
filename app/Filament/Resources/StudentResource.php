@@ -581,10 +581,10 @@ class StudentResource extends Resource
                             ->label('New Portal Password')
                             ->required()
                             ->minLength(6)
-                            ->helperText('Set a password for the student portal.'),
+                            ->helperText('Default (if not set): student roll number is the password.'),
                     ])
                     ->action(function (Student $record, array $data) {
-                        $record->update(['portal_password' => $data['password']]);
+                        $record->update(['portal_password' => bcrypt($data['password'])]);
                         \Filament\Notifications\Notification::make()->success()->title('Portal password updated.')->send();
                     }),
 

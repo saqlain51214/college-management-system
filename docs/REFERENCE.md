@@ -1,6 +1,6 @@
 # JDCA Dashboard — Quick Reference
 **Jinnah School & Degree College Astore**
-Last updated: 2026-06-16
+Last updated: 2026-06-19
 
 ---
 
@@ -11,21 +11,42 @@ Last updated: 2026-06-16
 | Role | Email | Password | Access Level |
 |------|-------|----------|--------------|
 | super_admin | jinnahschooldegreecollege@gmail.com | admin@1234 | Full access — all modules, settings, permissions |
+| admin | admin@jdca.edu.pk | admin@1234 | Operational admin access |
 | Developer | developer@jdca.edu.pk | dev@1234 | All modules (technical role) |
 | panel_user | staff@jdca.edu.pk | staff@1234 | Limited — assigned by super_admin |
+| teacher | teacher@jdca.edu.pk | teacher@1234 | Admin-side teacher role for permission checks |
+| student | student@jdca.edu.pk | student@1234 | Admin-side student role for permission checks |
 
 ### Student Portal → `/portal/login`
 
 | Name | Roll Number | Password |
 |------|-------------|----------|
-| Muhammad Ali Khan | CS-2024-0001 | student@1234 |
-| Fatima Zahra | CS-2024-0002 | student@1234 |
-| Hamza Raza | CS-2023-0001 | student@1234 |
-| Ayesha Siddiqi | CS-2023-0002 | student@1234 |
-| Usman Tariq | CS-2022-0001 | student@1234 |
+| Ali Raza | JDCA-2026-0001 | student@1234 |
 
 > **Default student password rule:** If no portal_password is set, the student's roll number itself is the password.
 > Admin can reset any student password from: Admin Panel → Students → (key icon action) → Set Portal Password
+
+### Teacher Portal → `/teacher/login`
+
+| Name | Login | Password |
+|------|-------|----------|
+| Muhammad Bilal | `teacher@jdca.edu.pk` or `JDCA-T-001` | `teacher@1234` |
+
+> **Default teacher password rule:** If no `portal_password` is set, the teacher's employee ID is the password.
+> The teacher user still also exists in `/admin` for admin-side permission checks.
+
+### Teacher Portal Main Routes
+
+| Feature | Route |
+|------|------|
+| Teacher Dashboard | `/teacher` |
+| Timetable | `/teacher/timetable` |
+| Attendance Sessions | `/teacher/attendance` |
+| Mark Attendance | `/teacher/attendance/{session}/mark` |
+| Materials | `/teacher/materials` |
+| Assignments | `/teacher/assignments` |
+| Notices | `/teacher/notices` |
+| Profile | `/teacher/profile` |
 
 ---
 
@@ -81,10 +102,10 @@ php artisan storage:link
 ### Shield (Permissions)
 ```bash
 # Generate permissions for ALL resources
-php artisan shield:generate --all
+php artisan shield:generate --all --panel=admin --no-interaction
 
 # Generate permissions for specific resources only
-php artisan shield:generate --resource="TimetableResource,AdmissionInquiryResource,ContactMessageResource"
+php artisan shield:generate --resource="TimetableResource,AdmissionInquiryResource,ContactMessageResource" --panel=admin --no-interaction
 
 # Assign super_admin role to a user by email
 php artisan shield:super-admin --user=jinnahschooldegreecollege@gmail.com
@@ -140,11 +161,19 @@ Filament Shield manages role-based access to the admin panel.
 | `Developer` | All modules — technical/developer role |
 | `panel_user` | Restricted access — admin assigns specific permissions |
 
+### Current behavior notes
+
+- Only `super_admin` should have full access by default.
+- `Settings` is permission-controlled and should not appear for roles without its page permission.
+- `Dashboard` navigation is hidden when a user has no effective permissions.
+- If you change role visibility or add new resources/pages, regenerate Shield permissions and clear caches.
+
 ### Key commands
 
 ```bash
 # Regenerate permissions after adding new Filament resources
-php artisan shield:generate --all
+php artisan shield:generate --all --panel=admin --no-interaction
+php artisan optimize:clear
 
 # Make a user super_admin
 php artisan shield:super-admin --user=EMAIL_HERE
@@ -160,7 +189,8 @@ Admin Panel → Users → Edit → Role (select from dropdown)
 ### After adding new Filament resources
 New resources won't appear for non-super_admin roles until you run:
 ```bash
-php artisan shield:generate --resource="NewResourceName"
+php artisan shield:generate --resource="NewResourceName" --panel=admin --no-interaction
+php artisan optimize:clear
 ```
 > **Note:** `super_admin` always sees all resources automatically without running this command.
 
@@ -186,6 +216,11 @@ php artisan shield:generate --resource="NewResourceName"
 | Student Fees | `/portal/fees` |
 | Student Timetable | `/portal/timetable` |
 | Student Notices | `/portal/notices` |
+| **Teacher Portal Login** | `/teacher/login` |
+| Teacher Dashboard | `/teacher` |
+| Teacher Attendance | `/teacher/attendance` |
+| Teacher Materials | `/teacher/materials` |
+| Teacher Assignments | `/teacher/assignments` |
 
 ### PDF Downloads (requires admin login)
 | Document | URL |
@@ -221,8 +256,9 @@ php artisan db:seed
 php artisan storage:link
 
 # 6. Permissions (Filament Shield)
-php artisan shield:generate --all
+php artisan shield:generate --all --panel=admin --no-interaction
 php artisan shield:super-admin --user=jinnahschooldegreecollege@gmail.com
+php artisan optimize:clear
 
 # 7. Cache for production
 php artisan optimize

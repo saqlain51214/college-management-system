@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum DegreeTypeEnum: string
 {
+    case Intermediate = 'intermediate';
     case BS          = 'bs';
     case BEd         = 'bed';
     case MS          = 'ms';
@@ -17,6 +18,7 @@ enum DegreeTypeEnum: string
     public function label(): string
     {
         return match($this) {
+            self::Intermediate => 'Intermediate (FA / FSc / ICS / I.Com)',
             self::BS          => 'BS (Bachelor of Science)',
             self::BEd         => 'B.Ed (Bachelor of Education)',
             self::MS          => 'MS (Master of Science)',
@@ -32,6 +34,7 @@ enum DegreeTypeEnum: string
     public function shortLabel(): string
     {
         return match($this) {
+            self::Intermediate => 'Intermediate',
             self::BS          => 'BS',
             self::BEd         => 'B.Ed',
             self::MS          => 'MS',
@@ -47,6 +50,7 @@ enum DegreeTypeEnum: string
     public function color(): string
     {
         return match($this) {
+            self::Intermediate           => 'emerald',
             self::BS, self::BEd         => 'blue',
             self::MS, self::MEd         => 'violet',
             self::MA, self::MSc         => 'indigo',
@@ -59,6 +63,7 @@ enum DegreeTypeEnum: string
     public function defaultDuration(): int
     {
         return match($this) {
+            self::Intermediate           => 2,
             self::BS, self::BEd         => 4,
             self::MS, self::MEd,
             self::MA, self::MSc         => 2,

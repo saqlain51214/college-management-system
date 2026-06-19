@@ -34,14 +34,14 @@ class StudentAuthController extends Controller
             ])->withInput();
         }
 
-        // Verify portal password
+        // If portal_password is set, verify it; otherwise accept roll_number as password
         $valid = $student->portal_password
             ? Hash::check($request->password, $student->portal_password)
-            : false;
+            : ($request->password === $student->roll_number);
 
         if (! $valid) {
             return back()->withErrors([
-                'password' => 'Incorrect password.',
+                'password' => 'Incorrect password. Your default password is your roll number.',
             ])->withInput();
         }
 

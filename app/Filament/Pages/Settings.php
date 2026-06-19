@@ -3,8 +3,9 @@
 namespace App\Filament\Pages;
 
 use App\Models\CollegeSetting;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -16,10 +17,12 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class Settings extends Page implements HasForms
 {
     use InteractsWithForms;
+    use HasPageShield;
 
     protected static ?string $navigationIcon  = 'heroicon-o-cog-6-tooth';
     protected static ?string $navigationLabel = 'Settings';
@@ -177,6 +180,78 @@ class Settings extends Page implements HasForms
                             ->columnSpanFull(),
                     ]),
 
+                Section::make('Website Appearance')
+                    ->icon('heroicon-o-paint-brush')
+                    ->columns(2)
+                    ->schema([
+                        Placeholder::make('appearance_current_summary')
+                            ->label('Current Active Style')
+                            ->content(function (): string {
+                                $state = $this->form->getRawState();
+
+                                return sprintf(
+                                    'Brand %s, Dark %s, Accent %s, Footer %s, Body %s, Surface %s, Body Font %s, Display Font %s',
+                                    $this->normalizeSelectableSetting($state['website_theme_brand'] ?? '#6B2D39'),
+                                    $this->normalizeSelectableSetting($state['website_theme_brand_dark'] ?? '#5A2430'),
+                                    $this->normalizeSelectableSetting($state['website_theme_gold'] ?? '#C4973A'),
+                                    $this->normalizeSelectableSetting($state['website_theme_footer_bg'] ?? '#1A1A1A'),
+                                    $this->normalizeSelectableSetting($state['website_theme_body_bg'] ?? '#F8FAFC'),
+                                    $this->normalizeSelectableSetting($state['website_theme_surface'] ?? '#F1F5F9'),
+                                    $this->normalizeSelectableSetting($state['website_font_sans'] ?? 'open-sans'),
+                                    $this->normalizeSelectableSetting($state['website_font_display'] ?? 'playfair-display')
+                                );
+                            })
+                            ->columnSpanFull(),
+                        Textarea::make('website_footer_about')
+                            ->label('Footer About Text')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        TextInput::make('website_footer_copyright')
+                            ->label('Footer Copyright Text')
+                            ->columnSpanFull(),
+                        Select::make('website_theme_brand')
+                            ->label('Brand Color')
+                            ->options($this->withCurrentOption($this->themeColorOptions(), CollegeSetting::get('website_theme_brand', '#6B2D39')))
+                            ->searchable()
+                            ->native(false)
+                            ->helperText('Preset list includes the current live value so it is not lost.'),
+                        Select::make('website_theme_brand_dark')
+                            ->label('Brand Dark Color')
+                            ->options($this->withCurrentOption($this->themeColorOptions(), CollegeSetting::get('website_theme_brand_dark', '#5A2430')))
+                            ->searchable()
+                            ->native(false),
+                        Select::make('website_theme_gold')
+                            ->label('Accent Color')
+                            ->options($this->withCurrentOption($this->accentColorOptions(), CollegeSetting::get('website_theme_gold', '#C4973A')))
+                            ->searchable()
+                            ->native(false),
+                        Select::make('website_theme_footer_bg')
+                            ->label('Footer Background')
+                            ->options($this->withCurrentOption($this->footerColorOptions(), CollegeSetting::get('website_theme_footer_bg', '#1A1A1A')))
+                            ->searchable()
+                            ->native(false),
+                        Select::make('website_theme_body_bg')
+                            ->label('Global Body Background')
+                            ->options($this->withCurrentOption($this->backgroundColorOptions(), CollegeSetting::get('website_theme_body_bg', '#F8FAFC')))
+                            ->searchable()
+                            ->native(false),
+                        Select::make('website_theme_surface')
+                            ->label('Global Surface Background')
+                            ->options($this->withCurrentOption($this->surfaceColorOptions(), CollegeSetting::get('website_theme_surface', '#F1F5F9')))
+                            ->searchable()
+                            ->native(false),
+                        Select::make('website_font_sans')
+                            ->label('Body Font')
+                            ->options($this->withCurrentOption($this->bodyFontOptions(), CollegeSetting::get('website_font_sans', 'open-sans')))
+                            ->searchable()
+                            ->native(false),
+                        Select::make('website_font_display')
+                            ->label('Heading Font')
+                            ->options($this->withCurrentOption($this->displayFontOptions(), CollegeSetting::get('website_font_display', 'playfair-display')))
+                            ->searchable()
+                            ->native(false),
+                    ]),
+
                 Section::make('Library Settings')
                     ->icon('heroicon-o-book-open')
                     ->columns(2)
@@ -261,6 +336,21 @@ class Settings extends Page implements HasForms
     {
         $data = $this->form->getState();
 
+        foreach ([
+            'website_theme_brand',
+            'website_theme_brand_dark',
+            'website_theme_gold',
+            'website_theme_footer_bg',
+            'website_theme_body_bg',
+            'website_theme_surface',
+            'website_font_sans',
+            'website_font_display',
+        ] as $key) {
+            if (array_key_exists($key, $data)) {
+                $data[$key] = $this->normalizeSelectableSetting($data[$key]);
+            }
+        }
+
         $groups = [
             'college_name'               => 'college',
             'college_name_urdu'          => 'college',
@@ -286,6 +376,16 @@ class Settings extends Page implements HasForms
             'fee_bank_name'              => 'fee',
             'fee_bank_account'           => 'fee',
             'fee_bank_branch'            => 'fee',
+            'website_footer_about'       => 'website',
+            'website_footer_copyright'   => 'website',
+            'website_theme_brand'        => 'website',
+            'website_theme_brand_dark'   => 'website',
+            'website_theme_gold'         => 'website',
+            'website_theme_footer_bg'    => 'website',
+            'website_theme_body_bg'      => 'website',
+            'website_theme_surface'      => 'website',
+            'website_font_sans'          => 'website',
+            'website_font_display'       => 'website',
             'library_issue_days_student' => 'library',
             'library_issue_days_teacher' => 'library',
             'library_fine_per_day'       => 'library',
@@ -307,5 +407,99 @@ class Settings extends Page implements HasForms
             ->title('Settings saved successfully')
             ->success()
             ->send();
+    }
+
+    protected function withCurrentOption(array $options, ?string $current): array
+    {
+        $current = $this->normalizeSelectableSetting($current);
+
+        if (blank($current) || array_key_exists($current, $options)) {
+            return $options;
+        }
+
+        return ['current:' . $current => 'Current (' . $current . ')'] + $options;
+    }
+
+    protected function normalizeSelectableSetting(null|string|int|float $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = (string) $value;
+
+        return Str::startsWith($value, 'current:')
+            ? Str::after($value, 'current:')
+            : $value;
+    }
+
+    protected function themeColorOptions(): array
+    {
+        return [
+            '#6B2D39' => 'JDCA Maroon',
+            '#1D4ED8' => 'Royal Blue',
+            '#166534' => 'Academic Green',
+            '#7C3AED' => 'Deep Violet',
+        ];
+    }
+
+    protected function accentColorOptions(): array
+    {
+        return [
+            '#C4973A' => 'Classic Gold',
+            '#D97706' => 'Warm Amber',
+            '#0F766E' => 'Teal Accent',
+            '#BE185D' => 'Rose Accent',
+        ];
+    }
+
+    protected function footerColorOptions(): array
+    {
+        return [
+            '#1A1A1A' => 'Charcoal',
+            '#111827' => 'Slate Black',
+            '#172554' => 'Navy',
+            '#3F1D2E' => 'Deep Plum',
+        ];
+    }
+
+    protected function backgroundColorOptions(): array
+    {
+        return [
+            '#F8FAFC' => 'Soft Slate',
+            '#F5F5F4' => 'Warm Stone',
+            '#FAF7F2' => 'Light Beige',
+            '#F4F7FB' => 'Cool Blue Tint',
+        ];
+    }
+
+    protected function surfaceColorOptions(): array
+    {
+        return [
+            '#F1F5F9' => 'Slate Surface',
+            '#FFFFFF' => 'White Surface',
+            '#F8F5F0' => 'Warm Surface',
+            '#EEF6FF' => 'Cool Surface',
+        ];
+    }
+
+    protected function bodyFontOptions(): array
+    {
+        return [
+            'open-sans' => 'Open Sans',
+            'inter' => 'Inter',
+            'nunito' => 'Nunito',
+            'lato' => 'Lato',
+        ];
+    }
+
+    protected function displayFontOptions(): array
+    {
+        return [
+            'playfair-display' => 'Playfair Display',
+            'merriweather' => 'Merriweather',
+            'lora' => 'Lora',
+            'source-serif-4' => 'Source Serif 4',
+        ];
     }
 }

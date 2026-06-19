@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\StudentPortalPasswordChangedMail;
 use App\Models\Announcement;
 use App\Models\ExamResult;
 use App\Models\FeePayment;
@@ -9,6 +10,7 @@ use App\Models\Timetable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class StudentPortalController extends Controller
 {
@@ -139,13 +141,17 @@ class StudentPortalController extends Controller
 
         $valid = $student->portal_password
             ? Hash::check($request->current_password, $student->portal_password)
-            : false;
+            : ($request->current_password === $student->roll_number);
 
         if (!$valid) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
         }
 
         $student->update(['portal_password' => $request->password]);
+
+        if (filled($student->email)) {
+            Mail::to($student->email)->queue(new StudentPortalPasswordChangedMail($student->fresh()));
+        }
 
         return back()->with('success', 'Password updated successfully.');
     }

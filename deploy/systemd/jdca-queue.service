@@ -1,0 +1,19 @@
+[Unit]
+Description=JDCA Laravel Queue Worker
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=5
+WorkingDirectory=/var/www/jdca
+ExecStart=/usr/bin/php /var/www/jdca/artisan queue:work redis --queue=default --sleep=3 --tries=3 --timeout=120 --max-time=3600
+ExecReload=/usr/bin/php /var/www/jdca/artisan queue:restart
+StandardOutput=append:/var/www/jdca/storage/logs/queue-worker.log
+StandardError=append:/var/www/jdca/storage/logs/queue-worker.log
+Environment=APP_ENV=production
+
+[Install]
+WantedBy=multi-user.target

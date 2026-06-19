@@ -6,13 +6,17 @@ use App\Enums\BloodGroupEnum;
 use App\Enums\EmploymentTypeEnum;
 use App\Enums\GenderEnum;
 use App\Enums\TeacherStatusEnum;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Teacher extends Model
+class Teacher extends Model implements AuthenticatableContract
 {
-    use SoftDeletes;
+    use SoftDeletes, Authenticatable;
 
     protected $fillable = [
         'user_id',
@@ -48,6 +52,7 @@ class Teacher extends Model
         'status',
         'is_active',
         'remarks',
+        'portal_password',
     ];
 
     protected $casts = [
@@ -62,6 +67,13 @@ class Teacher extends Model
         'basic_salary'    => 'decimal:2',
     ];
 
+    protected $hidden = ['portal_password', 'remember_token'];
+
+    public function getAuthIdentifierName(): string  { return 'employee_id'; }
+    public function getAuthIdentifier(): mixed        { return $this->employee_id; }
+    public function getAuthPassword(): string         { return $this->portal_password ?? ''; }
+    public function getRememberTokenName(): string    { return 'remember_token'; }
+
     // ─── Relations ────────────────────────────────────────────────────────────
 
     public function user(): BelongsTo
@@ -72,6 +84,38 @@ class Teacher extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function timetables(): HasMany
+    {
+        return $this->hasMany(Timetable::class);
+    }
+
+    public function attendanceSessions(): HasMany
+    {
+        return $this->hasMany(AttendanceSession::class);
+    }
+
+    public function lmsMaterials(): HasMany
+    {
+        return $this->hasMany(LmsMaterial::class);
+    }
+
+    public function lmsAssignments(): HasMany
+    {
+        return $this->hasMany(LmsAssignment::class);
+    }
+
+    public function bookIssues(): HasMany
+    {
+        return $this->hasMany(BookIssue::class);
+    }
+
+    protected function portalPassword(): Attribute
+    {
+        return Attribute::make(
+            set: fn(?string $value) => filled($value) ? \Illuminate\Support\Facades\Hash::make($value) : null
+        );
     }
 
     // ─── Scopes ───────────────────────────────────────────────────────────────

@@ -7,6 +7,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\Auth\EditProfile;
 use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
@@ -30,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->darkMode()
+            ->darkMode(true, true)
             ->brandName(fn() => \App\Models\CollegeSetting::get('college_name', 'JDCA'))
             ->brandLogo(function () {
                 $logo = \App\Models\CollegeSetting::get('college_logo');
@@ -44,7 +45,18 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->plugins([
-                FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make()
+                    ->localizePermissionLabels()
+                    ->gridColumns(1)
+                    ->sectionColumns(1)
+                    ->checkboxListColumns([
+                        'md' => 2,
+                        'xl' => 3,
+                    ])
+                    ->resourceCheckboxListColumns([
+                        'md' => 2,
+                        'xl' => 3,
+                    ]),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
@@ -72,6 +84,10 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-computer-desktop')
                     ->collapsed(true),
 
+                NavigationGroup::make('Website Management')
+                    ->icon('heroicon-o-globe-alt')
+                    ->collapsed(true),
+
                 NavigationGroup::make('System')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->collapsed(true),
@@ -79,7 +95,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([])

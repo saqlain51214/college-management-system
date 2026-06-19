@@ -1,482 +1,314 @@
 @extends('layouts.public')
-@section('title', 'Admissions 2025 — ' . ($college->college_name ?? 'JDCA'))
+@section('title', 'Online Admission Form — ' . ($college->college_name ?? 'JDCA'))
 
 @section('content')
 
-{{-- ============================================================
-     SECTION 1: PAGE HERO
-     ============================================================ --}}
-<section class="relative overflow-hidden text-white" style="background:var(--c-ink); padding-top:7rem; padding-bottom:3.5rem;">
-  <div class="absolute inset-0 pointer-events-none" style="opacity:.06;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:32px 32px;"></div>
-  <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(to bottom,rgba(107,45,57,.35) 0%,transparent 100%);"></div>
-  <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
-    <nav class="mb-4 flex items-center gap-1.5 text-xs" style="color:rgba(255,255,255,.50);">
-      <a href="{{ route('home') }}" class="transition hover:text-white">Home</a>
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-      <span style="color:rgba(255,255,255,.80);">Admissions</span>
-    </nav>
-    <div class="mb-4 inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold backdrop-blur-sm">
-      <span class="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse"></span>
-      Applications Open — Academic Year {{ date('Y') }}
-    </div>
-    <h1 class="font-display text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
-      Admissions <span style="color:var(--c-gold);">{{ date('Y') }}</span>
-    </h1>
-    <p class="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed" style="color:rgba(255,255,255,.80);">
-      Begin your academic journey at {{ $college->college_name ?? 'Jinnah Degree College Astore' }}. KIU-affiliated, HEC-recognised degrees in the heart of Gilgit-Baltistan.
-    </p>
-    <div class="mt-6 flex flex-wrap gap-3">
-      <a href="#inquiry" class="inline-flex items-center gap-2 rounded-md px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:opacity-90" style="background:var(--c-primary);">
-        Apply Now
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-      </a>
-      <a href="#how-to-apply" class="inline-flex items-center gap-2 rounded-md border-2 border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
-        How to Apply
-      </a>
-    </div>
-  </div>
-</section>
+    @php
+        $normalizePhoneInput = function (?string $value): string {
+            $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
 
-{{-- ============================================================
-     SECTION 2: WHY JDCA
-     ============================================================ --}}
-<section class="py-20 bg-white">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            if ($digits === '') {
+                return '';
+            }
 
-    <div class="text-center mb-12">
-      <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--c-gold)">Why Choose Us</p>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold tracking-tight" style="color:var(--c-primary)">
-        Why Study at {{ $college->short_name ?? 'JDCA' }}?
-      </h2>
-    </div>
+            if (str_starts_with($digits, '92') && strlen($digits) === 12) {
+                return substr($digits, 2);
+            }
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            if (str_starts_with($digits, '0') && strlen($digits) === 11) {
+                return substr($digits, 1);
+            }
 
-      {{-- Quality Education --}}
-      <div class="rounded-2xl p-8 border-l-4" style="background:#fafafa;border-left-color:var(--c-primary)">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-             style="background:linear-gradient(135deg,#5a1212,#7b1a1a)">
-          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-        </div>
-        <h3 class="text-xl font-bold mb-3" style="color:var(--c-primary)">Quality Education</h3>
-        <p class="text-gray-600 leading-relaxed mb-4">
-          Experienced and qualified faculty, a structured curriculum aligned with KIU standards, and a
-          supportive learning environment ensure every student receives an education they can be proud of.
-        </p>
-        <div class="flex flex-wrap gap-2">
-          <span class="text-xs px-3 py-1 rounded-full" style="background:rgba(90,18,18,.1);color:var(--c-primary)">KIU Curriculum</span>
-          <span class="text-xs px-3 py-1 rounded-full" style="background:rgba(90,18,18,.1);color:var(--c-primary)">Qualified Faculty</span>
-        </div>
-      </div>
+            return $digits;
+        };
 
-      {{-- Beautiful Location --}}
-      <div class="rounded-2xl p-8 border-l-4" style="background:#fafafa;border-left-color:var(--c-gold)">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-             style="background:linear-gradient(135deg,#b8862a,#c4973a)">
-          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-        <h3 class="text-xl font-bold mb-3" style="color:var(--c-primary)">Beautiful Location</h3>
-        <p class="text-gray-600 leading-relaxed mb-4">
-          Nestled in the breathtaking Astore Valley of Gilgit-Baltistan, our campus offers an environment
-          of natural beauty, clean mountain air, and a close-knit community atmosphere that promotes focus
-          and wellbeing.
-        </p>
-        <div class="flex flex-wrap gap-2">
-          <span class="text-xs px-3 py-1 rounded-full" style="background:rgba(184,134,42,.12);color:#7c5e1e">Astore Valley</span>
-          <span class="text-xs px-3 py-1 rounded-full" style="background:rgba(184,134,42,.12);color:#7c5e1e">Gilgit-Baltistan</span>
-        </div>
-      </div>
+        $oldGuardianPhone = $normalizePhoneInput(old('phone'));
+        $oldStudentPhone = $normalizePhoneInput(old('student_phone'));
+    @endphp
 
-      {{-- KIU Affiliation --}}
-      <div class="rounded-2xl p-8 border-l-4" style="background:#fafafa;border-left-color:#1e3a5f">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-             style="background:linear-gradient(135deg,#1e293b,#1e3a5f)">
-          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-        </div>
-        <h3 class="text-xl font-bold mb-3" style="color:var(--c-primary)">KIU Affiliation &amp; HEC Recognition</h3>
-        <p class="text-gray-600 leading-relaxed mb-4">
-          Every degree earned at JDCA is affiliated with Karakoram International University and recognised
-          by the Higher Education Commission of Pakistan — guaranteeing full national validity and acceptance
-          by employers and institutions across the country.
-        </p>
-        <div class="flex flex-wrap gap-2">
-          <span class="text-xs px-3 py-1 rounded-full text-white" style="background:#1e3a5f">KIU Affiliated</span>
-          <span class="text-xs px-3 py-1 rounded-full text-white" style="background:#1e3a5f">HEC Recognised</span>
-        </div>
-      </div>
+    <main id="main" tabindex="-1" class="site-main outline-none [&_h1]:font-display [&_h2]:font-display [&_h3]:font-sans [&_h4]:font-sans [&_h1]:tracking-tight [&_h2]:tracking-tight [&_h3]:tracking-tight [&_h4]:tracking-tight">
+        <section class="relative overflow-hidden bg-ink pt-28 pb-12 text-white sm:pt-32 sm:pb-14" aria-labelledby="page-title">
+            <div class="absolute inset-0 bg-[url('{{ asset('assets/images/photo-1562774053-701939374585.jpg') }}')] bg-cover bg-center opacity-25"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-brand/90 via-ink/95 to-ink"></div>
+            <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
+                <nav class="mb-4 text-xs text-white/70" aria-label="Breadcrumb">
+                    <a href="{{ route('home') }}" class="transition hover:text-white">Home</a>
+                    <span class="mx-2 text-white/40" aria-hidden="true">/</span>
+                    <span class="text-white">Admission Form</span>
+                </nav>
+                <h1 id="page-title" class="font-display text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">{{ $pageContent['intro_title'] ?? 'Online admission form' }}</h1>
+                <p class="mt-3 max-w-2xl text-sm text-white/90 sm:text-base">{{ $pageContent['intro_text'] ?? 'Multi-step application aligned with common Pakistani college portals.' }}</p>
+            </div>
+        </section>
 
-    </div>
-  </div>
-</section>
-
-{{-- ============================================================
-     SECTION 3: HOW TO APPLY
-     ============================================================ --}}
-<section class="py-20" id="how-to-apply" style="background:var(--c-surface)">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-
-    <div class="text-center mb-12">
-      <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--c-gold)">Process</p>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold tracking-tight" style="color:var(--c-primary)">How to Apply</h2>
-      <p class="mt-3 text-gray-500">Follow these simple steps to secure your place at JDCA.</p>
-    </div>
-
-    <div class="space-y-6">
-
-      @php
-        $steps = [
-          [
-            'num'    => '1',
-            'title'  => 'Check Eligibility',
-            'text'   => 'Review the academic requirements for your desired programme. Ensure you hold the minimum qualification (Matric for Intermediate; FSc/FA for BS programmes) with at least a Second Division.',
-            'docs'   => [],
-            'gold'   => false,
-          ],
-          [
-            'num'    => '2',
-            'title'  => 'Collect Required Documents',
-            'text'   => 'Gather all necessary documents before visiting the admissions office. Having complete paperwork ready will speed up your application considerably.',
-            'docs'   => ['Mark Sheets (all previous)', 'Domicile Certificate', 'CNIC / B-Form (copy)', '2 Passport Photos', 'Character Certificate'],
-            'gold'   => false,
-          ],
-          [
-            'num'    => '3',
-            'title'  => 'Visit Admissions Office',
-            'text'   => 'Come to the JDCA Admissions Office in Astore during office hours (Monday to Friday, 8:00 AM – 3:00 PM). Our staff will guide you through form submission and fee payment.',
-            'docs'   => [],
-            'gold'   => false,
-          ],
-          [
-            'num'    => '4',
-            'title'  => 'Entry Test / Interview',
-            'text'   => 'Depending on your programme, you may be required to sit an entry test or attend a brief interview with the academic panel. Dates are announced at the time of form submission.',
-            'docs'   => [],
-            'gold'   => false,
-          ],
-          [
-            'num'    => '5',
-            'title'  => 'Confirmation & Enrolment',
-            'text'   => 'Once your application is approved and fee deposited, you will receive a confirmation slip. Attend the orientation session to complete your enrolment and receive your timetable.',
-            'docs'   => [],
-            'gold'   => true,
-          ],
-        ];
-      @endphp
-
-      @foreach($steps as $i => $step)
-      <div class="relative flex gap-6">
-
-        {{-- Connector line --}}
-        @if(!$loop->last)
-        <div class="hidden md:block absolute left-6 top-14 bottom-0 w-0.5" style="background:rgba(90,18,18,.15);transform:translateX(-50%)"></div>
+        @if(!empty($pageContent['body_html']))
+            <section class="border-b border-stone-200/80 bg-white py-10 md:py-12">
+                <div class="mx-auto max-w-4xl px-4 sm:px-6">
+                    <div class="prose prose-stone max-w-none">
+                        {!! $pageContent['body_html'] !!}
+                    </div>
+                </div>
+            </section>
         @endif
 
-        {{-- Number circle --}}
-        <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-white z-10"
-             style="background:{{ $step['gold'] ? 'var(--c-gold)' : 'var(--c-primary)' }};min-width:3rem">
-          {{ $step['num'] }}
-        </div>
+        <section class="border-b border-stone-200/80 bg-surface py-10 md:py-12" aria-labelledby="before-you-apply">
+            <div class="mx-auto max-w-4xl px-4 sm:px-6">
+                <p id="before-you-apply" class="font-display text-lg font-semibold text-ink">Before you apply</p>
+                <p class="mt-2 text-sm leading-relaxed text-stone-600">Read admission procedure — academic records. Flow: programme level → personal → contact → <strong class="text-ink">last exam record</strong> (matric only for 1st-year intermediate; matric + HSSC/12th for BS/ADP) → declaration.</p>
+                <div class="mt-6 rounded-xl border border-amber-200/80 bg-amber-50/90 p-4 text-sm text-stone-800">
+                    <p class="font-semibold text-ink">What previous study we need (matches <a href="{{ route('programs') }}" class="text-brand underline">academics programmes</a>)</p>
+                    <ul class="mt-2 list-inside list-disc space-y-1 text-stone-700">
+                        <li><strong class="text-ink">Intermediate (FSc, FA, ICS, I.Com):</strong> you have completed or are completing <strong>matric</strong> (or O Level + IBCC). Step 4 asks for matric/O Level marks, board, roll number, school.</li>
+                        <li><strong class="text-ink">BS / ADP (undergraduate):</strong> you have passed <strong>intermediate (12th / HSSC Part II)</strong> or A-Level (IBCC). Step 4 asks for a short <strong>matric</strong> summary plus full <strong>HSSC</strong> record (board, group, marks, roll, college).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-        {{-- Content card --}}
-        <div class="flex-1 bg-white rounded-2xl p-6 shadow-md mb-2 {{ $step['gold'] ? 'border-l-4' : '' }}"
-             style="{{ $step['gold'] ? 'border-left-color:var(--c-gold)' : '' }}">
-          <h3 class="font-bold text-lg mb-2" style="color:var(--c-primary)">{{ $step['title'] }}</h3>
-          <p class="text-gray-600 leading-relaxed">{{ $step['text'] }}</p>
+        <section id="online-application" class="border-b border-stone-200/80 bg-white py-12 md:py-16">
+            <div class="mx-auto max-w-3xl px-4 sm:px-6">
+                @php($oldProgramId = old('program_id'))
+                <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 class="font-display text-xl font-semibold text-ink sm:text-2xl">Application steps</h2>
+                        <p class="mt-1 text-sm text-stone-600">Complete each step. You can go back to edit before submitting.</p>
+                    </div>
+                </div>
 
-          @if(!empty($step['docs']))
-          <div class="flex flex-wrap gap-2 mt-4">
-            @foreach($step['docs'] as $doc)
-            <span class="text-xs px-3 py-1 rounded-full font-medium"
-                  style="background:rgba(90,18,18,.08);color:var(--c-primary)">{{ $doc }}</span>
-            @endforeach
-          </div>
-          @endif
+                <ol class="mb-8 flex flex-wrap gap-2" id="admProgress" aria-label="Form progress">
+                    <li><span class="adm-step-pill inline-flex min-w-[2.5rem] items-center justify-center rounded-full border-2 border-brand bg-brand px-3 py-1 text-xs font-bold text-white" data-step-i="0">1</span></li>
+                    <li><span class="adm-step-pill inline-flex min-w-[2.5rem] items-center justify-center rounded-full border-2 border-stone-200 bg-white px-3 py-1 text-xs font-bold text-stone-500" data-step-i="1">2</span></li>
+                    <li><span class="adm-step-pill inline-flex min-w-[2.5rem] items-center justify-center rounded-full border-2 border-stone-200 bg-white px-3 py-1 text-xs font-bold text-stone-500" data-step-i="2">3</span></li>
+                    <li><span class="adm-step-pill inline-flex min-w-[2.5rem] items-center justify-center rounded-full border-2 border-stone-200 bg-white px-3 py-1 text-xs font-bold text-stone-500" data-step-i="3">4</span></li>
+                    <li><span class="adm-step-pill inline-flex min-w-[2.5rem] items-center justify-center rounded-full border-2 border-stone-200 bg-white px-3 py-1 text-xs font-bold text-stone-500" data-step-i="4">5</span></li>
+                </ol>
 
-          @if($step['gold'])
-          <div class="flex items-center gap-2 mt-4 text-sm font-semibold text-green-700">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            You are enrolled!
-          </div>
-          @endif
-        </div>
+                @if($errors->any())
+                <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                    <p class="font-semibold">Please fix the highlighted admission form errors and submit again.</p>
+                </div>
+                @endif
 
-      </div>
-      @endforeach
+                <form id="admissionWizard" class="rounded-2xl border border-stone-200/80 bg-surface/50 p-6 shadow-sm sm:p-8" novalidate action="{{ route('admissions.inquiry') }}" method="POST">
+                    @csrf
+                    <div class="adm-panel space-y-5" data-adm-step="0">
+                        <h3 class="font-display text-lg font-semibold text-ink">Step 1 — Level, programme &amp; campus</h3>
+                        <label class="block text-sm font-medium text-ink">You are applying for <span class="text-red-600">*</span>
+                            <select name="entry_path" id="entryPath" required class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                <option value="">Select</option>
+                                <option value="intermediate" @selected(old('entry_path') === 'intermediate')>Intermediate — 1st year (after matric / O Level)</option>
+                                <option value="undergraduate" @selected(old('entry_path') === 'undergraduate')>Undergraduate — BS / ADP 1st year (after intermediate / A-Level)</option>
+                            </select>
+                        </label>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <label class="block text-sm font-medium text-ink">Gender <span class="text-red-600">*</span>
+                                <select name="gender" required class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                    <option value="">Select</option>
+                                    <option value="female" @selected(old('gender') === 'female')>Female</option>
+                                    <option value="male" @selected(old('gender') === 'male')>Male</option>
+                                </select>
+                            </label>
+                            <label class="block text-sm font-medium text-ink">Preferred campus <span class="text-red-600">*</span>
+                                <select name="campus" required class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                    <option value="">Select campus</option>
+                                    <option value="main" @selected(old('campus') === 'main')>{{ $college->city ?? 'Astore' }} (main)</option>
+                                    <option value="other" @selected(old('campus') === 'other')>Other / undecided</option>
+                                </select>
+                            </label>
+                        </div>
+                        <label class="block text-sm font-medium text-ink">City / district <span class="text-red-600">*</span>
+                            <input type="text" name="city" required value="{{ old('city') }}" placeholder="e.g. Astore" autocomplete="address-level2" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                        </label>
+                        <div id="wrapProgInter" class="hidden space-y-2">
+                            <label class="block text-sm font-medium text-ink">Intermediate programme <span class="text-red-600">*</span>
+                                <select name="program_id" id="selProgInter" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                    <option value="">Select programme</option>
+                                    @foreach($intermediatePrograms as $prog)
+                                        <option value="{{ $prog->id }}" @selected((string) $oldProgramId === (string) $prog->id)>{{ $prog->name }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                            @if($intermediatePrograms->isEmpty())
+                                <p class="text-xs text-amber-700">No intermediate programmes are configured yet. Please update `Academic Programs` admin and set admission category to `Intermediate`.</p>
+                            @endif
+                        </div>
+                        <div id="wrapProgUnder" class="hidden space-y-2">
+                            <label class="block text-sm font-medium text-ink">Undergraduate programme / major <span class="text-red-600">*</span>
+                                <select name="program_id" id="selProgUnder" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                    <option value="">Select programme</option>
+                                    @foreach($undergraduatePrograms as $prog)
+                                        <option value="{{ $prog->id }}" @selected((string) $oldProgramId === (string) $prog->id)>{{ $prog->name }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                            @if($undergraduatePrograms->isEmpty())
+                                <p class="text-xs text-amber-700">No undergraduate programmes are configured yet. Please update `Academic Programs` admin and set admission category to `Undergraduate`.</p>
+                            @endif
+                        </div>
+                    </div>
 
-    </div>
-  </div>
-</section>
+                    <div class="adm-panel hidden space-y-5" data-adm-step="1" hidden>
+                        <h3 class="font-display text-lg font-semibold text-ink">Step 2 — Personal information</h3>
+                        <label class="block text-sm font-medium text-ink">Full name (student) <span class="text-red-600">*</span>
+                            <input type="text" name="name" required value="{{ old('name') }}" autocomplete="name" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                        </label>
+                        <label class="block text-sm font-medium text-ink">Father’s / guardian’s name <span class="text-red-600">*</span>
+                            <input type="text" name="father_name" required value="{{ old('father_name') }}" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                        </label>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <label class="block text-sm font-medium text-ink">Student CNIC / B-Form <span class="text-red-600">*</span>
+                            <input type="text" name="cnic" required value="{{ old('cnic') }}" inputmode="numeric" placeholder="xxxxx-xxxxxxx-x" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2" data-validate-pattern="cnic">
+                            </label>
+                            <label class="block text-sm font-medium text-ink">Date of birth <span class="text-red-600">*</span>
+                                <input type="date" name="dob" required value="{{ old('dob') }}" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                            </label>
+                        </div>
+                    </div>
 
-{{-- ============================================================
-     SECTION 4: REQUIREMENTS TABLE
-     ============================================================ --}}
-<section class="py-16 bg-white">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+                    <div class="adm-panel hidden space-y-5" data-adm-step="2" hidden>
+                        <h3 class="font-display text-lg font-semibold text-ink">Step 3 — Contact</h3>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <label class="block text-sm font-medium text-ink">Guardian mobile <span class="text-red-600">*</span>
+                                <div class="mt-1.5 flex rounded-md border border-stone-200 bg-white ring-brand/20 focus-within:ring-2">
+                                    <span class="inline-flex items-center border-r border-stone-200 bg-surface px-3 text-sm font-semibold text-ink">+92</span>
+                                    <input type="tel" name="phone" required value="{{ $oldGuardianPhone }}" placeholder="312-3456789" autocomplete="tel" class="w-full rounded-r-md border-0 bg-transparent px-3 py-2 text-sm outline-none focus:ring-0" data-validate-pattern="phone_pk">
+                                </div>
+                            </label>
+                            <label class="block text-sm font-medium text-ink">Student mobile
+                                <div class="mt-1.5 flex rounded-md border border-stone-200 bg-white ring-brand/20 focus-within:ring-2">
+                                    <span class="inline-flex items-center border-r border-stone-200 bg-surface px-3 text-sm font-semibold text-ink">+92</span>
+                                    <input type="tel" name="student_phone" value="{{ $oldStudentPhone }}" placeholder="312-3456789" class="w-full rounded-r-md border-0 bg-transparent px-3 py-2 text-sm outline-none focus:ring-0" data-validate-pattern="phone_pk">
+                                </div>
+                            </label>
+                        </div>
+                        <label class="block text-sm font-medium text-ink">Email <span class="text-red-600">*</span>
+                            <input type="email" name="email" required value="{{ old('email') }}" autocomplete="email" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                        </label>
+                        <label class="block text-sm font-medium text-ink">Complete mailing address <span class="text-red-600">*</span>
+                            <textarea name="address" required rows="3" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">{{ old('address') }}</textarea>
+                        </label>
+                    </div>
 
-    <div class="text-center mb-10">
-      <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--c-gold)">Programmes</p>
-      <h2 class="text-3xl font-extrabold" style="color:var(--c-primary)">Available Programmes &amp; Requirements</h2>
-    </div>
+                    <div class="adm-panel hidden space-y-6" data-adm-step="3" hidden>
+                        <h3 class="font-display text-lg font-semibold text-ink">Step 4 — Academic record</h3>
+                        <fieldset id="admFsMatric" class="space-y-4 border-0 p-0">
+                            <legend class="mb-2 font-semibold text-ink">For intermediate applicants — matric / O Level (last completed exam)</legend>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <label class="block text-sm font-medium text-ink">Degree <span class="text-red-600">*</span>
+                                    <select name="academic[matric][qualification]" required class="adm-matric-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                        <option value="">Select</option>
+                                        <option value="matric" @selected(old('academic.matric.qualification') === 'matric')>Matriculation (10th)</option>
+                                        <option value="olevel" @selected(old('academic.matric.qualification') === 'olevel')>O Level (IBCC equivalence required)</option>
+                                        <option value="other" @selected(old('academic.matric.qualification') === 'other')>Other</option>
+                                    </select>
+                                </label>
+                                <label class="block text-sm font-medium text-ink">Passing year <span class="text-red-600">*</span>
+                                    <input type="number" name="academic[matric][pass_year]" required min="2018" max="2035" value="{{ old('academic.matric.pass_year') }}" class="adm-matric-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                </label>
+                            </div>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <label class="block text-sm font-medium text-ink">Board <span class="text-red-600">*</span>
+                                    <input type="text" name="academic[matric][board]" value="{{ old('academic.matric.board') }}" placeholder="e.g. BISE Gilgit" required class="adm-matric-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                </label>
+                                <label class="block text-sm font-medium text-ink">Total marks / Obtained <span class="text-red-600">*</span>
+                                    <input type="text" name="academic[matric][marks]" required value="{{ old('academic.matric.marks') }}" placeholder="e.g. 850/1100" class="adm-matric-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2" data-validate-pattern="marks_fraction">
+                                </label>
+                            </div>
+                            <label class="block text-sm font-medium text-ink">School name (last attended) <span class="text-red-600">*</span>
+                                <input type="text" name="academic[matric][school]" required value="{{ old('academic.matric.school') }}" class="adm-matric-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                            </label>
+                        </fieldset>
 
-    <div class="overflow-x-auto rounded-2xl shadow-md">
-      <table class="w-full text-sm">
-        <thead>
-          <tr style="background:var(--c-primary);color:#fff">
-            <th class="px-6 py-4 text-left font-semibold">Programme</th>
-            <th class="px-6 py-4 text-left font-semibold">Min. Qualification</th>
-            <th class="px-6 py-4 text-left font-semibold">Duration</th>
-            <th class="px-6 py-4 text-left font-semibold">Seats</th>
-            <th class="px-6 py-4 text-left font-semibold">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse(isset($programs) ? $programs : [] as $prog)
-          <tr class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} border-b border-gray-100 hover:bg-orange-50 transition-colors">
-            <td class="px-6 py-4">
-              <span class="font-semibold" style="color:var(--c-primary)">{{ $prog->name }}</span>
-              @if(!empty($prog->short_name))
-              <span class="ml-2 text-xs text-gray-400">({{ $prog->short_name }})</span>
-              @endif
-            </td>
-            <td class="px-6 py-4 text-gray-600">
-              @php
-                $level = strtolower($prog->level ?? $prog->degree_type?->value ?? '');
-                if (str_contains($level, 'intermediate')) $minQ = 'Matric (SSC)';
-                elseif (str_contains($level, 'ms') || str_contains($level, 'mphil') || str_contains($level, 'm-ed')) $minQ = 'Bachelor\'s Degree';
-                elseif (str_contains($level, 'bs') || str_contains($level, 'ba') || str_contains($level, 'b-ed')) $minQ = 'FSc / FA (Intermediate)';
-                else $minQ = 'As per programme';
-              @endphp
-              {{ $minQ }}
-            </td>
-            <td class="px-6 py-4 text-gray-600">
-              {{ $prog->duration_years ?? '2' }} Year{{ ($prog->duration_years ?? 2) != 1 ? 's' : '' }}
-              @if(!empty($prog->total_semesters))
-              / {{ $prog->total_semesters }} Semesters
-              @endif
-            </td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full text-green-700 bg-green-50">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                Limited
-              </span>
-            </td>
-            <td class="px-6 py-4">
-              <a href="#inquiry" class="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
-                 style="background:var(--c-primary)">Inquire</a>
-            </td>
-          </tr>
-          @empty
-          <tr>
-            <td colspan="5" class="px-6 py-12 text-center text-gray-400">
-              Programme information will be listed here once added.
-            </td>
-          </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
+                        <fieldset id="admFsHssc" class="hidden space-y-5 border-0 p-0" disabled>
+                            <legend class="mb-2 font-semibold text-ink">For undergraduate applicants — matric summary + intermediate (12th / HSSC)</legend>
+                            <p class="text-xs text-stone-500">You must have passed HSSC Part II (2nd year intermediate) or A-Level with IBCC.</p>
+                            <div class="grid gap-4 sm:grid-cols-3">
+                                <label class="block text-sm font-medium text-ink">Matric board summary <span class="text-red-600">*</span>
+                                    <input type="text" name="academic[matric_summary][board]" required value="{{ old('academic.matric_summary.board') }}" placeholder="e.g. BISE Gilgit" class="adm-hssc-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                </label>
+                                <label class="block text-sm font-medium text-ink">Matric passing year <span class="text-red-600">*</span>
+                                    <input type="number" name="academic[matric_summary][pass_year]" required min="2018" max="2035" value="{{ old('academic.matric_summary.pass_year') }}" class="adm-hssc-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                </label>
+                                <label class="block text-sm font-medium text-ink">Matric marks <span class="text-red-600">*</span>
+                                    <input type="text" name="academic[matric_summary][marks]" required value="{{ old('academic.matric_summary.marks') }}" placeholder="e.g. 930/1100" class="adm-hssc-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2" data-validate-pattern="marks_fraction">
+                                </label>
+                            </div>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <label class="block text-sm font-medium text-ink">Qualification <span class="text-red-600">*</span>
+                                    <select name="academic[hssc][qualification]" required class="adm-hssc-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                        <option value="">Select</option>
+                                        <option value="hssc" @selected(old('academic.hssc.qualification') === 'hssc')>HSSC / FA–FSc (2nd year passed)</option>
+                                        <option value="alevel" @selected(old('academic.hssc.qualification') === 'alevel')>A-Level (IBCC equivalence)</option>
+                                        <option value="dae" @selected(old('academic.hssc.qualification') === 'dae')>DAE / other</option>
+                                    </select>
+                                </label>
+                                <label class="block text-sm font-medium text-ink">Passing year (Part II) <span class="text-red-600">*</span>
+                                    <input type="number" name="academic[hssc][pass_year]" required min="2018" max="2035" value="{{ old('academic.hssc.pass_year') }}" class="adm-hssc-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                </label>
+                            </div>
+                            <div class="grid gap-4 sm:grid-cols-2">
+                                <label class="block text-sm font-medium text-ink">Board <span class="text-red-600">*</span>
+                                    <input type="text" name="academic[hssc][board]" value="{{ old('academic.hssc.board') }}" placeholder="e.g. BISE Gilgit" required class="adm-hssc-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                                </label>
+                                <label class="block text-sm font-medium text-ink">Total marks / Obtained <span class="text-red-600">*</span>
+                                    <input type="text" name="academic[hssc][marks]" required value="{{ old('academic.hssc.marks') }}" placeholder="e.g. 850/1100" class="adm-hssc-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2" data-validate-pattern="marks_fraction">
+                                </label>
+                            </div>
+                            <label class="block text-sm font-medium text-ink">College attended (for intermediate) <span class="text-red-600">*</span>
+                                <input type="text" name="academic[hssc][school]" required value="{{ old('academic.hssc.school') }}" class="adm-hssc-req mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">
+                            </label>
+                        </fieldset>
+                    </div>
 
-    <p class="mt-4 text-xs text-gray-400">
-      * Seats are limited and filled on a first-come, first-served basis. Contact the admissions office for the latest seat availability.
-    </p>
+                    <div class="adm-panel hidden space-y-5" data-adm-step="4" hidden>
+                        <h3 class="font-display text-lg font-semibold text-ink">Step 5 — Declaration</h3>
+                        <label class="block text-sm font-medium text-ink">Message / Note (optional)
+                            <textarea name="message" rows="3" class="mt-1.5 w-full rounded-md border border-stone-200 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:ring-2">{{ old('message') }}</textarea>
+                        </label>
+                        <label class="flex cursor-pointer gap-3 text-sm leading-relaxed text-stone-700">
+                            <input type="checkbox" name="declare_true" required value="1" @checked(old('declare_true')) class="mt-1 h-4 w-4 shrink-0 rounded border-stone-300 text-brand focus:ring-brand">
+                            <span>I confirm that the information provided is true. I agree to the college rules, fee policy, and use of my data for admission processing. <span class="text-red-600">*</span></span>
+                        </label>
+                    </div>
 
-  </div>
-</section>
+                    <p id="admFormError" class="mt-4 hidden text-sm font-medium text-red-700" role="alert"></p>
 
-{{-- ============================================================
-     SECTION 5: INQUIRY FORM
-     ============================================================ --}}
-<section class="py-20" id="inquiry" style="background:var(--c-surface)">
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="mt-8 flex flex-col-reverse gap-3 border-t border-stone-200/80 pt-6 sm:flex-row sm:justify-between" id="admNavButtons">
+                        <button type="button" id="admBack" class="hidden rounded-md border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-ink transition hover:bg-surface">Back</button>
+                        <div class="flex gap-3 sm:ml-auto">
+                            <button type="button" id="admNext" class="rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2">Next step</button>
+                            <button type="submit" id="admSubmit" class="hidden rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2">Submit application</button>
+                        </div>
+                    </div>
+                </form>
 
-    <div class="text-center mb-10">
-      <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--c-gold)">Get in Touch</p>
-      <h2 class="text-3xl font-extrabold" style="color:var(--c-primary)">Submit an Admission Inquiry</h2>
-      <p class="mt-3 text-gray-500">Fill in the form below and our admissions team will contact you shortly.</p>
-    </div>
+                <div id="admSuccess" class="mt-8 rounded-2xl border border-green-200 bg-green-50/90 p-6 sm:p-8 {{ session('success') ? '' : 'hidden' }}" role="status" aria-live="polite">
+                    <h3 class="font-display text-xl font-semibold text-ink">Application received</h3>
+                    <p class="mt-2 text-sm text-stone-700" data-adm-success-message>{{ session('success') }}</p>
+                    <ul class="mt-4 list-inside list-disc space-y-1 text-sm text-stone-600">
+                        <li>Visit <strong class="text-ink">Admission Office, {{ $college->address ?? 'Astore' }}</strong> within the published dates.</li>
+                        <li>Carry original certificates, CNIC/B-Form copies, and photographs.</li>
+                    </ul>
+                    <a href="{{ route('admissions') }}" class="mt-6 inline-block rounded-md border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-brand transition hover:bg-stone-50">Start new application</a>
+                </div>
+            </div>
+        </section>
 
-    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+        <section class="bg-white py-12 md:py-16">
+            <div class="mx-auto max-w-4xl space-y-6 px-4 sm:px-6">
+                <h2 class="font-display text-xl font-semibold text-ink">Offline / paper application</h2>
+                <p class="text-sm leading-relaxed text-stone-600">You can also visit the admission office to get a <strong class="text-ink">printed form with prospectus</strong>.</p>
+                <h2 class="font-display text-xl font-semibold text-ink">Office hours</h2>
+                <p class="text-sm leading-relaxed text-stone-600">Monday–Saturday, 9:00 a.m. – 4:00 p.m. Phone: <a href="tel:{{ str_replace(' ', '', $college->phone ?? '') }}" class="font-semibold text-brand hover:underline">{{ $college->phone ?? '' }}</a>.</p>
+            </div>
+        </section>
 
-      {{-- Success banner --}}
-      @if(session('success'))
-      <div class="flex items-start gap-3 rounded-xl p-4 mb-6 text-green-800 bg-green-50 border border-green-200">
-        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <p class="font-medium">{{ session('success') }}</p>
-      </div>
-      @endif
-
-      {{-- Validation errors --}}
-      @if($errors->any())
-      <div class="flex items-start gap-3 rounded-xl p-4 mb-6 text-red-800 bg-red-50 border border-red-200">
-        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        <div>
-          <p class="font-semibold mb-1">Please fix the following errors:</p>
-          <ul class="list-disc list-inside space-y-0.5 text-sm">
-            @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-          </ul>
-        </div>
-      </div>
-      @endif
-
-      <form action="{{ route('admissions.inquiry') }}" method="POST" class="space-y-6">
-        @csrf
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-          {{-- Full Name --}}
-          <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--c-primary)">Full Name <span class="text-red-500">*</span></label>
-            <input type="text" name="name" value="{{ old('name') }}" required
-                   placeholder="Your full name"
-                   class="w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all {{ $errors->has('name') ? 'border-red-400 ring-red-200' : 'border-gray-200 focus:ring-red-100' }}"
-                   style="focus:border-color:var(--c-primary)">
-            @error('name')
-            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-            @enderror
-          </div>
-
-          {{-- Phone --}}
-          <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--c-primary)">Phone Number <span class="text-red-500">*</span></label>
-            <input type="tel" name="phone" value="{{ old('phone') }}" required
-                   placeholder="03xx-xxxxxxx"
-                   class="w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all {{ $errors->has('phone') ? 'border-red-400 ring-red-200' : 'border-gray-200 focus:ring-red-100' }}">
-            @error('phone')
-            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-            @enderror
-          </div>
-
-        </div>
-
-        {{-- Email --}}
-        <div>
-          <label class="block text-sm font-semibold mb-1.5" style="color:var(--c-primary)">Email Address <span class="text-gray-400 text-xs font-normal">(optional)</span></label>
-          <input type="email" name="email" value="{{ old('email') }}"
-                 placeholder="your@email.com"
-                 class="w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all {{ $errors->has('email') ? 'border-red-400 ring-red-200' : 'border-gray-200 focus:ring-red-100' }}">
-          @error('email')
-          <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-          @enderror
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-          {{-- Program --}}
-          <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--c-primary)">Program of Interest <span class="text-red-500">*</span></label>
-            <select name="program_id" required
-                    class="w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all {{ $errors->has('program_id') ? 'border-red-400 ring-red-200' : 'border-gray-200 focus:ring-red-100' }}">
-              <option value="">-- Select Program --</option>
-              @foreach(isset($programs) ? $programs : [] as $prog)
-              <option value="{{ $prog->id }}" {{ old('program_id') == $prog->id ? 'selected' : '' }}>
-                {{ $prog->name }}
-              </option>
-              @endforeach
-            </select>
-            @error('program_id')
-            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-            @enderror
-          </div>
-
-          {{-- Last Qualification --}}
-          <div>
-            <label class="block text-sm font-semibold mb-1.5" style="color:var(--c-primary)">Last Qualification <span class="text-red-500">*</span></label>
-            <select name="qualification" required
-                    class="w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all {{ $errors->has('qualification') ? 'border-red-400 ring-red-200' : 'border-gray-200 focus:ring-red-100' }}">
-              <option value="">-- Select --</option>
-              <option value="matric" {{ old('qualification') == 'matric' ? 'selected' : '' }}>Matric (SSC)</option>
-              <option value="intermediate" {{ old('qualification') == 'intermediate' ? 'selected' : '' }}>Intermediate (FSc / FA)</option>
-              <option value="bachelor" {{ old('qualification') == 'bachelor' ? 'selected' : '' }}>Bachelor's Degree</option>
-              <option value="master" {{ old('qualification') == 'master' ? 'selected' : '' }}>Master's Degree</option>
-              <option value="other" {{ old('qualification') == 'other' ? 'selected' : '' }}>Other</option>
-            </select>
-            @error('qualification')
-            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-            @enderror
-          </div>
-
-        </div>
-
-        {{-- Message --}}
-        <div>
-          <label class="block text-sm font-semibold mb-1.5" style="color:var(--c-primary)">Message <span class="text-gray-400 text-xs font-normal">(optional)</span></label>
-          <textarea name="message" rows="4"
-                    placeholder="Any questions or additional information..."
-                    class="w-full px-4 py-3 rounded-xl border text-sm focus:outline-none focus:ring-2 transition-all resize-none {{ $errors->has('message') ? 'border-red-400 ring-red-200' : 'border-gray-200 focus:ring-red-100' }}">{{ old('message') }}</textarea>
-          @error('message')
-          <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-          @enderror
-        </div>
-
-        <button type="submit"
-                class="w-full py-4 rounded-xl font-bold text-white text-base transition-transform hover:-translate-y-0.5"
-                style="background:var(--c-primary)">
-          Submit Inquiry
-        </button>
-
-      </form>
-    </div>
-  </div>
-</section>
-
-{{-- ============================================================
-     SECTION 6: CONTACT STRIP
-     ============================================================ --}}
-<section class="py-14" style="background:var(--c-primary)">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-      {{-- Phone --}}
-      <div class="flex items-start gap-4">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-             style="background:rgba(255,255,255,.1);backdrop-filter:blur(6px)">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-        </div>
-        <div>
-          <p class="font-semibold text-white mb-1">Phone</p>
-          @if(!empty($college->phone))
-          <a href="tel:{{ $college->phone }}" class="text-sm hover:underline" style="color:rgba(255,255,255,.8)">{{ $college->phone }}</a>
-          @else
-          <p class="text-sm" style="color:rgba(255,255,255,.6)">Contact number coming soon</p>
-          @endif
-          <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.5)">Mon – Fri, 8:00 AM – 3:00 PM</p>
-        </div>
-      </div>
-
-      {{-- Email --}}
-      <div class="flex items-start gap-4">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-             style="background:rgba(255,255,255,.1);backdrop-filter:blur(6px)">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        </div>
-        <div>
-          <p class="font-semibold text-white mb-1">Email</p>
-          @if(!empty($college->email))
-          <a href="mailto:{{ $college->email }}" class="text-sm hover:underline" style="color:rgba(255,255,255,.8)">{{ $college->email }}</a>
-          @else
-          <p class="text-sm" style="color:rgba(255,255,255,.6)">Email coming soon</p>
-          @endif
-          <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.5)">We reply within 24 hours</p>
-        </div>
-      </div>
-
-      {{-- Office Hours --}}
-      <div class="flex items-start gap-4">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-             style="background:rgba(255,255,255,.1);backdrop-filter:blur(6px)">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        </div>
-        <div>
-          <p class="font-semibold text-white mb-1">Office Hours</p>
-          <p class="text-sm" style="color:rgba(255,255,255,.8)">Mon – Fri: 8:00 AM – 3:00 PM</p>
-          <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.5)">{{ $college->address ?? 'Astore, Gilgit-Baltistan' }}</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
+    </main>
 
 @endsection
+
+@push('scripts')
+    <script id="admissionValidationConfig" type="application/json">@json($admissionValidation)</script>
+    <script id="admissionServerErrors" type="application/json">@json($errors->messages())</script>
+    <script src="{{ asset('assets/js/admission-wizard.js') }}" defer></script>
+@endpush

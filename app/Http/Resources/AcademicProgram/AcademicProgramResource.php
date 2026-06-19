@@ -24,6 +24,8 @@ class AcademicProgramResource extends JsonResource
             'code'               => $this->code,
             'degree_type'        => $this->degree_type?->value,
             'degree_type_label'  => $this->degree_type?->label(),
+            'admission_category' => $this->admission_category?->value,
+            'admission_category_label' => $this->admission_category?->label(),
             'duration_years'     => $this->duration_years,
             'total_semesters'    => $this->total_semesters,
             'total_credit_hours' => $this->total_credit_hours,

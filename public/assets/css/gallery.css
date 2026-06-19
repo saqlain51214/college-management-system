@@ -1,0 +1,43 @@
+/* College gallery — filters, hero shine, lightbox */
+#galleryGrid .gallery-card {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+#galleryGrid.is-filtering .gallery-card {
+  opacity: 0.35;
+  transform: scale(0.98);
+}
+
+#galleryGrid .gallery-card.is-active {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes gallery-shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.gallery-hero-shine {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: gallery-shimmer 4s ease infinite;
+}
+
+dialog#galleryLightbox::backdrop {
+  background: rgba(10, 8, 9, 0.92);
+  backdrop-filter: blur(6px);
+}
+
+dialog#galleryLightbox {
+  border: none;
+  padding: 0;
+  max-width: min(96vw, 56rem);
+  background: transparent;
+}

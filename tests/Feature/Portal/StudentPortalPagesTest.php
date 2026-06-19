@@ -20,10 +20,11 @@ class StudentPortalPagesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->student = Student::factory()->withPassword('test@1234')->create([
+        $this->student = Student::factory()->create([
             'roll_number'      => 'CS-2024-TEST',
             'name'             => 'Test Portal Student',
             'current_semester' => 1,
+            'portal_password'  => 'test@1234',
         ]);
     }
 

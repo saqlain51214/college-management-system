@@ -3,405 +3,180 @@
 
 @section('content')
 
-{{-- ============================================================
-     SECTION 1: PAGE HERO
-     ============================================================ --}}
-<section class="relative overflow-hidden text-white" style="background:var(--c-ink); padding-top:7rem; padding-bottom:3.5rem;">
-  <div class="absolute inset-0 pointer-events-none" style="opacity:.06;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:32px 32px;"></div>
-  <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(to bottom,rgba(107,45,57,.35) 0%,transparent 100%);"></div>
-  <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
-    <nav class="mb-4 flex items-center gap-1.5 text-xs" style="color:rgba(255,255,255,.50);">
-      <a href="{{ route('home') }}" class="transition hover:text-white">Home</a>
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-      <span style="color:rgba(255,255,255,.80);">About</span>
-    </nav>
-    <h1 class="font-display text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
-      About <span style="color:var(--c-gold);">{{ $college->short_name ?? 'JDCA' }}</span>
-    </h1>
-    <p class="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed" style="color:rgba(255,255,255,.80);">
-      Empowering the youth of Gilgit-Baltistan through quality, accessible, and accredited higher education since {{ $college->established_year ?? '2010' }}.
-    </p>
-  </div>
-</section>
+    <main id="main" tabindex="-1" class="site-main outline-none [&_h1]:font-display [&_h2]:font-display [&_h3]:font-sans [&_h4]:font-sans [&_h1]:tracking-tight [&_h2]:tracking-tight [&_h3]:tracking-tight [&_h4]:tracking-tight">
 
-{{-- ============================================================
-     SECTION 2: OUR STORY
-     ============================================================ --}}
-<section class="py-20 bg-white">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+        <section class="relative overflow-hidden bg-ink pt-28 pb-12 text-white sm:pt-32 sm:pb-14" aria-labelledby="page-title">
+            <div class="absolute inset-0 bg-[url('{{ asset('assets/images/photo-1562774053-701939374585.jpg') }}')] bg-cover bg-center opacity-25"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-brand/90 via-ink/95 to-ink"></div>
+            <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
+                <nav class="mb-4 text-xs text-white/70" aria-label="Breadcrumb">
+                    <a href="{{ route('home') }}" class="transition hover:text-white">Home</a>
+                    <span class="mx-2 text-white/40" aria-hidden="true">/</span>
+                    <span class="text-white">About Us</span>
+                </nav>
+                <h1 id="page-title" class="font-display text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">{{ $pageContent['intro_title'] ?? ('About ' . ($college->college_name ?? 'JDCA')) }}</h1>
+                <p class="mt-3 max-w-2xl text-sm leading-relaxed text-white/90 sm:text-base">
+                    {{ $pageContent['intro_text'] ?? 'A premier college combining board-focused intermediate programmes with modern labs, digital learning, and pathways into Pakistan top universities and professions.' }}
+                </p>
+            </div>
+        </section>
 
-      {{-- Left: narrative --}}
-      <div>
-        <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--c-gold)">Our Story</p>
-        <h2 class="font-display text-2xl sm:text-3xl md:text-[2rem] font-semibold leading-snug mb-5" style="color:var(--c-primary)">
-          Empowering Minds Since {{ $college->established_year ?? '2010' }}
-        </h2>
-
-        <p class="text-gray-600 leading-relaxed mb-4">
-          {{ $college->college_name ?? 'Jinnah Degree College Astore' }} was founded with a single, clear purpose: to bring
-          recognised degree-level education to the remote but vibrant communities of Astore, Gilgit-Baltistan.
-          Before its establishment, students from this region faced the daunting challenge of travelling hundreds
-          of kilometres to access higher education — a barrier that left countless talented young people behind.
-        </p>
-        <p class="text-gray-600 leading-relaxed mb-4">
-          Situated in the heart of Astore District in Gilgit-Baltistan, the college occupies a unique position
-          both geographically and academically. Surrounded by some of the world's most spectacular mountain
-          scenery, our campus provides an environment that inspires curiosity, resilience, and a deep connection
-          to both heritage and the wider world.
-        </p>
-        <p class="text-gray-600 leading-relaxed mb-8">
-          As an affiliated institution of <strong>Karakoram International University (KIU)</strong> and recognised
-          by the <strong>Higher Education Commission (HEC) of Pakistan</strong>, every degree and certificate
-          awarded carries full national accreditation — opening doors across Pakistan and beyond for our graduates.
-        </p>
-
-        <div class="flex flex-wrap gap-4">
-          <a href="{{ route('programs') }}"
-             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-transform hover:-translate-y-0.5"
-             style="background:var(--c-primary)">
-            View Programs
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-          </a>
-          <a href="{{ route('admissions') }}"
-             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-transform hover:-translate-y-0.5"
-             style="border:2px solid var(--c-gold);color:var(--c-gold)">
-            Apply for Admission
-          </a>
-        </div>
-      </div>
-
-      {{-- Right: 2x2 stat cards --}}
-      <div class="grid grid-cols-2 gap-6">
-
-        @php
-          $aboutStats = [
-            ['icon'=>'🏛️','value'=>$college->established_year ?? '2010','label'=>'Year Founded','accent'=>'var(--c-primary)'],
-            ['icon'=>'🎓','value'=>($college->total_students ?? '500') . '+','label'=>'Students Enrolled','accent'=>'var(--c-gold)'],
-            ['icon'=>'👨‍🏫','value'=>($college->total_faculty ?? '25') . '+','label'=>'Faculty Members','accent'=>'var(--c-primary)'],
-            ['icon'=>'📚','value'=>(isset($programs) ? $programs->count() : '4') . '+','label'=>'Academic Programs','accent'=>'var(--c-gold)'],
-          ];
-        @endphp
-
-        @foreach($aboutStats as $stat)
-        <div class="bg-white rounded-2xl p-6 shadow-md border-t-4 hover:-translate-y-1 transition-transform"
-             style="border-top-color:{{ $stat['accent'] }}">
-          <div class="text-3xl mb-3">{{ $stat['icon'] }}</div>
-          <div class="text-3xl font-extrabold mb-1" style="color:{{ $stat['accent'] }}">{{ $stat['value'] }}</div>
-          <div class="text-sm text-gray-500">{{ $stat['label'] }}</div>
-        </div>
-        @endforeach
-
-      </div>
-    </div>
-  </div>
-</section>
-
-{{-- ============================================================
-     SECTION 3: MISSION, VISION, VALUES
-     ============================================================ --}}
-<section class="py-20" style="background:var(--c-surface)">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
-
-    <div class="text-center mb-12">
-      <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--c-gold)">Our Purpose</p>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold tracking-tight" style="color:var(--c-primary)">Mission, Vision &amp; Values</h2>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-      {{-- Mission --}}
-      <div class="bg-white rounded-xl shadow-md p-6 sm:p-8 border-l-4" style="border-left-color:var(--c-primary)">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6"
-             style="background:linear-gradient(135deg,#5a1212,#7b1a1a)">🎯</div>
-        <h3 class="text-xl font-bold mb-4" style="color:var(--c-primary)">Our Mission</h3>
-        <p class="text-gray-600 leading-relaxed">
-          To provide accessible, high-quality, and HEC-recognised higher education to the students of Astore
-          and the broader Gilgit-Baltistan region — equipping graduates with the academic knowledge, practical
-          skills, and ethical grounding needed to contribute meaningfully to society and national development.
-        </p>
-      </div>
-
-      {{-- Vision --}}
-      <div class="bg-white rounded-xl shadow-md p-6 sm:p-8 border-l-4" style="border-left-color:var(--c-gold)">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6"
-             style="background:linear-gradient(135deg,#b8862a,#c4973a)">🔭</div>
-        <h3 class="text-xl font-bold mb-4" style="color:var(--c-primary)">Our Vision</h3>
-        <p class="text-gray-600 leading-relaxed">
-          To be the leading institution of higher learning in the mountainous north of Pakistan — a beacon of
-          academic excellence, cultural pride, and community uplift that transforms Gilgit-Baltistan through
-          the power of education, research, and informed citizenship.
-        </p>
-      </div>
-
-      {{-- Values --}}
-      <div class="bg-white rounded-xl shadow-md p-6 sm:p-8 border-l-4" style="border-left-color:#1e3a5f">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6"
-             style="background:linear-gradient(135deg,#1e293b,#1e3a5f)">⭐</div>
-        <h3 class="text-xl font-bold mb-4" style="color:var(--c-primary)">Core Values</h3>
-        <ul class="space-y-2 text-gray-600">
-          @foreach(['Academic Excellence','Integrity & Honesty','Inclusivity & Accessibility','Community Service','Continuous Improvement','Respect for All'] as $coreValue)
-          <li class="flex items-center gap-2">
-            <span style="color:var(--c-gold);font-size:1.1rem">•</span>
-            {{ $coreValue }}
-          </li>
-          @endforeach
-        </ul>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-{{-- ============================================================
-     SECTION 4: PRINCIPAL'S MESSAGE
-     ============================================================ --}}
-<section class="py-20 bg-white">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
-
-    <div class="text-center mb-12">
-      <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--c-gold)">Leadership</p>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold tracking-tight" style="color:var(--c-primary)">Principal's Message</h2>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-
-      {{-- Left: avatar card --}}
-      <div class="flex flex-col items-center text-center">
-        @php
-          $principalName = $college->principal_name ?? 'Arif Ali';
-          $nameParts = explode(' ', $principalName);
-          $initials = strtoupper(substr($nameParts[0] ?? 'A', 0, 1)) . strtoupper(substr($nameParts[1] ?? 'A', 0, 1));
-        @endphp
-
-        {{-- Avatar circle --}}
-        <div class="relative mb-6">
-          <div class="w-40 h-40 rounded-full flex items-center justify-center text-5xl font-extrabold text-white"
-               style="background:linear-gradient(135deg,#5a1212,#1e3a5f);box-shadow:0 0 0 6px rgba(196,151,58,.4),0 0 0 12px rgba(196,151,58,.12)">
-            {{ $initials }}
-          </div>
-          {{-- Gold check badge --}}
-          <div class="absolute -bottom-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold"
-               style="background:var(--c-gold)">&#10003;</div>
-        </div>
-
-        <h3 class="text-2xl font-bold mb-1" style="color:var(--c-primary)">{{ $principalName }}</h3>
-        <p class="text-sm text-gray-500 mb-4">Principal, {{ $college->short_name ?? 'JDCA' }}</p>
-
-        @if(!empty($college->email))
-        <a href="mailto:{{ $college->email }}" class="text-sm hover:underline" style="color:var(--c-gold)">
-          {{ $college->email }}
-        </a>
+        @if(!empty($pageContent['body_html']))
+            <section class="border-b border-stone-200/80 bg-white py-10 md:py-12">
+                <div class="mx-auto max-w-4xl px-4 sm:px-6">
+                    <div class="prose prose-stone max-w-none">
+                        {!! $pageContent['body_html'] !!}
+                    </div>
+                </div>
+            </section>
         @endif
-        @if(!empty($college->phone))
-        <a href="tel:{{ $college->phone }}" class="block text-sm text-gray-500 mt-1 hover:underline">
-          {{ $college->phone }}
-        </a>
-        @endif
-      </div>
 
-      {{-- Right: quote --}}
-      <div class="relative">
-        {{-- Decorative quote mark --}}
-        <div class="absolute -top-8 -left-4 text-9xl font-serif leading-none pointer-events-none select-none"
-             style="color:rgba(90,18,18,.08)">"</div>
+        <section class="border-b border-stone-200/80 bg-white py-12 md:py-16">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <h2 class="mb-8 text-center font-display text-2xl font-semibold text-ink sm:text-3xl">Mission, vision &amp; values</h2>
+                <div class="grid gap-6 md:grid-cols-3">
+                    <div class="rounded-xl border border-stone-200/80 bg-surface p-6 shadow-md shadow-stone-900/5">
+                        <h3 class="mb-2 text-base font-semibold text-brand">Mission</h3>
+                        <p class="text-sm leading-relaxed text-stone-600">To deliver affordable, inclusive education that strengthens Pakistan’s youth with knowledge, ethics, and skills aligned with national curriculum goals and global opportunity.</p>
+                    </div>
+                    <div class="rounded-xl border border-stone-200/80 bg-surface p-6 shadow-md shadow-stone-900/5">
+                        <h3 class="mb-2 text-base font-semibold text-brand">Vision</h3>
+                        <p class="text-sm leading-relaxed text-stone-600">To be recognised as a leading college where every student is known, supported, and challenged to reach their potential.</p>
+                    </div>
+                    <div class="rounded-xl border border-stone-200/80 bg-surface p-6 shadow-md shadow-stone-900/5">
+                        <h3 class="mb-2 text-base font-semibold text-brand">Values</h3>
+                        <p class="text-sm leading-relaxed text-stone-600">Integrity, respect, curiosity, responsibility, and service to community guide everything we do on campus.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <div class="relative space-y-4 text-gray-700 leading-relaxed">
-          <p>
-            Education is the most powerful gift we can offer to the young people of Gilgit-Baltistan. Here at
-            {{ $college->college_name ?? 'Jinnah Degree College Astore' }}, we do not merely impart knowledge —
-            we strive to ignite a lifelong love of learning that transcends the boundaries of our valley and
-            reaches the wider world.
-          </p>
-          <p>
-            Our students come from villages scattered across Astore District, many overcoming significant
-            personal and geographic challenges simply to walk through our gates each morning. Their dedication
-            inspires every member of our faculty and administration to raise the standard of teaching,
-            resources, and pastoral support we provide.
-          </p>
-          <p>
-            As an institution affiliated with KIU and recognised by HEC, we hold ourselves to the highest
-            national standards. I personally invite every eligible student of our region to seize the
-            opportunity that this college represents — your future, and the future of Astore, depends on it.
-          </p>
-        </div>
+        <section class="py-12 md:py-16">
+            <div class="mx-auto grid max-w-6xl items-start gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-14">
+                <div>
+                    <h2 class="mb-4 font-display text-2xl font-semibold text-ink sm:text-3xl">Our story</h2>
+                    <p class="mb-4 text-sm leading-relaxed text-stone-600 sm:text-base">
+                        Founded to serve families in <strong class="text-ink">{{ $college->city ?? 'Astore' }} and surrounding districts</strong>, {{ $college->college_name ?? 'JDCA' }} grew from a single campus into a recognised name for disciplined study, qualified faculty, and transparent admissions.
+                    </p>
+                    <p class="text-sm leading-relaxed text-stone-600 sm:text-base">
+                        We are registered with the <strong class="text-ink">{{ $college->affiliation ?? 'Karakoram International University' }}</strong> for intermediate streams; any <strong class="text-ink">BS or ADP</strong> programme is offered only under valid affiliation and HEC approval.
+                    </p>
+                </div>
+                <div class="overflow-hidden rounded-xl border border-stone-200/80 shadow-lg shadow-stone-900/10">
+                    <img src="{{ asset('assets/images/photo-1523050854058-8df90110c9f1.jpg') }}" alt="Graduates celebrating on campus" class="h-56 w-full object-cover sm:h-72 lg:h-full lg:min-h-[280px]" width="900" height="600" loading="lazy" decoding="async" />
+                </div>
+            </div>
+        </section>
 
-        {{-- Signature row --}}
-        <div class="flex items-center gap-4 mt-8 pt-6 border-t border-gray-100">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-               style="background:linear-gradient(135deg,#5a1212,#1e3a5f)">
-            {{ $initials }}
-          </div>
-          <div>
-            <p class="font-semibold text-sm" style="color:var(--c-primary)">{{ $principalName }}</p>
-            <p class="text-xs text-gray-400">Principal — {{ $college->short_name ?? 'JDCA' }}</p>
-          </div>
-        </div>
+        <section class="border-y border-stone-200/80 bg-white py-12 md:py-16">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <h2 class="mb-8 font-display text-2xl font-semibold text-ink sm:text-3xl">Leadership</h2>
+                <div class="flex max-w-xl flex-col gap-6 rounded-xl border border-stone-200/80 bg-surface p-6 shadow-md sm:flex-row sm:items-center sm:p-8">
+                    <img src="{{ asset('assets/images/photo-1573496359142-b8d87734a5a2.jpg') }}" alt="Principal portrait" class="h-28 w-28 shrink-0 rounded-lg object-cover sm:h-32 sm:w-32" width="200" height="200" loading="lazy" decoding="async" />
+                    <div>
+                        <p class="font-display text-lg font-semibold text-ink">{{ $college->principal_name ?? 'Principal Name' }}</p>
+                        <p class="text-sm font-medium text-brand">Principal</p>
+                        <p class="mt-2 text-sm leading-relaxed text-stone-600">Oversees academic quality, student welfare, liaison with boards and universities, and implementation of national student safety policies on campus.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-      </div>
-    </div>
-  </div>
-</section>
+        <section class="py-12 md:py-16">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="rounded-xl bg-brand px-5 py-6 text-center text-white shadow-lg shadow-brand/20">
+                        <p class="font-display text-3xl font-semibold sm:text-4xl">{{ number_format($stats['students'] ?? 1500) }}+</p>
+                        <p class="mt-1 text-xs text-white/90 sm:text-sm">Learners supported</p>
+                    </div>
+                    <div class="rounded-xl border border-stone-200/80 bg-white px-5 py-6 text-center shadow-md">
+                        <p class="font-display text-3xl font-semibold text-brand sm:text-4xl">98%</p>
+                        <p class="mt-1 text-xs text-stone-600 sm:text-sm">Completion / progression</p>
+                    </div>
+                    <div class="rounded-xl border border-stone-200/80 bg-white px-5 py-6 text-center shadow-md">
+                        <p class="font-display text-3xl font-semibold text-brand sm:text-4xl">{{ number_format($stats['teachers'] ?? 50) }}+</p>
+                        <p class="mt-1 text-xs text-stone-600 sm:text-sm">Faculty &amp; staff</p>
+                    </div>
+                    <div class="rounded-xl border border-stone-200/80 bg-white px-5 py-6 text-center shadow-md">
+                        <p class="font-display text-3xl font-semibold text-brand sm:text-4xl">{{ date('Y') - ($college->established_year ?? 2010) }}+</p>
+                        <p class="mt-1 text-xs text-stone-600 sm:text-sm">Years of excellence</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-{{-- ============================================================
-     SECTION 5: AFFILIATION
-     ============================================================ --}}
-<section class="py-14" style="background:var(--c-surface)">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <section class="border-t border-stone-200/80 bg-white py-12 md:py-16">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <h2 class="mb-8 text-center font-display text-2xl font-semibold text-ink sm:text-3xl">Why families choose us</h2>
+                <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <li class="flex gap-3 rounded-xl border border-stone-200/60 bg-surface p-4 transition hover:border-brand/30 hover:shadow-md">
+                        <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-brand/10 text-sm font-bold text-brand">1</span>
+                        <div><p class="font-semibold text-ink">Experienced faculty</p><p class="mt-1 text-sm text-stone-600">Subject specialists and regular professional development.</p></div>
+                    </li>
+                    <li class="flex gap-3 rounded-xl border border-stone-200/60 bg-surface p-4 transition hover:border-brand/30 hover:shadow-md">
+                        <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-brand/10 text-sm font-bold text-brand">2</span>
+                        <div><p class="font-semibold text-ink">Clear pathways</p><p class="mt-1 text-sm text-stone-600">Guidance for board exams, entry tests, and university applications.</p></div>
+                    </li>
+                    <li class="flex gap-3 rounded-xl border border-stone-200/60 bg-surface p-4 transition hover:border-brand/30 hover:shadow-md">
+                        <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-brand/10 text-sm font-bold text-brand">3</span>
+                        <div><p class="font-semibold text-ink">Safe campus</p><p class="mt-1 text-sm text-stone-600">Structured supervision, counselling, and student support services.</p></div>
+                    </li>
+                    <li class="flex gap-3 rounded-xl border border-stone-200/60 bg-surface p-4 transition hover:border-brand/30 hover:shadow-md">
+                        <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-brand/10 text-sm font-bold text-brand">4</span>
+                        <div><p class="font-semibold text-ink">Modern facilities</p><p class="mt-1 text-sm text-stone-600">Labs, library, sports, and digital learning resources.</p></div>
+                    </li>
+                    <li class="flex gap-3 rounded-xl border border-stone-200/60 bg-surface p-4 transition hover:border-brand/30 hover:shadow-md">
+                        <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-brand/10 text-sm font-bold text-brand">5</span>
+                        <div><p class="font-semibold text-ink">Co-curricular depth</p><p class="mt-1 text-sm text-stone-600">Clubs, debates, sports, and leadership opportunities.</p></div>
+                    </li>
+                    <li class="flex gap-3 rounded-xl border border-stone-200/60 bg-surface p-4 transition hover:border-brand/30 hover:shadow-md">
+                        <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-brand/10 text-sm font-bold text-brand">6</span>
+                        <div><p class="font-semibold text-ink">Transparent admissions</p><p class="mt-1 text-sm text-stone-600">Published criteria, timelines, and merit processes.</p></div>
+                    </li>
+                </ul>
+            </div>
+        </section>
 
-    <div class="text-center mb-10">
-      <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--c-gold)">Recognition</p>
-      <h2 class="text-3xl font-extrabold" style="color:var(--c-primary)">Our Affiliations</h2>
-    </div>
+        <section class="border-t border-stone-200/80 bg-surface py-12 md:py-16" aria-labelledby="at-a-glance-heading">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <h2 id="at-a-glance-heading" class="mb-8 text-center font-display text-2xl font-semibold text-ink sm:text-3xl">At a glance</h2>
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="rounded-xl border border-stone-200/80 bg-white p-6 text-center shadow-md">
+                        <p class="font-display text-3xl font-bold text-brand">{{ number_format($stats['students'] ?? 1500) }}+</p>
+                        <p class="mt-1 text-sm font-medium text-ink">Students on roll</p>
+                        <p class="mt-2 text-xs text-stone-500">Intermediate &amp; undergraduate cohorts</p>
+                    </div>
+                    <div class="rounded-xl border border-stone-200/80 bg-white p-6 text-center shadow-md">
+                        <p class="font-display text-3xl font-bold text-brand">{{ number_format($stats['teachers'] ?? 50) }}+</p>
+                        <p class="mt-1 text-sm font-medium text-ink">Teaching faculty</p>
+                        <p class="mt-2 text-xs text-stone-500">Subject leads &amp; lab demonstrators</p>
+                    </div>
+                    <div class="rounded-xl border border-stone-200/80 bg-white p-6 text-center shadow-md">
+                        <p class="font-display text-3xl font-bold text-brand">{{ date('Y') - ($college->established_year ?? 2010) }}</p>
+                        <p class="mt-1 text-sm font-medium text-ink">Years of service</p>
+                        <p class="mt-2 text-xs text-stone-500">Founded {{ $college->established_year ?? 2010 }}</p>
+                    </div>
+                    <div class="rounded-xl border border-stone-200/80 bg-white p-6 text-center shadow-md">
+                        <p class="font-display text-3xl font-bold text-brand">{{ number_format($stats['programs'] ?? 10) }}</p>
+                        <p class="mt-1 text-sm font-medium text-ink">Academic Programs</p>
+                        <p class="mt-2 text-xs text-stone-500">Intermediate &amp; BS Programs</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <section class="bg-brand py-12 text-center text-white md:py-14">
+            <div class="mx-auto max-w-2xl px-4 sm:px-6">
+                <h2 class="font-display text-2xl font-semibold sm:text-3xl">Ready to apply?</h2>
+                <p class="mt-3 text-sm text-white/90 sm:text-base">View intake dates, fees, and how to submit your application.</p>
+                <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+                    <a href="{{ route('admissions') }}#online-application" class="inline-flex items-center justify-center rounded-md bg-white px-7 py-3 text-sm font-semibold text-brand shadow-lg transition hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand">Apply online</a>
+                    <a href="{{ route('admissions') }}" class="inline-flex items-center justify-center rounded-md border-2 border-white px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand">Admissions info</a>
+                    <a href="{{ route('contact') }}" class="inline-flex items-center justify-center rounded-md border-2 border-white px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand">Contact us</a>
+                </div>
+            </div>
+        </section>
 
-      {{-- KIU --}}
-      <div class="bg-white rounded-2xl shadow-lg p-8 border-t-4" style="border-top-color:var(--c-primary)">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-extrabold text-lg"
-               style="background:var(--c-primary)">KIU</div>
-          <div>
-            <h3 class="font-bold text-lg" style="color:var(--c-primary)">Karakoram International University</h3>
-            <p class="text-sm text-gray-500">Gilgit, Gilgit-Baltistan</p>
-          </div>
-        </div>
-        <p class="text-gray-600 leading-relaxed">
-          JDCA is formally affiliated with Karakoram International University (KIU), the premier public university
-          of Gilgit-Baltistan. All academic programmes, examinations, and degree certificates are conducted and
-          issued under KIU's framework, ensuring nationally recognised credentials for every graduate.
-        </p>
-      </div>
-
-      {{-- HEC --}}
-      <div class="bg-white rounded-2xl shadow-lg p-8 border-t-4" style="border-top-color:var(--c-gold)">
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-extrabold text-lg"
-               style="background:var(--c-gold)">HEC</div>
-          <div>
-            <h3 class="font-bold text-lg" style="color:var(--c-primary)">Higher Education Commission</h3>
-            <p class="text-sm text-gray-500">Government of Pakistan</p>
-          </div>
-        </div>
-        <p class="text-gray-600 leading-relaxed">
-          The Higher Education Commission of Pakistan provides national oversight and quality assurance for all
-          degree-awarding institutions across the country. JDCA's recognition by HEC means our programmes meet
-          federal standards, and our graduates' qualifications are accepted by employers and universities nationwide.
-        </p>
-      </div>
-
-    </div>
-
-    {{-- Summary strip --}}
-    <div class="rounded-2xl py-6 px-8 text-center text-white"
-         style="background:linear-gradient(135deg,#5a1212,#1e293b)">
-      <p class="text-base font-medium">
-        Affiliated with <strong>KIU</strong> &bull; Recognised by <strong>HEC Pakistan</strong> &bull;
-        Degrees accepted nationwide and beyond
-      </p>
-    </div>
-
-  </div>
-</section>
-
-{{-- ============================================================
-     SECTION 6: FACULTY HIGHLIGHT
-     ============================================================ --}}
-<section class="py-20 bg-white">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6">
-
-    <div class="text-center mb-12">
-      <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--c-gold)">Our People</p>
-      <h2 class="font-display text-2xl sm:text-3xl font-semibold tracking-tight" style="color:var(--c-primary)">Dedicated Faculty &amp; Staff</h2>
-      <p class="mt-3 text-gray-500 max-w-2xl mx-auto">
-        Our team of qualified educators, counsellors, and administrators is committed to every student's success.
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-
-      @php
-        $facultyHighlights = [
-          [
-            'icon'       => '👨‍🏫',
-            'gradient'   => 'linear-gradient(135deg,#5a1212,#7b1a1a)',
-            'title'      => 'Qualified Educators',
-            'text'       => 'Our faculty members hold advanced degrees from recognised Pakistani and international universities. Many bring years of field experience alongside their academic qualifications.',
-            'statColor'  => 'var(--c-primary)',
-            'stat'       => ($college->total_faculty ?? '25') . '+ Faculty Members',
-          ],
-          [
-            'icon'       => '🤝',
-            'gradient'   => 'linear-gradient(135deg,#b8862a,#c4973a)',
-            'title'      => 'Student-Centred Support',
-            'text'       => 'Beyond the classroom, our counselling and student-affairs team ensures that every student — regardless of background or learning need — receives the guidance required to thrive.',
-            'statColor'  => 'var(--c-gold)',
-            'stat'       => 'Personalised Counselling Available',
-          ],
-          [
-            'icon'       => '🏢',
-            'gradient'   => 'linear-gradient(135deg,#1e293b,#1e3a5f)',
-            'title'      => 'Professional Administration',
-            'text'       => 'Our administrative staff manages registrations, examinations, finances, and campus operations with professionalism and transparency, creating a smooth experience for students and families.',
-            'statColor'  => '#1e3a5f',
-            'stat'       => 'Transparent & Efficient Operations',
-          ],
-        ];
-      @endphp
-
-      @foreach($facultyHighlights as $fCard)
-      <div class="bg-white rounded-2xl shadow-md p-8 border border-gray-100 hover:-translate-y-1 transition-transform">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-6"
-             style="background:{{ $fCard['gradient'] }}">{{ $fCard['icon'] }}</div>
-        <h3 class="text-xl font-bold mb-3" style="color:var(--c-primary)">{{ $fCard['title'] }}</h3>
-        <p class="text-gray-600 leading-relaxed mb-4">{{ $fCard['text'] }}</p>
-        <p class="text-sm font-semibold flex items-center gap-2" style="color:{{ $fCard['statColor'] }}">
-          <span>•</span> {{ $fCard['stat'] }}
-        </p>
-      </div>
-      @endforeach
-
-    </div>
-
-    <div class="text-center">
-      <a href="{{ route('faculty') }}"
-         class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white transition-transform hover:-translate-y-0.5"
-         style="background:var(--c-primary)">
-        Meet Our Faculty
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-      </a>
-    </div>
-
-  </div>
-</section>
-
-{{-- ============================================================
-     CLOSING CTA
-     ============================================================ --}}
-<section class="py-20" style="background:var(--c-surface)">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="rounded-3xl py-16 px-8 text-center text-white"
-         style="background:linear-gradient(135deg,#5a1212 0%,#1e293b 100%)">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-4">Ready to Begin Your Journey?</h2>
-      <p class="text-lg mb-8" style="color:rgba(255,255,255,.75)">
-        Join hundreds of students building their future at {{ $college->short_name ?? 'JDCA' }}.
-        Applications for the next academic year are now open.
-      </p>
-      <div class="flex flex-wrap justify-center gap-4">
-        <a href="{{ route('admissions') }}"
-           class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-transform hover:-translate-y-0.5"
-           style="background:var(--c-gold);color:#1a0a00">
-          Apply for Admission
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-        </a>
-        <a href="{{ route('contact') }}"
-           class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white transition-transform hover:-translate-y-0.5"
-           style="border:2px solid rgba(255,255,255,.5)">
-          Contact Us
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
+    </main>
 
 @endsection

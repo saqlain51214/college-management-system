@@ -21,7 +21,7 @@ class StudentPortalAuthTest extends TestCase
 
     public function test_authenticated_student_is_redirected_from_login(): void
     {
-        $student = Student::factory()->withPassword('test@1234')->create();
+        $student = Student::factory()->create(['portal_password' => 'test@1234']);
 
         $response = $this->actingAs($student, 'student')->get('/portal/login');
 
@@ -49,7 +49,10 @@ class StudentPortalAuthTest extends TestCase
 
     public function test_login_fails_with_wrong_password(): void
     {
-        Student::factory()->withPassword('correct@pass')->create(['roll_number' => 'CS-2024-0001']);
+        Student::factory()->create([
+            'roll_number' => 'CS-2024-0001',
+            'portal_password' => 'correct@pass',
+        ]);
 
         $response = $this->post('/portal/login', [
             'roll_number' => 'CS-2024-0001',
@@ -61,7 +64,10 @@ class StudentPortalAuthTest extends TestCase
 
     public function test_student_can_login_with_hashed_password(): void
     {
-        Student::factory()->withPassword('student@1234')->create(['roll_number' => 'CS-2024-0001']);
+        Student::factory()->create([
+            'roll_number' => 'CS-2024-0001',
+            'portal_password' => 'student@1234',
+        ]);
 
         $response = $this->post('/portal/login', [
             'roll_number' => 'CS-2024-0001',

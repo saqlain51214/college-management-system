@@ -1,0 +1,18 @@
+[Unit]
+Description=JDCA Laravel Scheduler Runner
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=5
+WorkingDirectory=/var/www/jdca
+ExecStart=/usr/bin/php /var/www/jdca/artisan schedule:work
+StandardOutput=append:/var/www/jdca/storage/logs/scheduler.log
+StandardError=append:/var/www/jdca/storage/logs/scheduler.log
+Environment=APP_ENV=production
+
+[Install]
+WantedBy=multi-user.target
