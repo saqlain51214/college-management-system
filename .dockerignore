@@ -1,0 +1,12 @@
+.git
+node_modules
+vendor
+tests
+storage/logs/*
+storage/app/public/livewire-tmp/*
+.env
+*.xlsx
+vercel.json
+api
+.vercelignore
+railpack.json
