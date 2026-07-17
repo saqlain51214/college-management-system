@@ -1,4 +1,15 @@
-# Laravel + Filament on Railway
+# syntax=docker/dockerfile:1
+
+# ── Stage 1: build front-end assets (Vite/Tailwind) ──────────────────────────
+FROM node:20-alpine AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+# Full source needed so Tailwind can scan blade templates for used classes
+COPY . .
+RUN npm run build
+
+# ── Stage 2: PHP application ─────────────────────────────────────────────────
 FROM php:8.3-cli
 
 # System libraries needed to build the PHP extensions this app requires
@@ -25,6 +36,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 
 # Copy the rest of the application
 COPY . /app
+
+# Bring in the freshly built assets (overwrites any committed build)
+COPY --from=assets /app/public/build /app/public/build
 
 # Finalise autoload + publish framework/Filament assets (no DB needed)
 RUN composer dump-autoload --optimize --no-interaction \

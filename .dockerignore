@@ -1,6 +1,7 @@
 .git
 node_modules
 vendor
+public/hot
 tests
 storage/logs/*
 storage/app/public/livewire-tmp/*
