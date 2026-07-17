@@ -12,7 +12,7 @@ class ContactMessageResource extends Resource
 {
     protected static ?string $model = ContactMessage::class;
     protected static ?string $navigationIcon  = 'heroicon-o-chat-bubble-left-right';
-    protected static ?string $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'Website Management';
     protected static ?string $navigationLabel = 'Contact Messages';
     protected static ?int    $navigationSort  = 10;
 

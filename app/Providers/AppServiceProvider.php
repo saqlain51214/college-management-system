@@ -14,6 +14,7 @@ use App\Models\Teacher;
 use App\Models\WebsiteEvent;
 use App\Models\WebsitePage;
 use App\Observers\ActivityLogObserver;
+use App\Observers\AnnouncementNotificationObserver;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
@@ -69,6 +70,8 @@ class AppServiceProvider extends ServiceProvider
         ] as $modelClass) {
             $modelClass::observe(ActivityLogObserver::class);
         }
+
+        Announcement::observe(AnnouncementNotificationObserver::class);
 
         // All table row actions → icon-only with label as tooltip on hover
         EditAction::configureUsing(fn($a)        => $a->iconButton());

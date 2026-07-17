@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>@yield('title', 'Dashboard') — Student Portal | JDCA</title>
+  <title>@yield('title', 'Dashboard') — Student Portal | {{ \App\Models\CollegeSetting::get('college_short_name', 'JDCA') }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -13,6 +13,11 @@
     .sidebar-w { width: 260px; }
     .main-pl { padding-left: 0; }
     @media (min-width: 1024px) { .main-pl { padding-left: 260px; } }
+
+    /* Placeholder text visible on dark backgrounds */
+    input::placeholder,
+    textarea::placeholder { color: #64748b; opacity: 1; }
+    select option { background: #1e293b; color: #e2e8f0; }
   </style>
 </head>
 <body class="portal-theme font-sans antialiased min-h-screen" x-data="{ sidebarOpen: false }">
@@ -31,13 +36,30 @@
        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
 
   {{-- Logo --}}
-  <div class="flex items-center gap-3 px-5 py-5 flex-shrink-0" style="border-bottom: 1px solid rgba(255,255,255,0.08)">
-    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: #c4973a">
-      <span class="text-white font-black text-[11px] leading-none">JDCA</span>
-    </div>
-    <div>
-      <div class="text-white font-bold text-sm leading-tight">Student Portal</div>
-      <div class="text-xs mt-0.5" style="color: rgba(255,255,255,0.35)">Jinnah Degree College</div>
+  @php
+    $cShort    = \App\Models\CollegeSetting::get('college_short_name', 'JDCA');
+    $cName     = \App\Models\CollegeSetting::get('college_name', 'Jinnah Degree College Astore');
+    $cLogoPath = \App\Models\CollegeSetting::get('college_logo');
+    $cLogoUrl  = $cLogoPath ? \Illuminate\Support\Facades\Storage::disk('public')->url($cLogoPath) : null;
+  @endphp
+  <div class="flex flex-col gap-2 px-5 py-4 flex-shrink-0" style="border-bottom: 1px solid rgba(255,255,255,0.08)">
+    @if($cLogoUrl)
+      {{-- Image logo: shown at natural width, max constrained --}}
+      <img src="{{ $cLogoUrl }}" alt="{{ $cShort }}"
+           class="h-12 w-auto max-w-[170px] object-contain object-left">
+    @else
+      {{-- Text fallback: gold pill --}}
+      <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 font-black text-white text-sm tracking-tight"
+             style="background: #c4973a">{{ $cShort }}</div>
+        <div class="min-w-0">
+          <div class="text-white font-bold text-sm leading-tight truncate">{{ $cShort }}</div>
+          <div class="text-xs mt-0.5 truncate" style="color: rgba(255,255,255,0.35)">{{ $cName }}</div>
+        </div>
+      </div>
+    @endif
+    <div class="text-xs font-semibold" style="color: rgba(255,255,255,0.4); letter-spacing: 0.05em; text-transform: uppercase">
+      Student Portal
     </div>
   </div>
 
@@ -58,19 +80,17 @@
   <nav class="flex-1 px-3 py-3 overflow-y-auto space-y-0.5">
     @php
     $navLinks = [
-      ['route' => 'portal.dashboard', 'label' => 'Dashboard',   'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
-      ['route' => 'portal.results',   'label' => 'Exam Results', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'],
-      ['route' => 'portal.fees',      'label' => 'Fee Status',   'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'],
-      ['route' => 'portal.timetable', 'label' => 'Timetable',    'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
-      ['route' => 'portal.notices',   'label' => 'Notices',      'icon' => 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'],
-      ['route' => 'portal.profile',   'label' => 'My Profile',   'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'],
+      ['route' => 'portal.dashboard', 'label' => 'Dashboard', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
+      ['route' => 'portal.fees',      'label' => 'Fee Status', 'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'],
+      ['route' => 'portal.notices',   'label' => 'Notices',    'icon' => 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'],
+      ['route' => 'portal.profile',   'label' => 'My Profile', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'],
     ];
     @endphp
 
     <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-widest" style="color: rgba(255,255,255,0.25)">Navigation</p>
 
     @foreach($navLinks as $link)
-    @php $active = request()->routeIs($link['route']); @endphp
+    @php $active = request()->routeIs($link['route']) || request()->routeIs($link['route'] . '.*'); @endphp
     <a href="{{ route($link['route']) }}" @click="sidebarOpen = false"
        class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
        style="{{ $active ? 'background: rgba(255,255,255,0.12); color: #fff;' : 'color: rgba(255,255,255,0.55);' }}"
@@ -135,7 +155,7 @@
           </p>
         </div>
       </div>
-      {{-- Date + Avatar --}}
+      {{-- Notification Bell + Date + Avatar --}}
       <div class="flex items-center gap-3">
         <div class="text-right hidden sm:block">
           <div class="text-xs font-medium text-slate-300">{{ now()->format('l') }}</div>

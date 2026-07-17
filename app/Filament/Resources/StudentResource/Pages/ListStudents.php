@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\StudentResource\Pages;
 
+use App\Filament\Actions\DownloadImportTemplateAction;
+use App\Filament\Actions\ImportStudentsFromExcelAction;
 use App\Filament\Resources\StudentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -34,6 +36,8 @@ class ListStudents extends ListRecords
                         Column::make('admission_date')->heading('Admission Date'),
                     ]),
             ]),
+            DownloadImportTemplateAction::make(),
+            ImportStudentsFromExcelAction::make(),
             Actions\CreateAction::make(),
         ];
     }

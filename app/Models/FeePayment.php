@@ -19,6 +19,7 @@ class FeePayment extends Model
         'fee_type', 'semester_number', 'amount_due', 'amount_paid', 'fine_amount',
         'discount_amount', 'payment_status', 'payment_method', 'due_date',
         'payment_date', 'transaction_id', 'bank_name', 'remarks', 'collected_by',
+        'payment_proof_path', 'proof_uploaded_at',
     ];
 
     protected $casts = [

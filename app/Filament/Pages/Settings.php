@@ -106,11 +106,11 @@ class Settings extends Page implements HasForms
                             ->image()
                             ->disk('public')
                             ->directory('college')
-                            ->maxSize(1024)
+                            ->maxSize(5120)
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth('400')
                             ->imageResizeTargetHeight('120')
-                            ->helperText('Recommended: transparent PNG, max 400×120px, 1MB.')
+                            ->helperText('Recommended: transparent PNG, max 400×120px, 5MB.')
                             ->columnSpanFull(),
                     ]),
 
@@ -169,15 +169,32 @@ class Settings extends Page implements HasForms
 
                         TextInput::make('fee_bank_name')
                             ->label('Bank Name')
+                            ->placeholder('e.g. HBL, UBL')
                             ->columnSpan(1),
 
                         TextInput::make('fee_bank_account')
                             ->label('Bank Account Number')
                             ->columnSpan(1),
 
+                        TextInput::make('fee_bank_account_title')
+                            ->label('Account Title')
+                            ->placeholder('Jinnah School & Degree College Astore')
+                            ->columnSpan(1),
+
                         TextInput::make('fee_bank_branch')
-                            ->label('Bank Branch')
-                            ->columnSpanFull(),
+                            ->label('Bank Branch / Code')
+                            ->columnSpan(1),
+
+                        TextInput::make('fee_challan_1bill_prefix')
+                            ->label('1-Bill Consumer Number Prefix')
+                            ->helperText('Digits prepended to the challan SN for 1-Bill payment. Leave blank if not applicable.')
+                            ->columnSpan(1),
+
+                        TextInput::make('fee_challan_ref_prefix')
+                            ->label('Reference Number Prefix')
+                            ->placeholder('e.g. JDCA-2024')
+                            ->helperText('Prepended to the challan number on printed vouchers.')
+                            ->columnSpan(1),
                     ]),
 
                 Section::make('Website Appearance')
@@ -398,6 +415,9 @@ class Settings extends Page implements HasForms
         ];
 
         foreach ($data as $key => $value) {
+            if ($key === 'college_logo' && blank($value)) {
+                continue;
+            }
             CollegeSetting::set($key, $value, $groups[$key] ?? 'general');
         }
 

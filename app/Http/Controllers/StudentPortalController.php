@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Mail\StudentPortalPasswordChangedMail;
 use App\Models\Announcement;
-use App\Models\ExamResult;
 use App\Models\FeePayment;
-use App\Models\Timetable;
+use App\Models\FeeSlipTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -31,36 +30,12 @@ class StudentPortalController extends Controller
         ];
         $feeStats['balance'] = $feeStats['total_due'] - $feeStats['total_paid'];
 
-        $recentResults = ExamResult::with(['exam.course'])
-            ->where('student_id', $student->id)
-            ->whereHas('exam', fn($q) => $q->where('results_published', true))
-            ->latest()->limit(5)->get();
-
-        $avgGpa = $recentResults->whereNotNull('grade_points')->avg('grade_points');
-
         $notices = Announcement::where('is_published', true)
             ->where(fn($q) => $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()))
             ->where(fn($q) => $q->where('audience', 'all')->orWhere('audience', 'students')->orWhereNull('audience'))
             ->orderByDesc('publish_date')->limit(5)->get();
 
-        return view('portal.dashboard', compact('student', 'feeStats', 'recentResults', 'avgGpa', 'notices'));
-    }
-
-    public function results()
-    {
-        $student = $this->student();
-
-        $results = ExamResult::with(['exam.course', 'exam.academicProgram'])
-            ->where('student_id', $student->id)
-            ->whereHas('exam', fn($q) => $q->where('results_published', true))
-            ->orderByDesc('created_at')
-            ->get();
-
-        $grouped = $results->groupBy(fn($r) => $r->exam?->semester_number ?? 'Unknown');
-
-        $cgpa = $results->whereNotNull('grade_points')->avg('grade_points');
-
-        return view('portal.results', compact('student', 'results', 'grouped', 'cgpa'));
+        return view('portal.dashboard', compact('student', 'feeStats', 'notices'));
     }
 
     public function fees()
@@ -80,24 +55,6 @@ class StudentPortalController extends Controller
         return view('portal.fees', compact('student', 'payments', 'summary'));
     }
 
-    public function timetable()
-    {
-        $student = $this->student();
-
-        $days = ['monday','tuesday','wednesday','thursday','friday','saturday'];
-
-        $slots = Timetable::with(['course','teacher'])
-            ->forProgram($student->academic_program_id)
-            ->forSemester($student->current_semester ?? 1)
-            ->active()
-            ->orderByRaw("CASE day_of_week WHEN 'monday' THEN 1 WHEN 'tuesday' THEN 2 WHEN 'wednesday' THEN 3 WHEN 'thursday' THEN 4 WHEN 'friday' THEN 5 WHEN 'saturday' THEN 6 ELSE 7 END")
-            ->orderBy('start_time')
-            ->get()
-            ->groupBy('day_of_week');
-
-        return view('portal.timetable', compact('student', 'slots', 'days'));
-    }
-
     public function feeChallan(FeePayment $payment)
     {
         $student = $this->student();
@@ -107,6 +64,41 @@ class StudentPortalController extends Controller
         }
 
         return app(PdfController::class)->feeChallan($payment);
+    }
+
+    public function feeChallanPreview(FeePayment $payment)
+    {
+        $student = $this->student();
+
+        if ($payment->student_id !== $student->id) {
+            abort(403);
+        }
+
+        $payment->load(['student.academicProgram', 'student.academicYear', 'feeStructure', 'academicYear']);
+        $template = FeeSlipTemplate::active();
+        return view('portal.fee-challan-preview', compact('payment', 'template'));
+    }
+
+    public function uploadProof(Request $request, FeePayment $payment)
+    {
+        $student = $this->student();
+        if ($payment->student_id !== $student->id) abort(403);
+
+        $request->validate([
+            'proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
+
+        if ($payment->payment_proof_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($payment->payment_proof_path);
+        }
+
+        $path = $request->file('proof')->store('payment-proofs', 'public');
+        $payment->update([
+            'payment_proof_path' => $path,
+            'proof_uploaded_at'  => now(),
+        ]);
+
+        return back()->with('proof_uploaded', 'Payment proof uploaded. Admin will verify and mark as paid shortly.');
     }
 
     public function notices()

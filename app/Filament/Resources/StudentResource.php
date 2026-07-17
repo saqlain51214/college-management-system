@@ -4,19 +4,23 @@ namespace App\Filament\Resources;
 
 use App\Enums\AdmissionTypeEnum;
 use App\Enums\BloodGroupEnum;
+use App\Enums\FeeTypeEnum;
 use App\Enums\GenderEnum;
+use App\Enums\PaymentStatusEnum;
 use App\Enums\StudentStatusEnum;
 use App\Filament\Resources\StudentResource\Pages;
 use App\Helpers\ValidationHelper;
 use App\Models\AcademicProgram;
 use App\Models\AcademicYear;
 use App\Models\Department;
+use App\Models\FeePayment;
 use App\Models\Student;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class StudentResource extends Resource
 {
@@ -531,14 +535,6 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
 
-                Tables\Actions\Action::make('printTranscript')
-                    ->label('Transcript')
-                    ->icon('heroicon-o-document-arrow-down')
-                    ->color('info')
-                    ->iconButton()
-                    ->url(fn(\App\Models\Student $r) => route('pdf.transcript', $r))
-                    ->openUrlInNewTab(),
-
                 Tables\Actions\Action::make('attendanceReport')
                     ->label('Attendance Report')
                     ->icon('heroicon-o-chart-bar')
@@ -594,6 +590,70 @@ class StudentResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+
+                    Tables\Actions\BulkAction::make('generateChallans')
+                        ->label('Generate Fee Challans')
+                        ->icon('heroicon-o-document-plus')
+                        ->color('primary')
+                        ->form([
+                            Forms\Components\Select::make('fee_type')
+                                ->label('Fee Type')
+                                ->options(FeeTypeEnum::options())
+                                ->required()
+                                ->default(FeeTypeEnum::Tuition->value),
+
+                            Forms\Components\TextInput::make('amount_due')
+                                ->label('Amount Due (Rs.)')
+                                ->numeric()
+                                ->prefix('Rs.')
+                                ->required()
+                                ->minValue(100)
+                                ->placeholder('e.g. 28000'),
+
+                            Forms\Components\DatePicker::make('due_date')
+                                ->label('Due Date')
+                                ->required()
+                                ->native(false)
+                                ->displayFormat('d M Y'),
+
+                            Forms\Components\Select::make('semester_number')
+                                ->label('Semester')
+                                ->options(collect(range(1, 8))->mapWithKeys(fn($n) => [$n => "Semester $n"]))
+                                ->placeholder('Not applicable'),
+
+                            Forms\Components\Select::make('academic_year_id')
+                                ->label('Academic Year')
+                                ->options(fn() => AcademicYear::where('is_active', true)->pluck('name', 'id'))
+                                ->searchable(),
+
+                            Forms\Components\TextInput::make('remarks')
+                                ->label('Remarks (Optional)')
+                                ->placeholder('e.g. Spring 2026 Semester Fee'),
+                        ])
+                        ->action(function (\Illuminate\Support\Collection $records, array $data) {
+                            $created = 0;
+                            foreach ($records as $student) {
+                                FeePayment::create([
+                                    'student_id'       => $student->id,
+                                    'challan_number'   => 'CHN-' . strtoupper(Str::random(8)),
+                                    'fee_type'         => $data['fee_type'],
+                                    'amount_due'       => $data['amount_due'],
+                                    'fine_amount'      => 0,
+                                    'discount_amount'  => 0,
+                                    'amount_paid'      => 0,
+                                    'payment_status'   => PaymentStatusEnum::Pending->value,
+                                    'due_date'         => $data['due_date'],
+                                    'semester_number'  => $data['semester_number'] ?? null,
+                                    'academic_year_id' => $data['academic_year_id'] ?? null,
+                                    'remarks'          => $data['remarks'] ?? null,
+                                ]);
+                                $created++;
+                            }
+                            \Filament\Notifications\Notification::make()
+                                ->title("{$created} fee challans generated successfully.")
+                                ->success()->send();
+                        }),
+
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),

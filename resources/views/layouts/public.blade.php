@@ -68,10 +68,27 @@
         .site-brand-gradient { background: linear-gradient(135deg, var(--site-brand), var(--site-brand-dark)); }
         .site-gold-gradient { background: linear-gradient(135deg, var(--site-gold), #a07830); }
         .site-brand-text { color: var(--site-brand); }
+        /* ── Navigation dropdowns ───────────────────────────────────────── */
+        .dd-menu {
+            position: absolute; left: 0; top: 100%; z-index: 50; list-style: none;
+            border-radius: 0.75rem; background: #fff; padding: 0.5rem 0; color: #1c1917;
+            visibility: hidden; opacity: 0; pointer-events: none;
+            transform: translateY(-6px) scaleY(0.95); transform-origin: top;
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+            box-shadow: 0 12px 40px -4px rgba(0,0,0,0.18); min-width: 13rem;
+        }
+        .group:hover > .dd-menu, .group:focus-within > .dd-menu {
+            visibility: visible; opacity: 1; pointer-events: auto;
+            transform: translateY(0) scaleY(1);
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0s;
+        }
+        .mob-link { display:block; border-radius:0.5rem; padding:0.625rem 1rem; transition: background-color 0.15s; }
+        .mob-link:hover { background: rgba(255,255,255,0.1); }
+        .event-details-btn:hover { background: var(--site-brand); color: #fff; }
     </style>
 </head>
 
-<body class="site-body bg-surface font-sans text-stone-800 antialiased overflow-x-hidden">
+<body class="font-sans text-stone-800 antialiased overflow-x-hidden" style="background:var(--site-body-bg)">
 
 <a href="#main"
    class="absolute left-[-9999px] top-0 z-[300] whitespace-nowrap rounded-md bg-white px-4 py-2 text-sm font-semibold text-brand shadow-lg transition-none focus:left-4 focus:top-4 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand">Skip to main content</a>
@@ -79,7 +96,7 @@
 <div id="site-preloader"
      class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-gradient-to-br from-brand via-brand to-brand-dark transition-opacity duration-500 ease-out motion-reduce:duration-150"
      role="status" aria-live="polite" aria-busy="true">
-    <p class="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">JDCA</p>
+    <p class="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">{{ \App\Models\CollegeSetting::get('college_short_name', 'JDCA') }}</p>
     <div
         class="mt-8 h-10 w-10 rounded-full border-[3px] border-white/25 border-t-white motion-reduce:animate-none motion-reduce:border-white/60 animate-spin"
         aria-hidden="true"></div>
@@ -87,151 +104,220 @@
 </div>
 
 <header id="siteHeader" class="fixed inset-x-0 top-0 z-50 text-white">
-    <div class="site-topbar px-4 py-2 text-[11px] sm:text-xs">
-        <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 sm:px-2">
-            <div class="min-w-0 flex flex-1 flex-wrap items-center gap-x-3 gap-y-1 text-white/95 sm:gap-x-4">
-                <a href="tel:{{ preg_replace('/\s+/', '', $college->phone ?? '') }}" class="transition hover:text-white">{{ $college->phone ?? '+92 312 9776585' }}</a>
-                <span class="hidden text-white/40 sm:inline" aria-hidden="true">|</span>
-                <a href="mailto:{{ $college->email ?? '' }}" class="transition hover:text-white">{{ $college->email ?? 'jinnahschooldegreecollege@gmail.com' }}</a>
-            </div>
-            <div class="flex items-center gap-4">
-                <a href="{{ route('portal.login') }}" class="hidden transition hover:text-white sm:inline">Student Portal</a>
-            </div>
-        </div>
-    </div>
-    <div class="border-b border-white/15 bg-black/30 backdrop-blur-md">
-        <div class="mx-auto grid min-w-0 max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 sm:px-6 sm:py-3.5 sm:gap-4 xl:grid-cols-[auto_minmax(0,1fr)_auto]">
-            <a href="{{ route('home') }}" class="flex min-w-0 max-w-[70vw] items-center gap-2 sm:max-w-none">
-                <span class="site-gold-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-lg shadow-gold/30 text-sm font-black tracking-tighter text-white sm:h-11 sm:w-11 sm:text-base" aria-hidden="true">{{ $college->short_name ?? 'JDCA' }}</span>
-                <span class="truncate font-display text-lg font-semibold tracking-tight sm:text-xl">{{ $college->college_name ?? 'Jinnah School & Degree College' }}</span>
+
+    {{-- ── ROW 1: Identity bar — logo + name + search + hamburger ──────── --}}
+    <div class="site-topbar">
+        <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 h-[68px] sm:h-[80px]">
+
+            {{-- Logo + College Name --}}
+            <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3 self-stretch min-w-0">
+                @php $logoCustom = $college->logo_url ?? null; @endphp
+                @if($logoCustom)
+                    <img src="{{ $logoCustom }}" alt="{{ $college->short_name ?? 'JDCA' }}"
+                         class="h-full w-auto max-w-[80px] sm:max-w-[96px] shrink-0 object-contain">
+                @else
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none"
+                         style="height:100%;width:auto;max-width:96px;display:block;flex-shrink:0;"
+                         aria-label="{{ $college->short_name ?? 'JDCA' }}" role="img">
+                        <circle cx="100" cy="100" r="96" stroke="white" stroke-width="2.5" fill="none" opacity="0.9"/>
+                        <circle cx="100" cy="100" r="86" stroke="white" stroke-width="1" fill="none" opacity="0.3"/>
+                        <g transform="translate(100,88)">
+                            <path d="M-38,-22 C-38,-22 -20,-28 0,-20 L0,22 C-20,14 -38,20 -38,20 Z" fill="white" opacity="0.9"/>
+                            <path d="M38,-22 C38,-22 20,-28 0,-20 L0,22 C20,14 38,20 38,20 Z" fill="white" opacity="0.75"/>
+                            <line x1="0" y1="-20" x2="0" y2="22" stroke="white" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="-28" y1="-8" x2="-8" y2="-11" stroke="white" stroke-width="1" opacity="0.5"/>
+                            <line x1="-28" y1="-1" x2="-8" y2="-4" stroke="white" stroke-width="1" opacity="0.5"/>
+                            <line x1="-28" y1="6" x2="-8" y2="3" stroke="white" stroke-width="1" opacity="0.5"/>
+                            <line x1="28" y1="-8" x2="8" y2="-11" stroke="white" stroke-width="1" opacity="0.4"/>
+                            <line x1="28" y1="-1" x2="8" y2="-4" stroke="white" stroke-width="1" opacity="0.4"/>
+                            <line x1="28" y1="6" x2="8" y2="3" stroke="white" stroke-width="1" opacity="0.4"/>
+                            <polygon points="0,-36 3,-29 10,-29 5,-24 7,-17 0,-21 -7,-17 -5,-24 -10,-29 -3,-29" fill="white" opacity="0.9"/>
+                        </g>
+                        <text x="100" y="148" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" letter-spacing="5" fill="white" opacity="0.95">JDCA</text>
+                        <line x1="30" y1="155" x2="72" y2="155" stroke="white" stroke-width="0.8" opacity="0.4"/>
+                        <line x1="128" y1="155" x2="170" y2="155" stroke="white" stroke-width="0.8" opacity="0.4"/>
+                        <text x="100" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" letter-spacing="1.5" fill="white" opacity="0.6">JINNAH DEGREE COLLEGE ASTORE</text>
+                    </svg>
+                @endif
+                <div class="min-w-0">
+                    <div class="font-display font-bold leading-tight text-sm sm:text-base">{{ $college->college_name ?? 'Jinnah School & Degree College Astore' }}</div>
+                    <div class="hidden sm:block text-[10px] text-white/65 mt-0.5">Astore, Gilgit-Baltistan &nbsp;·&nbsp; Affiliated: KIU</div>
+                </div>
             </a>
 
-            <ul class="hidden min-w-0 list-none items-center justify-end gap-1 text-[12px] xl:flex xl:flex-nowrap xl:gap-2 2xl:gap-3" role="menubar">
-                <li><a href="{{ route('home') }}" class="nav-link">Home</a></li>
+            <div class="flex-1"></div>
 
-                @if($showAboutMenu)
-                    <li class="group relative">
-                        <a href="{{ route('about') }}" class="nav-link flex items-center gap-0.5">
-                            <span>About Us</span>
-                            <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
-                        </a>
-                        <ul class="invisible absolute left-0 z-50 mt-0 w-56 origin-top -translate-y-1 scale-95 list-none rounded-xl bg-white py-2 text-stone-800 opacity-0 shadow-xl shadow-stone-900/10 pointer-events-none transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
-                            <li><a href="{{ route('about') }}" class="dropdown-link">About Overview</a></li>
-                            @if($pageVisible('about-history'))
-                                <li><a href="{{ route('about.history') }}" class="dropdown-link">History & Location</a></li>
-                            @endif
-                            @if($pageVisible('about-mission'))
-                                <li><a href="{{ route('about.mission') }}" class="dropdown-link">Mission & Vision</a></li>
-                            @endif
-                            @if($pageVisible('faculty'))
-                                <li><a href="{{ route('faculty') }}" class="dropdown-link">Faculty & Leadership</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
+            {{-- Contact info (large screens only) --}}
+            <div class="hidden lg:flex flex-col items-end gap-0.5 text-[10px] text-white/70 shrink-0">
+                <a href="tel:{{ preg_replace('/\s+/', '', $college->phone ?? '') }}" class="hover:text-white transition flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+                    {{ $college->phone ?? '+92 312 9776585' }}
+                </a>
+                <a href="mailto:{{ $college->email ?? '' }}" class="hover:text-white transition flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                    {{ $college->email ?? 'jinnahschooldegreecollege@gmail.com' }}
+                </a>
+            </div>
 
-                @if($showAcademicsMenu)
-                    <li class="group relative">
-                        <a href="{{ route('programs') }}" class="nav-link flex items-center gap-0.5">
-                            <span>Academics</span>
-                            <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
-                        </a>
-                        <ul class="invisible absolute left-0 z-50 mt-0 w-56 origin-top -translate-y-1 scale-95 list-none rounded-xl bg-white py-2 text-stone-800 opacity-0 shadow-xl shadow-stone-900/10 pointer-events-none transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
-                            <li><a href="{{ route('programs') }}" class="dropdown-link">All Programs</a></li>
-                            @if($pageVisible('gallery'))
-                                <li><a href="{{ route('gallery') }}" class="dropdown-link">Campus Gallery</a></li>
-                            @endif
-                            @if($pageVisible('timetable'))
-                                <li><a href="{{ route('timetable') }}" class="dropdown-link">Timetable</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
+            {{-- Search --}}
+            <form action="{{ route('search') }}" method="GET" class="hidden sm:flex relative shrink-0">
+                <input type="search" name="q" placeholder="Search..."
+                       class="rounded-full pl-4 pr-9 py-1.5 text-xs bg-white/15 text-white placeholder-white/55 border border-white/20 focus:outline-none focus:bg-white/25 focus:border-white/40 transition w-32 lg:w-44">
+                <button type="submit" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition" aria-label="Search">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </form>
 
-                @if($showAdmissionsMenu)
-                    <li class="group relative">
-                        <a href="{{ route('admissions') }}" class="nav-link flex items-center gap-0.5">
-                            <span>Admission</span>
-                            <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
-                        </a>
-                        <ul class="invisible absolute left-0 z-50 mt-0 w-56 origin-top -translate-y-1 scale-95 list-none rounded-xl bg-white py-2 text-stone-800 opacity-0 shadow-xl shadow-stone-900/10 pointer-events-none transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
-                            <li><a href="{{ route('admissions') }}" class="dropdown-link">Admission Procedure</a></li>
-                            <li><a href="{{ route('admissions') }}#online-application" class="dropdown-link">Apply Online</a></li>
-                            @if($pageVisible('contact'))
-                                <li><a href="{{ route('contact') }}" class="dropdown-link">Contact Admissions</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
+            {{-- Portal link (xl only) --}}
+            <a href="{{ route('portal.login') }}" class="hidden xl:flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold bg-white/15 hover:bg-white/25 border border-white/20 transition shrink-0">
+                Student Portal
+            </a>
 
-                @if($showStudentLifeMenu)
-                    <li class="group relative">
-                        <a href="{{ route('news') }}" class="nav-link flex items-center gap-0.5">
-                            <span>Student Life</span>
-                            <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
-                        </a>
-                        <ul class="invisible absolute left-0 z-50 mt-0 w-56 origin-top -translate-y-1 scale-95 list-none rounded-xl bg-white py-2 text-stone-800 opacity-0 shadow-xl shadow-stone-900/10 pointer-events-none transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100">
-                            <li><a href="{{ route('news') }}" class="dropdown-link">News & Updates</a></li>
-                            @if($pageVisible('events'))
-                                <li><a href="{{ route('events') }}" class="dropdown-link">Events & Activities</a></li>
-                            @endif
-                            @if($pageVisible('notices'))
-                                <li><a href="{{ route('notices') }}" class="dropdown-link">Notices & Circulars</a></li>
-                            @endif
-                            @if($pageVisible('results'))
-                                <li><a href="{{ route('results') }}" class="dropdown-link">Exam Results</a></li>
-                            @endif
-                        </ul>
-                    </li>
-                @endif
+            {{-- Hamburger --}}
+            <button type="button" id="menuToggle"
+                    class="flex items-center gap-2 rounded-lg p-2 xl:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand shrink-0"
+                    aria-expanded="false" aria-controls="mobileMenu" aria-label="Open navigation menu">
+                <div id="hamburger" class="flex h-[18px] w-6 flex-col justify-center gap-1.5" aria-hidden="true">
+                    <span id="hb1" class="block h-0.5 w-full origin-center rounded bg-white transition-all duration-300"></span>
+                    <span id="hb2" class="block h-0.5 w-full rounded bg-white transition-all duration-300"></span>
+                    <span id="hb3" class="block h-0.5 w-full origin-center rounded bg-white transition-all duration-300"></span>
+                </div>
+            </button>
+        </div>
+    </div>
 
-                @if($pageVisible('contact'))
-                    <li><a href="{{ route('contact') }}" class="nav-link">Contact Us</a></li>
-                @endif
+    {{-- ── ROW 2: Nav bar — centered menu items ─────────────────────────── --}}
+    @php $deptList = \App\Models\Department::visible()->ordered()->get(); @endphp
+    <div class="relative border-t border-white/10" style="background:rgba(0,0,0,0.52); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
+        <div class="mx-auto max-w-6xl px-4">
+
+            {{-- Desktop nav --}}
+            <ul class="hidden xl:flex items-center justify-center gap-0 list-none h-10 text-[11.5px]" role="menubar">
+
+                <li><a href="{{ route('home') }}" class="nav-link px-3">Home</a></li>
+
+                {{-- About Us --}}
+                <li class="group relative">
+                    <a href="{{ route('about') }}" class="nav-link px-3 flex items-center gap-0.5">
+                        About Us<svg class="h-3 w-3 ml-0.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </a>
+                    <ul class="dd-menu w-60">
+                        <li><a href="{{ route('about.history') }}"   class="dropdown-link">History &amp; Geography</a></li>
+                        <li><a href="{{ route('about.mission') }}"   class="dropdown-link">Mission &amp; Vision</a></li>
+                        <li><a href="{{ route('about.message') }}"   class="dropdown-link">Message from VC</a></li>
+                        <li><a href="{{ route('about.director') }}"  class="dropdown-link">Message from Director</a></li>
+                        <li><a href="{{ route('about.principal') }}" class="dropdown-link">Message from Principal</a></li>
+                        <li><a href="{{ route('campus-facilities') }}" class="dropdown-link">Campus Facilities</a></li>
+                    </ul>
+                </li>
+
+                {{-- Academics --}}
+                <li class="group relative">
+                    <a href="{{ route('departments') }}" class="nav-link px-3 flex items-center gap-0.5">
+                        Academics<svg class="h-3 w-3 ml-0.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </a>
+                    <ul class="dd-menu w-56">
+                        <li class="group/depts relative">
+                            <a href="{{ route('departments') }}" class="dropdown-link flex items-center justify-between">
+                                Departments<svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                            <ul class="invisible absolute left-full top-0 z-50 w-72 list-none rounded-xl bg-white py-2 text-stone-800 shadow-xl pointer-events-none opacity-0 transition-all duration-200 group-hover/depts:pointer-events-auto group-hover/depts:visible group-hover/depts:opacity-100">
+                                @foreach($deptList as $dept)
+                                <li><a href="{{ route('departments.show', $dept->slug) }}" class="dropdown-link">{{ $dept->name }}</a></li>
+                                @endforeach
+                                @if($deptList->isEmpty())<li class="px-4 py-2 text-xs text-stone-400">No departments yet</li>@endif
+                            </ul>
+                        </li>
+                        <li><a href="{{ route('faculty') }}"                   class="dropdown-link">Faculty Profile</a></li>
+                        <li><a href="{{ route('admissions.semester-rules') }}" class="dropdown-link">Semester Rules</a></li>
+                    </ul>
+                </li>
+
+                {{-- Admission --}}
+                <li class="group relative">
+                    <a href="{{ route('admissions') }}" class="nav-link px-3 flex items-center gap-0.5">
+                        Admission<svg class="h-3 w-3 ml-0.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </a>
+                    <ul class="dd-menu w-56">
+                        <li><a href="{{ route('admissions.procedure') }}"    class="dropdown-link">Admission Procedure</a></li>
+                        <li><a href="{{ route('admissions') }}"              class="dropdown-link">Online Admission</a></li>
+                        <li><a href="{{ route('admissions') }}"              class="dropdown-link">Admission Form</a></li>
+                        <li><a href="{{ route('admissions.fee-structure') }}" class="dropdown-link">Fee Structure</a></li>
+                        <li class="group/schol relative">
+                            <a href="{{ route('scholarships') }}" class="dropdown-link flex items-center justify-between">
+                                Scholarships<svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                            <ul class="invisible absolute left-full top-0 z-50 w-64 list-none rounded-xl bg-white py-2 text-stone-800 shadow-xl pointer-events-none opacity-0 transition-all duration-200 group-hover/schol:pointer-events-auto group-hover/schol:visible group-hover/schol:opacity-100">
+                                <li><a href="{{ route('scholarships') }}" class="dropdown-link">Merit-Based Scholarship</a></li>
+                                <li><a href="{{ route('scholarships') }}" class="dropdown-link">Need-Based Scholarship</a></li>
+                                <li><a href="{{ route('scholarships') }}" class="dropdown-link">Orphan Scholarship</a></li>
+                                <li><a href="{{ route('scholarships') }}" class="dropdown-link">Special Category Scholarship</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+
+                <li><a href="https://colleges.kiu.edu.pk/" target="_blank" rel="noopener" class="nav-link px-3">College LMS</a></li>
+                <li><a href="{{ route('jobs') }}"     class="nav-link px-3">Jobs</a></li>
+                <li><a href="{{ route('downloads') }}" class="nav-link px-3">Downloads</a></li>
+                <li><a href="{{ route('contact') }}"  class="nav-link px-3">Contact Us</a></li>
+
+                <li class="ml-2">
+                    <a href="{{ route('admissions') }}" class="site-gold-gradient rounded-md px-3 py-1.5 text-[11px] font-semibold text-white shadow transition hover:opacity-90">Apply Now</a>
+                </li>
             </ul>
 
-            <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
-                @if($showAdmissionsMenu)
-                    <a href="{{ route('admissions') }}"
-                       class="site-gold-gradient hidden rounded-md px-3 py-2 text-xs font-semibold text-white shadow-md shadow-gold/30 transition hover:shadow-lg hover:shadow-gold/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand xl:inline-flex xl:shrink-0 xl:text-sm">Apply Now</a>
-                @endif
-                <button type="button" id="menuToggle"
-                        class="flex items-center gap-2 rounded-lg p-2 xl:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand"
-                        aria-expanded="false" aria-controls="mobileMenu" aria-label="Open navigation menu">
-                    <div id="hamburger" class="flex h-[18px] w-6 flex-col justify-center gap-1.5" aria-hidden="true">
-                        <span id="hb1" class="block h-0.5 w-full origin-center rounded bg-white transition-all duration-300"></span>
-                        <span id="hb2" class="block h-0.5 w-full rounded bg-white transition-all duration-300"></span>
-                        <span id="hb3" class="block h-0.5 w-full origin-center rounded bg-white transition-all duration-300"></span>
-                    </div>
-                </button>
-            </div>
-        </div>
+            {{-- Mobile menu (below nav bar) --}}
+            <nav id="mobileMenu"
+                 class="absolute left-0 right-0 top-full z-40 hidden max-h-[min(85dvh,36rem)] overflow-y-auto overscroll-contain bg-brand pb-[env(safe-area-inset-bottom,0px)] shadow-lg xl:hidden"
+                 aria-label="Mobile navigation">
+                <div class="px-4">
+                    <ul class="flex list-none flex-col gap-0.5 py-3 text-white text-sm">
+                        <li><a href="{{ route('home') }}" class="mob-link font-semibold">Home</a></li>
 
-        <nav id="mobileMenu"
-             class="absolute left-0 right-0 top-full z-40 hidden max-h-[min(85dvh,36rem)] overflow-y-auto overscroll-contain bg-brand pb-[env(safe-area-inset-bottom,0px)] shadow-lg shadow-stone-900/25 xl:hidden"
-             aria-label="Mobile navigation">
-            <div class="mx-auto max-w-6xl px-4">
-                <ul class="flex list-none flex-col gap-0.5 py-3 text-white">
-                    <li><a href="{{ route('home') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Home</a></li>
-                    @if($showAboutMenu)
-                        <li><a href="{{ route('about') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">About Us</a></li>
-                    @endif
-                    @if($showAcademicsMenu)
-                        <li><a href="{{ route('programs') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Academics</a></li>
-                    @endif
-                    @if($showAdmissionsMenu)
-                        <li><a href="{{ route('admissions') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Admission</a></li>
-                    @endif
-                    @if($showStudentLifeMenu)
-                        <li><a href="{{ route('news') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Student Life</a></li>
-                    @endif
-                    <li><a href="{{ route('portal.login') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Student Portal</a></li>
-                    @if($pageVisible('contact'))
-                        <li><a href="{{ route('contact') }}" class="block rounded-lg px-4 py-2.5 text-sm transition-colors hover:bg-white/10">Contact Us</a></li>
-                    @endif
-                </ul>
-            </div>
-        </nav>
+                        <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">About Us</li>
+                        <li><a href="{{ route('about.history') }}"   class="mob-link pl-7">History &amp; Geography</a></li>
+                        <li><a href="{{ route('about.mission') }}"   class="mob-link pl-7">Mission &amp; Vision</a></li>
+                        <li><a href="{{ route('about.message') }}"   class="mob-link pl-7">Message from VC</a></li>
+                        <li><a href="{{ route('about.director') }}"  class="mob-link pl-7">Message from Director</a></li>
+                        <li><a href="{{ route('about.principal') }}" class="mob-link pl-7">Message from Principal</a></li>
+                        <li><a href="{{ route('campus-facilities') }}" class="mob-link pl-7">Campus Facilities</a></li>
+
+                        <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">Academics</li>
+                        <li><a href="{{ route('departments') }}" class="mob-link pl-7">Departments</a></li>
+                        @foreach($deptList as $dept)
+                        <li><a href="{{ route('departments.show', $dept->slug) }}" class="mob-link pl-12 text-white/70">{{ $dept->name }}</a></li>
+                        @endforeach
+                        <li><a href="{{ route('faculty') }}"                   class="mob-link pl-7">Faculty Profile</a></li>
+                        <li><a href="{{ route('admissions.semester-rules') }}" class="mob-link pl-7">Semester Rules</a></li>
+
+                        <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">Admission</li>
+                        <li><a href="{{ route('admissions.procedure') }}"     class="mob-link pl-7">Admission Procedure</a></li>
+                        <li><a href="{{ route('admissions') }}"               class="mob-link pl-7">Online Admission</a></li>
+                        <li><a href="{{ route('admissions') }}"               class="mob-link pl-7">Admission Form</a></li>
+                        <li><a href="{{ route('admissions.fee-structure') }}" class="mob-link pl-7">Fee Structure</a></li>
+                        <li class="px-4 pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/30">Scholarships</li>
+                        <li><a href="{{ route('scholarships') }}" class="mob-link pl-12 text-white/70">Merit-Based Scholarship</a></li>
+                        <li><a href="{{ route('scholarships') }}" class="mob-link pl-12 text-white/70">Need-Based Scholarship</a></li>
+                        <li><a href="{{ route('scholarships') }}" class="mob-link pl-12 text-white/70">Orphan Scholarship</a></li>
+                        <li><a href="{{ route('scholarships') }}" class="mob-link pl-12 text-white/70">Special Category Scholarship</a></li>
+
+                        <li class="my-2 border-t border-white/10"></li>
+                        <li><a href="https://colleges.kiu.edu.pk/" target="_blank" rel="noopener" class="mob-link">College LMS</a></li>
+                        <li><a href="{{ route('jobs') }}"      class="mob-link">Jobs</a></li>
+                        <li><a href="{{ route('downloads') }}" class="mob-link">Downloads</a></li>
+                        <li><a href="{{ route('contact') }}"   class="mob-link">Contact Us</a></li>
+                        <li class="my-2 border-t border-white/10"></li>
+                        <li><a href="{{ route('portal.login') }}" class="mob-link text-white/70">Student Portal</a></li>
+                        <li>
+                            <a href="{{ route('admissions') }}"
+                               class="mob-link mx-2 mt-1 mb-2 flex items-center justify-center rounded-lg py-2.5 text-center text-sm font-bold text-white"
+                               style="background:var(--site-gold)">Apply for Admission</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
     </div>
 </header>
 
@@ -243,8 +329,34 @@
 <footer class="site-footer px-4 py-14 text-white sm:px-6 sm:py-16">
     <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
         <div class="text-left">
-            <div class="mb-4 flex items-center gap-2">
-                <span class="site-gold-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-lg shadow-gold/30 text-sm font-black tracking-tighter text-white" aria-hidden="true">{{ $college->short_name ?? 'JDCA' }}</span>
+            <div class="mb-4 flex items-center gap-3">
+                @if($logoCustom)
+                    <img src="{{ $logoCustom }}" alt="{{ $college->short_name ?? 'JDCA' }}"
+                         class="h-14 w-auto max-w-[60px] object-contain shrink-0">
+                @else
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none"
+                         style="height:3.5rem;width:auto;max-width:60px;display:block;flex-shrink:0;"
+                         aria-label="{{ $college->short_name ?? 'JDCA' }}" role="img">
+                        <circle cx="100" cy="100" r="96" stroke="white" stroke-width="2.5" fill="none" opacity="0.9"/>
+                        <circle cx="100" cy="100" r="86" stroke="white" stroke-width="1" fill="none" opacity="0.3"/>
+                        <g transform="translate(100,88)">
+                            <path d="M-38,-22 C-38,-22 -20,-28 0,-20 L0,22 C-20,14 -38,20 -38,20 Z" fill="white" opacity="0.9"/>
+                            <path d="M38,-22 C38,-22 20,-28 0,-20 L0,22 C20,14 38,20 38,20 Z" fill="white" opacity="0.75"/>
+                            <line x1="0" y1="-20" x2="0" y2="22" stroke="white" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="-28" y1="-8" x2="-8" y2="-11" stroke="white" stroke-width="1" opacity="0.5"/>
+                            <line x1="-28" y1="-1" x2="-8" y2="-4" stroke="white" stroke-width="1" opacity="0.5"/>
+                            <line x1="-28" y1="6" x2="-8" y2="3" stroke="white" stroke-width="1" opacity="0.5"/>
+                            <line x1="28" y1="-8" x2="8" y2="-11" stroke="white" stroke-width="1" opacity="0.4"/>
+                            <line x1="28" y1="-1" x2="8" y2="-4" stroke="white" stroke-width="1" opacity="0.4"/>
+                            <line x1="28" y1="6" x2="8" y2="3" stroke="white" stroke-width="1" opacity="0.4"/>
+                            <polygon points="0,-36 3,-29 10,-29 5,-24 7,-17 0,-21 -7,-17 -5,-24 -10,-29 -3,-29" fill="white" opacity="0.9"/>
+                        </g>
+                        <text x="100" y="148" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" letter-spacing="5" fill="white" opacity="0.95">JDCA</text>
+                        <line x1="30" y1="155" x2="72" y2="155" stroke="white" stroke-width="0.8" opacity="0.4"/>
+                        <line x1="128" y1="155" x2="170" y2="155" stroke="white" stroke-width="0.8" opacity="0.4"/>
+                        <text x="100" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" letter-spacing="1.5" fill="white" opacity="0.6">JINNAH DEGREE COLLEGE ASTORE</text>
+                    </svg>
+                @endif
                 <span class="font-display text-xl font-semibold">{{ $college->college_name ?? 'Jinnah School & Degree College' }}</span>
             </div>
             <p class="text-sm leading-relaxed text-stone-400">
@@ -252,39 +364,26 @@
             </p>
         </div>
         <div class="text-left">
-            <p class="mb-4 font-display text-xl font-semibold text-white">About & Academics</p>
+            <p class="mb-4 font-display text-xl font-semibold text-white">About &amp; Academics</p>
             <ul class="space-y-2.5 text-sm text-stone-400">
-                <li><a href="{{ route('home') }}" class="transition hover:text-white">Home</a></li>
-                @if($pageVisible('about'))
-                    <li><a href="{{ route('about') }}" class="transition hover:text-white">About Us</a></li>
-                @endif
-                @if($pageVisible('programs'))
-                    <li><a href="{{ route('programs') }}" class="transition hover:text-white">Programs</a></li>
-                @endif
-                @if($pageVisible('faculty'))
-                    <li><a href="{{ route('faculty') }}" class="transition hover:text-white">Faculty Profile</a></li>
-                @endif
+                <li><a href="{{ route('about') }}" class="transition hover:text-white">About Us</a></li>
+                <li><a href="{{ route('about.history') }}" class="transition hover:text-white">History &amp; Geography</a></li>
+                <li><a href="{{ route('about.mission') }}" class="transition hover:text-white">Mission &amp; Vision</a></li>
+                <li><a href="{{ route('departments') }}" class="transition hover:text-white">Departments</a></li>
+                <li><a href="{{ route('faculty') }}" class="transition hover:text-white">Faculty Profile</a></li>
+                <li><a href="{{ route('campus-facilities') }}" class="transition hover:text-white">Campus Facilities</a></li>
             </ul>
         </div>
         <div class="text-left">
             <p class="mb-4 font-display text-xl font-semibold text-white">Quick Links</p>
             <ul class="space-y-2.5 text-sm text-stone-400">
-                @if($pageVisible('admissions'))
-                    <li><a href="{{ route('admissions') }}" class="transition hover:text-white">Admissions</a></li>
-                @endif
-                @if($pageVisible('news'))
-                    <li><a href="{{ route('news') }}" class="transition hover:text-white">News & Updates</a></li>
-                @endif
-                @if($pageVisible('events'))
-                    <li><a href="{{ route('events') }}" class="transition hover:text-white">Events & Activities</a></li>
-                @endif
-                @if($pageVisible('notices'))
-                    <li><a href="{{ route('notices') }}" class="transition hover:text-white">Notices</a></li>
-                @endif
-                @if($pageVisible('results'))
-                    <li><a href="{{ route('results') }}" class="transition hover:text-white">Results</a></li>
-                @endif
+                <li><a href="{{ route('admissions') }}" class="transition hover:text-white">Online Admission</a></li>
+                <li><a href="{{ route('admissions.fee-structure') }}" class="transition hover:text-white">Fee Structure</a></li>
+                <li><a href="{{ route('scholarships') }}" class="transition hover:text-white">Scholarships</a></li>
+                <li><a href="{{ route('jobs') }}" class="transition hover:text-white">Jobs</a></li>
+                <li><a href="{{ route('notices') }}" class="transition hover:text-white">Notices</a></li>
                 <li><a href="{{ route('portal.login') }}" class="transition hover:text-white">Student Portal</a></li>
+                <li><a href="https://colleges.kiu.edu.pk/" target="_blank" class="transition hover:text-white">College LMS</a></li>
             </ul>
         </div>
         <div class="text-left">

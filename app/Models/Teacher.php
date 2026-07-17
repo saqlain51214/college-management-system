@@ -13,10 +13,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class Teacher extends Model implements AuthenticatableContract
 {
-    use SoftDeletes, Authenticatable;
+    use SoftDeletes, Authenticatable, Notifiable;
 
     protected $fillable = [
         'user_id',
@@ -69,6 +70,11 @@ class Teacher extends Model implements AuthenticatableContract
 
     protected $hidden = ['portal_password', 'remember_token'];
 
+    public function routeNotificationForMail(): string
+    {
+        return $this->email;
+    }
+
     public function getAuthIdentifierName(): string  { return 'employee_id'; }
     public function getAuthIdentifier(): mixed        { return $this->employee_id; }
     public function getAuthPassword(): string         { return $this->portal_password ?? ''; }
@@ -116,6 +122,11 @@ class Teacher extends Model implements AuthenticatableContract
         return Attribute::make(
             set: fn(?string $value) => filled($value) ? \Illuminate\Support\Facades\Hash::make($value) : null
         );
+    }
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        return $this->photo ? asset('storage/' . $this->photo) : null;
     }
 
     // ─── Scopes ───────────────────────────────────────────────────────────────

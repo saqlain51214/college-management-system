@@ -10,6 +10,8 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('fees:check-overdue')->dailyAt('01:00');
+Schedule::command('attendance:check-warnings')->weeklyOn(1, '08:00');  // every Monday 8am
+Schedule::command('attendance:send-reminders')->dailyAt('07:00');      // remind teachers before class
 Schedule::command('queue:prune-failed --hours=72')->dailyAt('01:30');
 Schedule::command('queue:prune-batches --hours=72')->dailyAt('02:00');
 Schedule::call(function (): void {

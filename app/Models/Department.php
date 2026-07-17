@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use App\Enums\DepartmentTypeEnum;
+use App\Models\AcademicProgram;
+use App\Models\Teacher;
 use App\Enums\StatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -97,5 +100,15 @@ class Department extends Model
     public function getBannerImageUrlAttribute(): ?string
     {
         return $this->banner_image ? asset('storage/' . $this->banner_image) : null;
+    }
+
+    public function teachers(): HasMany
+    {
+        return $this->hasMany(Teacher::class)->where('is_active', true)->orderBy('name');
+    }
+
+    public function academicPrograms(): HasMany
+    {
+        return $this->hasMany(AcademicProgram::class)->where('is_active', true)->orderBy('name');
     }
 }

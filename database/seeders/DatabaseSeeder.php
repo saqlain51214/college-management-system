@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
 
             // Login accounts and role-based access testing.
             TestCredentialsSeeder::class,
+
+            // Fee slip template designer presets.
+            FeeSlipTemplateSeeder::class,
         ]);
     }
 }

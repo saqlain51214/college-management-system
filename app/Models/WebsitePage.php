@@ -11,20 +11,38 @@ class WebsitePage extends Model
     use SoftDeletes;
 
     public const STATIC_PAGES = [
-        'home' => ['title' => 'Home', 'route_name' => 'home', 'sort' => 1, 'in_menu' => true],
-        'about' => ['title' => 'About Overview', 'route_name' => 'about', 'sort' => 2, 'in_menu' => true],
-        'about-history' => ['title' => 'History & Location', 'route_name' => 'about.history', 'sort' => 3, 'in_menu' => false],
-        'about-mission' => ['title' => 'Mission & Vision', 'route_name' => 'about.mission', 'sort' => 4, 'in_menu' => false],
-        'programs' => ['title' => 'Academics', 'route_name' => 'programs', 'sort' => 5, 'in_menu' => true],
-        'faculty' => ['title' => 'Faculty', 'route_name' => 'faculty', 'sort' => 6, 'in_menu' => false],
-        'admissions' => ['title' => 'Online Admission Form', 'route_name' => 'admissions', 'sort' => 7, 'in_menu' => true],
-        'gallery' => ['title' => 'College Gallery', 'route_name' => 'gallery', 'sort' => 8, 'in_menu' => false],
-        'news' => ['title' => 'News', 'route_name' => 'news', 'sort' => 9, 'in_menu' => false],
-        'events' => ['title' => 'Events', 'route_name' => 'events', 'sort' => 10, 'in_menu' => false],
-        'notices' => ['title' => 'Notices', 'route_name' => 'notices', 'sort' => 11, 'in_menu' => false],
-        'results' => ['title' => 'Results', 'route_name' => 'results', 'sort' => 12, 'in_menu' => false],
-        'timetable' => ['title' => 'Timetable', 'route_name' => 'timetable', 'sort' => 13, 'in_menu' => false],
-        'contact' => ['title' => 'Contact Us', 'route_name' => 'contact', 'sort' => 14, 'in_menu' => true],
+        // ── Home ──────────────────────────────────────────────────────
+        'home'                => ['title' => 'Home',                    'route_name' => 'home',                    'sort' =>  1, 'in_menu' => true],
+
+        // ── About Us ──────────────────────────────────────────────────
+        'about'               => ['title' => 'About JDCA',              'route_name' => 'about',                   'sort' =>  2, 'in_menu' => true],
+        'about-history'       => ['title' => 'History & Geography',     'route_name' => 'about.history',           'sort' =>  3, 'in_menu' => false],
+        'about-mission'       => ['title' => 'Mission & Vision',        'route_name' => 'about.mission',           'sort' =>  4, 'in_menu' => false],
+        'about-message'       => ['title' => 'Message from Principal',  'route_name' => 'about.message',           'sort' =>  5, 'in_menu' => false],
+
+        // ── Academics ─────────────────────────────────────────────────
+        'programs'            => ['title' => 'Academic Programmes',     'route_name' => 'programs',                'sort' =>  6, 'in_menu' => true],
+        'departments'         => ['title' => 'Departments',             'route_name' => 'departments',             'sort' =>  7, 'in_menu' => false],
+        'faculty'             => ['title' => 'Faculty Profile',         'route_name' => 'faculty',                 'sort' =>  8, 'in_menu' => false],
+        'campus-facilities'   => ['title' => 'Campus Facilities',       'route_name' => 'campus-facilities',       'sort' =>  9, 'in_menu' => false],
+        'downloads'           => ['title' => 'Downloads',               'route_name' => 'downloads',               'sort' => 10, 'in_menu' => false],
+        'gallery'             => ['title' => 'College Gallery',         'route_name' => 'gallery',                 'sort' => 11, 'in_menu' => false],
+
+        // ── Admission ─────────────────────────────────────────────────
+        'admissions'          => ['title' => 'Online Admission Form',   'route_name' => 'admissions',              'sort' => 12, 'in_menu' => true],
+        'admission-procedure' => ['title' => 'Admission Procedure',     'route_name' => 'admissions.procedure',    'sort' => 13, 'in_menu' => false],
+        'fee-structure'       => ['title' => 'Fee Structure',           'route_name' => 'admissions.fee-structure','sort' => 14, 'in_menu' => false],
+        'semester-rules'      => ['title' => 'Semester Rules',          'route_name' => 'admissions.semester-rules','sort'=> 15, 'in_menu' => false],
+
+        // ── Scholarships ──────────────────────────────────────────────
+        'scholarships'        => ['title' => 'Scholarships',            'route_name' => 'scholarships',            'sort' => 16, 'in_menu' => true],
+
+        // ── Other public pages ────────────────────────────────────────
+        'alumni'              => ['title' => 'Alumni',                  'route_name' => 'alumni',                  'sort' => 17, 'in_menu' => true],
+        'news'                => ['title' => 'News',                    'route_name' => 'news',                    'sort' => 18, 'in_menu' => false],
+        'events'              => ['title' => 'Events',                  'route_name' => 'events',                  'sort' => 19, 'in_menu' => false],
+        'notices'             => ['title' => 'Notices',                 'route_name' => 'notices',                 'sort' => 20, 'in_menu' => false],
+        'contact'             => ['title' => 'Contact Us',              'route_name' => 'contact',                 'sort' => 21, 'in_menu' => true],
     ];
 
     protected $fillable = [
@@ -213,8 +231,71 @@ class WebsitePage extends Model
             ],
             'contact' => [
                 'intro_title' => 'Contact Us',
-                'intro_text' => "Reach out to the JDCA team - we're happy to answer your questions about admissions, programmes, or anything else.",
+                'intro_text' => "Reach out to the JDCA team — we're happy to answer your questions about admissions, programmes, or anything else.",
                 'body_html' => '<p>Use this section for contact instructions, reception details, or visitor notes.</p>',
+            ],
+            'about-message' => [
+                'intro_title' => 'Message from the Principal',
+                'intro_text' => 'A personal message from the Principal of Jinnah School & Degree College Astore.',
+                'principal_name' => 'Arif Ali',
+                'principal_title' => 'Principal, JDCA',
+                'message_html' => '<p>On behalf of the faculty and staff of Jinnah School & Degree College Astore, I warmly welcome you to our institution. We are committed to providing quality education and nurturing every student to realise their full potential. Our aim is to create a supportive learning environment that prepares students for success in higher education and professional life.</p><p>We believe that education is not only about academic achievement, but also about character, service, and contribution to society. I invite you to explore our programmes and join the JDCA family.</p>',
+            ],
+            'departments' => [
+                'intro_title' => 'Our Departments',
+                'intro_text' => 'Jinnah Degree College Astore offers a range of academic departments covering arts, sciences, computer science, and professional education.',
+                'body_html' => '<p>Each department is staffed by qualified subject specialists committed to academic excellence and student development.</p>',
+            ],
+            'campus-facilities' => [
+                'intro_title' => 'Campus Facilities',
+                'intro_text' => 'Modern facilities supporting academic, co-curricular, and student welfare activities at JDCA.',
+                'body_html' => '<p>Update this section with the latest campus facilities information.</p>',
+                'facilities' => [
+                    ['title' => 'Computer Lab', 'description' => 'Modern computers with internet access for student research and coursework.', 'icon' => 'computer'],
+                    ['title' => 'Science Labs', 'description' => 'Fully equipped physics, chemistry, and biology laboratories for practical sessions.', 'icon' => 'flask'],
+                    ['title' => 'Library', 'description' => 'A comprehensive collection of academic texts, reference books, and digital resources.', 'icon' => 'book'],
+                    ['title' => 'Sports Ground', 'description' => 'Outdoor sports facilities including cricket, football, and athletics.', 'icon' => 'sports'],
+                    ['title' => 'Prayer Area', 'description' => 'Dedicated prayer spaces for students and staff.', 'icon' => 'mosque'],
+                    ['title' => 'Canteen', 'description' => 'On-campus canteen providing meals and refreshments during college hours.', 'icon' => 'food'],
+                ],
+            ],
+            'downloads' => [
+                'intro_title' => 'Downloads',
+                'intro_text' => 'Download official forms, notices, syllabi, and other academic documents from Jinnah School & Degree College Astore.',
+                'body_html' => '<p>Use this section to provide guidance on available downloads.</p>',
+            ],
+            'admission-procedure' => [
+                'intro_title' => 'Admission Procedure',
+                'intro_text' => 'Step-by-step guide to applying for admission at JDCA for Intermediate and Degree programmes.',
+                'body_html' => '<p>Update this section with the latest admission procedure and eligibility requirements.</p>',
+                'steps' => [
+                    ['step' => '01', 'title' => 'Eligibility Check', 'description' => 'Confirm you meet the minimum qualification requirements for your chosen programme (Matric for Intermediate, FA/FSc for Degree).'],
+                    ['step' => '02', 'title' => 'Collect Form', 'description' => 'Collect the admission form from the college office or download it from this website.'],
+                    ['step' => '03', 'title' => 'Submit Documents', 'description' => 'Submit the completed form along with attested copies of your academic certificates, CNIC/B-Form, and passport photos.'],
+                    ['step' => '04', 'title' => 'Fee Deposit', 'description' => 'Deposit the admission fee at the designated bank and attach the original bank receipt.'],
+                    ['step' => '05', 'title' => 'Verification', 'description' => 'Attend the college for document verification and interview if required.'],
+                    ['step' => '06', 'title' => 'Enrolment', 'description' => 'Collect your student ID and timetable from the college office. You are now officially enrolled.'],
+                ],
+            ],
+            'fee-structure' => [
+                'intro_title' => 'Fee Structure',
+                'intro_text' => 'Transparent fee information for all programmes offered at Jinnah School & Degree College Astore.',
+                'body_html' => '<p>Fee details are updated each academic session. Contact the college office for the most current information.</p>',
+            ],
+            'semester-rules' => [
+                'intro_title' => 'Semester Rules & Regulations',
+                'intro_text' => 'Academic rules, attendance requirements, and examination policies for all students of JDCA.',
+                'body_html' => '<p>Update this section with the current semester rules and regulations.</p>',
+            ],
+            'scholarships' => [
+                'intro_title' => 'Scholarships',
+                'intro_text' => 'JDCA offers scholarships to support deserving students — merit-based, need-based, and special category awards.',
+                'body_html' => '<p>Update this section with scholarship eligibility, application process, and deadlines.</p>',
+            ],
+            'alumni' => [
+                'intro_title' => 'JDCA Alumni',
+                'intro_text' => 'Join our growing community of JDCA graduates who are making a difference in Astore, Gilgit-Baltistan, and beyond.',
+                'body_html' => '<p>Update this section with alumni stories, achievements, and how to register as an alumnus.</p>',
             ],
             default => [
                 'intro_title' => self::STATIC_PAGES[$slug]['title'] ?? 'Website Page',

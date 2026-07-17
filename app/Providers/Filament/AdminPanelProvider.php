@@ -70,19 +70,11 @@ class AdminPanelProvider extends PanelProvider
 
                 NavigationGroup::make('Faculty & Staff')
                     ->icon('heroicon-o-users')
-                    ->collapsed(true),
+                    ->collapsed(false),
 
-                NavigationGroup::make('Academic')
-                    ->icon('heroicon-o-academic-cap')
-                    ->collapsed(true),
-
-                NavigationGroup::make('Library')
-                    ->icon('heroicon-o-book-open')
-                    ->collapsed(true),
-
-                NavigationGroup::make('LMS Portal')
-                    ->icon('heroicon-o-computer-desktop')
-                    ->collapsed(true),
+                NavigationGroup::make('Finance')
+                    ->icon('heroicon-o-banknotes')
+                    ->collapsed(false),
 
                 NavigationGroup::make('Website Management')
                     ->icon('heroicon-o-globe-alt')

@@ -22,6 +22,8 @@ use Illuminate\Validation\Rules\Unique;
 
 class RoleResource extends BaseRoleResource
 {
+    protected static ?string $navigationGroup = 'System';
+
     public static function form(Form $form): Form
     {
         return $form

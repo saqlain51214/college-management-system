@@ -13,10 +13,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class Student extends Model implements AuthenticatableContract
 {
-    use HasFactory, SoftDeletes, Authenticatable;
+    use HasFactory, SoftDeletes, Authenticatable, Notifiable;
 
     protected $fillable = [
         'user_id', 'department_id', 'academic_program_id', 'academic_year_id',
@@ -46,6 +47,11 @@ class Student extends Model implements AuthenticatableContract
     ];
 
     protected $hidden = ['portal_password', 'remember_token'];
+
+    public function routeNotificationForMail(): string
+    {
+        return $this->email;
+    }
 
     public function getAuthIdentifierName(): string  { return 'roll_number'; }
     public function getAuthIdentifier(): mixed        { return $this->roll_number; }

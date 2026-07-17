@@ -17,7 +17,7 @@ class ScholarshipResource extends Resource
     protected static ?string $model = Scholarship::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-gift';
-    protected static ?string $navigationGroup = 'Students & Admissions';
+    protected static ?string $navigationGroup = 'Finance';
     protected static ?string $navigationLabel = 'Scholarships';
     protected static ?int    $navigationSort  = 5;
 
@@ -70,11 +70,11 @@ class ScholarshipResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn($state) => $state instanceof ScholarshipTypeEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof ScholarshipTypeEnum ? $state->color() : 'gray'),
-                Tables\Columns\TextColumn::make('funding_source')->placeholder('â€”')->toggleable(),
-                Tables\Columns\TextColumn::make('amount')->money('PKR')->placeholder('â€”')->sortable(),
-                Tables\Columns\TextColumn::make('coverage_percent')->suffix('%')->placeholder('â€”')->label('Coverage'),
+                Tables\Columns\TextColumn::make('funding_source')->placeholder('Ã¢â‚¬â€')->toggleable(),
+                Tables\Columns\TextColumn::make('amount')->money('PKR')->placeholder('Ã¢â‚¬â€')->sortable(),
+                Tables\Columns\TextColumn::make('coverage_percent')->suffix('%')->placeholder('Ã¢â‚¬â€')->label('Coverage'),
                 Tables\Columns\TextColumn::make('seats')->placeholder('Unlimited')->label('Seats'),
-                Tables\Columns\TextColumn::make('application_end')->label('Closes')->date('d M Y')->placeholder('â€”'),
+                Tables\Columns\TextColumn::make('application_end')->label('Closes')->date('d M Y')->placeholder('Ã¢â‚¬â€'),
                 Tables\Columns\IconColumn::make('is_active')->label('Active')->boolean(),
             ])
             ->filters([

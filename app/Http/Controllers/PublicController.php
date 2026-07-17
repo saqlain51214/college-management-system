@@ -8,10 +8,10 @@ use App\Mail\ContactMessageAcknowledgementMail;
 use App\Mail\ContactMessageOfficeNotificationMail;
 use App\Models\AcademicProgram;
 use App\Models\AdmissionInquiry;
+use App\Models\Department;
 use App\Models\Announcement;
 use App\Models\CollegeSetting;
 use App\Models\ContactMessage;
-use App\Models\ExamResult;
 use App\Models\HomeSection;
 use App\Models\NewsArticle;
 use App\Models\Student;
@@ -36,6 +36,9 @@ class PublicController extends Controller
         $principal   = CollegeSetting::get('college_principal',   'Arif Ali');
         $affiliation = CollegeSetting::get('college_affiliation', 'Karakoram International University');
 
+        $logoPath = CollegeSetting::get('college_logo');
+        $logoUrl  = $logoPath ? asset('storage/' . $logoPath) : null;
+
         return (object) [
             // canonical names
             'name'             => $name,
@@ -48,6 +51,7 @@ class PublicController extends Controller
             'website'          => CollegeSetting::get('college_website', 'https://jdca.edu.pk'),
             'principal'        => $principal,
             'affiliation'      => $affiliation,
+            'logo_url'         => $logoUrl,
             // aliases used by views
             'college_name'     => $name,
             'college_short'    => $short,
@@ -152,22 +156,6 @@ class PublicController extends Controller
         return view('public.about', compact('college', 'cmsPage', 'pageContent', 'stats'));
     }
 
-    public function history()
-    {
-        $college = $this->college();
-        $cmsPage = $this->cmsPage('about-history');
-        $pageContent = $cmsPage->content;
-        return view('public.history', compact('college', 'cmsPage', 'pageContent'));
-    }
-
-    public function mission()
-    {
-        $college = $this->college();
-        $cmsPage = $this->cmsPage('about-mission');
-        $pageContent = $cmsPage->content;
-        return view('public.mission', compact('college', 'cmsPage', 'pageContent'));
-    }
-
     public function programs()
     {
         $college  = $this->college();
@@ -188,26 +176,16 @@ class PublicController extends Controller
 
     public function admissions()
     {
-        $college  = $this->college();
-        $cmsPage  = $this->cmsPage('admissions');
+        $college     = $this->college();
+        $cmsPage     = $this->cmsPage('admissions');
         $pageContent = $cmsPage->content;
-        $intermediatePrograms = AcademicProgram::visible()
-            ->forAdmissionCategory('intermediate')
-            ->ordered()
-            ->get();
-        $undergraduatePrograms = AcademicProgram::visible()
-            ->forAdmissionCategory('undergraduate')
-            ->ordered()
-            ->get();
-        $admissionValidation = AdmissionValidation::frontendConfig();
+        $allPrograms = collect(); // programmes are now static in the view
 
         return view('public.admissions', compact(
             'college',
             'cmsPage',
             'pageContent',
-            'intermediatePrograms',
-            'undergraduatePrograms',
-            'admissionValidation'
+            'allPrograms'
         ));
     }
 
@@ -243,54 +221,93 @@ class PublicController extends Controller
 
     public function admissionInquiry(Request $request)
     {
-        $payload = $request->all();
-        $payload['phone'] = AdmissionValidation::normalizePhone($payload['phone'] ?? null);
-        $payload['student_phone'] = AdmissionValidation::normalizePhone($payload['student_phone'] ?? null);
+        $validated = $request->validate([
+            'semester'          => 'required|string',
+            'program_type'      => 'nullable|string',
+            'program_name'      => 'required|string',
+            'name'              => 'required|string',
+            'cnic'              => 'required|string',
+            'gender'            => 'required|string',
+            'dob'               => 'required|string',
+            'student_phone'     => 'required|string',
+            'father_name'       => 'required|string',
+            'father_occupation' => 'nullable|string',
+            'father_phone'      => 'nullable|string',
+            'guardian_name'     => 'nullable|string',
+            'guardian_phone'    => 'nullable|string',
+            'address'           => 'required|string',
+            'district'          => 'required|string',
+            'tehsil'            => 'nullable|string',
+            'village'           => 'nullable|string',
+            'post_office'       => 'nullable|string',
+            'email'             => 'required|string',
+            'academic'          => 'nullable|array',
+            'declare_true'      => 'required',
+            'message'           => 'nullable|string',
+            'doc_ssc'           => 'required|file|max:4096',
+            'doc_hssc'          => 'required|file|max:4096',
+            'doc_photo'         => 'required|file|max:2048',
+            'doc_cnic'          => 'required|file|max:4096',
+            'doc_domicile'      => 'nullable|file|max:4096',
+            'doc_migration'     => 'nullable|file|max:4096',
+            'doc_bachelors'     => 'nullable|file|max:4096',
+            'doc_mabs'          => 'nullable|file|max:4096',
+        ]);
 
-        $entryPath = (string) $request->input('entry_path');
-        $step = $request->filled('current_step') ? (int) $request->input('current_step') : null;
-        $validationMode = (string) $request->input('validation_mode');
-        $rules = AdmissionValidation::rules($entryPath, $validationMode === 'step' ? $step : null);
+        $academicDetails = $validated['academic'] ?? [];
+        $hsscData = $academicDetails['hssc'] ?? [];
+        $primaryQualification = filled($hsscData['board'] ?? null) ? 'hssc' : 'ssc';
 
-        $validated = Validator::make(
-            $payload,
-            $rules,
-            AdmissionValidation::messages()
-        )->validate();
-
-        if ($validationMode === 'step') {
-            return response()->json([
-                'message' => 'Step validation passed.',
-                'step' => $step,
-            ]);
+        $docSlots = [
+            'doc_ssc'       => 'SSC / O Level DMC',
+            'doc_hssc'      => 'HSSC / A Level DMC',
+            'doc_photo'     => 'Passport Photograph',
+            'doc_cnic'      => 'CNIC / Form B',
+            'doc_domicile'  => 'Domicile Certificate',
+            'doc_migration' => 'Migration Certificate',
+            'doc_bachelors' => 'Bachelors Degree / DMC',
+            'doc_mabs'      => 'MA / BS Certificate / DMC',
+        ];
+        $storedDocs = [];
+        foreach ($docSlots as $field => $label) {
+            if ($request->hasFile($field)) {
+                $path = $request->file($field)->store('admissions/docs', 'public');
+                $storedDocs[$field] = ['label' => $label, 'path' => $path];
+            }
         }
 
-        $program = AcademicProgram::findOrFail($validated['program_id']);
-        $academicDetails = $validated['academic'] ?? [];
-        $primaryQualification = $entryPath === 'undergraduate'
-            ? ($academicDetails['hssc']['qualification'] ?? 'hssc')
-            : ($academicDetails['matric']['qualification'] ?? 'matric');
-
         $admissionInquiry = AdmissionInquiry::create([
-            'reference_no'   => 'JDCA-' . now()->format('Y') . '-' . strtoupper(Str::random(8)),
-            'name'           => $validated['name'],
-            'father_name'    => $validated['father_name'],
-            'email'          => $validated['email'],
-            'phone'          => $validated['phone'],
-            'student_phone'  => $validated['student_phone'] ?? null,
-            'cnic'           => $validated['cnic'],
-            'dob'            => $validated['dob'],
-            'entry_path'     => $entryPath,
-            'gender'         => $validated['gender'],
-            'campus'         => $validated['campus'],
-            'city'           => $validated['city'],
-            'address'        => $validated['address'],
-            'program_id'     => $program->id,
-            'qualification'  => $primaryQualification,
-            'academic_details' => $academicDetails,
-            'declare_true'   => (bool) ($validated['declare_true'] ?? false),
-            'message'        => $validated['message'] ?? null,
-            'status'         => 'new',
+            'reference_no'      => 'JDCA-' . now()->format('Y') . '-' . strtoupper(Str::random(8)),
+            'name'              => $validated['name'],
+            'father_name'       => $validated['father_name'],
+            'father_occupation' => $validated['father_occupation'] ?? null,
+            'father_phone'      => AdmissionValidation::normalizePhone($validated['father_phone'] ?? null),
+            'guardian_name'     => $validated['guardian_name'] ?? null,
+            'guardian_phone'    => AdmissionValidation::normalizePhone($validated['guardian_phone'] ?? null),
+            'email'             => $validated['email'],
+            'phone'             => AdmissionValidation::normalizePhone($validated['guardian_phone'] ?? null),
+            'student_phone'     => AdmissionValidation::normalizePhone($validated['student_phone']),
+            'cnic'              => $validated['cnic'],
+            'dob'               => $validated['dob'],
+            'entry_path'        => 'undergraduate',
+            'semester'          => $validated['semester'],
+            'program_type'      => $validated['program_type'] ?? null,
+            'gender'            => $validated['gender'],
+            'campus'            => 'main',
+            'city'              => $validated['district'],
+            'district'          => $validated['district'],
+            'tehsil'            => $validated['tehsil'] ?? null,
+            'village'           => $validated['village'] ?? null,
+            'post_office'       => $validated['post_office'] ?? null,
+            'address'           => $validated['address'],
+            'program_id'        => null,
+            'program_name'      => $validated['program_name'],
+            'qualification'     => $primaryQualification,
+            'academic_details'  => $academicDetails,
+            'documents'         => $storedDocs ?: null,
+            'declare_true'      => true,
+            'message'           => $validated['message'] ?? null,
+            'status'            => 'new',
         ]);
 
         if (filled($admissionInquiry->email)) {
@@ -349,64 +366,6 @@ class PublicController extends Controller
         return view('public.notices', compact('college', 'cmsPage', 'pageContent', 'notices'));
     }
 
-    public function results(Request $request)
-    {
-        $college = $this->college();
-        $cmsPage = $this->cmsPage('results');
-        $pageContent = $cmsPage->content;
-        $results = null;
-        $student = null;
-        $error   = null;
-
-        if ($request->filled('roll_number')) {
-            $student = Student::where('roll_number', trim($request->roll_number))->first();
-            if ($student) {
-                $results = ExamResult::with(['exam.course', 'exam.academicProgram'])
-                    ->where('student_id', $student->id)
-                    ->whereHas('exam', fn($q) => $q->where('results_published', true))
-                    ->orderByDesc('created_at')
-                    ->get();
-            } else {
-                $error = 'No student found with roll number "' . e($request->roll_number) . '". Please check and try again.';
-            }
-        }
-
-        return view('public.results', compact('college', 'cmsPage', 'pageContent', 'results', 'student', 'error'));
-    }
-
-    public function timetable(Request $request)
-    {
-        $college  = $this->college();
-        $cmsPage  = $this->cmsPage('timetable');
-        $pageContent = $cmsPage->content;
-        $programs = AcademicProgram::active()->orderBy('sort_order')->orderBy('name')->get();
-
-        $selectedProgram  = null;
-        $selectedSemester = null;
-        $slots            = collect();
-        $days             = ['monday','tuesday','wednesday','thursday','friday','saturday'];
-
-        if ($request->filled('program_id')) {
-            $selectedProgram  = AcademicProgram::find($request->program_id);
-            $selectedSemester = (int) $request->get('semester', 1);
-
-            if ($selectedProgram) {
-                $slots = \App\Models\Timetable::with(['course','teacher'])
-                    ->forProgram($selectedProgram->id)
-                    ->forSemester($selectedSemester)
-                    ->active()
-                    ->orderByRaw("CASE day_of_week WHEN 'monday' THEN 1 WHEN 'tuesday' THEN 2 WHEN 'wednesday' THEN 3 WHEN 'thursday' THEN 4 WHEN 'friday' THEN 5 WHEN 'saturday' THEN 6 ELSE 7 END")
-                    ->orderBy('start_time')
-                    ->get()
-                    ->groupBy('day_of_week');
-            }
-        }
-
-        return view('public.timetable', compact(
-            'college', 'cmsPage', 'pageContent', 'programs', 'selectedProgram', 'selectedSemester', 'slots', 'days'
-        ));
-    }
-
     public function gallery()
     {
         $college = $this->college();
@@ -436,5 +395,192 @@ class PublicController extends Controller
             ->orderBy('start_datetime')
             ->paginate(12);
         return view('public.events', compact('college', 'cmsPage', 'pageContent', 'events'));
+    }
+
+    // ─── About sub-pages ────────────────────────────────────────────────────
+
+    public function aboutHistory()
+    {
+        $college = $this->college();
+        return view('public.about-history', compact('college'));
+    }
+
+    public function aboutMission()
+    {
+        $college = $this->college();
+        return view('public.about-mission', compact('college'));
+    }
+
+    public function aboutMessage()
+    {
+        $college = $this->college();
+        return view('public.about-message', compact('college'));
+    }
+
+    public function aboutDirector()
+    {
+        $college = $this->college();
+        return view('public.about-director', compact('college'));
+    }
+
+    public function aboutPrincipal()
+    {
+        $college = $this->college();
+        return view('public.about-principal', compact('college'));
+    }
+
+    // ─── Academics sub-pages ────────────────────────────────────────────────
+
+    public function departments()
+    {
+        $college     = $this->college();
+        $departments = Department::visible()->ordered()->get();
+        return view('public.departments', compact('college', 'departments'));
+    }
+
+    public function departmentDetail(string $slug)
+    {
+        $college    = $this->college();
+        $department = Department::visible()->where('slug', $slug)->firstOrFail();
+        $teachers   = $department->teachers()->get();
+        $programs   = $department->academicPrograms()->get();
+        return view('public.department-detail', compact('college', 'department', 'teachers', 'programs'));
+    }
+
+    public function campusFacilities()
+    {
+        $college = $this->college();
+        return view('public.campus-facilities', compact('college'));
+    }
+
+    public function downloads()
+    {
+        $college = $this->college();
+        $downloads = [];
+        if (class_exists(\App\Models\Download::class)) {
+            $downloads = \App\Models\Download::where('is_active', true)
+                ->orderBy('category')->orderBy('sort_order')->orderBy('title')
+                ->get()->groupBy('category');
+        }
+        return view('public.downloads', compact('college', 'downloads'));
+    }
+
+    public function search(Request $request)
+    {
+        $college = $this->college();
+        $q = trim($request->get('q', ''));
+        $results = collect();
+
+        if (strlen($q) >= 2) {
+            $news = NewsArticle::where('is_published', true)
+                ->where(fn($query) => $query->where('title', 'like', "%{$q}%")->orWhere('content', 'like', "%{$q}%"))
+                ->select('id', 'title', 'slug', 'excerpt', 'published_date')
+                ->latest('published_date')->take(5)->get()
+                ->map(fn($r) => ['type' => 'News', 'title' => $r->title, 'excerpt' => Str::limit($r->excerpt ?? strip_tags($r->content ?? ''), 100), 'url' => route('news.show', $r->slug), 'date' => optional($r->published_date)->format('d M Y')]);
+
+            $notices = Announcement::where('is_published', true)
+                ->where('title', 'like', "%{$q}%")
+                ->select('id', 'title', 'publish_date')->latest('publish_date')->take(5)->get()
+                ->map(fn($r) => ['type' => 'Notice', 'title' => $r->title, 'excerpt' => '', 'url' => route('notices'), 'date' => optional(\Carbon\Carbon::parse($r->publish_date))->format('d M Y')]);
+
+            $events = WebsiteEvent::where('title', 'like', "%{$q}%")
+                ->select('id', 'title', 'start_datetime')->latest('start_datetime')->take(5)->get()
+                ->map(fn($r) => ['type' => 'Event', 'title' => $r->title, 'excerpt' => '', 'url' => route('events'), 'date' => optional($r->start_datetime)->format('d M Y')]);
+
+            $depts = Department::where('show_on_website', true)->where('is_active', true)
+                ->where(fn($query) => $query->where('name', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%"))
+                ->select('id', 'name', 'slug')->take(4)->get()
+                ->map(fn($r) => ['type' => 'Department', 'title' => $r->name, 'excerpt' => '', 'url' => route('departments.show', $r->slug), 'date' => null]);
+
+            $programs = AcademicProgram::where('is_active', true)->where('show_on_website', true)
+                ->where(fn($query) => $query->where('name', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%"))
+                ->select('id', 'name', 'short_name', 'description')->take(4)->get()
+                ->map(fn($r) => ['type' => 'Program', 'title' => $r->name, 'excerpt' => Str::limit($r->description ?? '', 80), 'url' => route('programs'), 'date' => null]);
+
+            $results = $news->concat($notices)->concat($events)->concat($depts)->concat($programs);
+        }
+
+        return view('public.search', compact('college', 'q', 'results'));
+    }
+
+    // ─── Admission sub-pages ────────────────────────────────────────────────
+
+    public function admissionProcedure()
+    {
+        $college = $this->college();
+        return view('public.admission-procedure', compact('college'));
+    }
+
+    public function feeStructurePublic()
+    {
+        $college = $this->college();
+        return view('public.fee-structure-public', compact('college'));
+    }
+
+    public function semesterRules()
+    {
+        $college = $this->college();
+        return view('public.semester-rules', compact('college'));
+    }
+
+    public function scholarships()
+    {
+        $college = $this->college();
+        return view('public.scholarships', compact('college'));
+    }
+
+    public function scholarshipDetail(string $type)
+    {
+        $college = $this->college();
+        $types   = ['merit', 'need', 'orphan', 'special'];
+        if (! in_array($type, $types)) {
+            abort(404);
+        }
+        return view('public.scholarship-detail', compact('college', 'type'));
+    }
+
+    // ─── Jobs ────────────────────────────────────────────────────────────────
+
+    public function jobs()
+    {
+        $college = $this->college();
+        return view('public.jobs', compact('college'));
+    }
+
+    public function jobApply(Request $request)
+    {
+        $data = $request->validate([
+            'position'    => ['required', 'string', 'max:120'],
+            'name'        => ['required', 'string', 'max:100'],
+            'email'       => ['required', 'email', 'max:120'],
+            'phone'       => ['required', 'string', 'max:30'],
+            'education'   => ['required', 'string', 'max:200'],
+            'experience'  => ['nullable', 'string', 'max:200'],
+            'message'     => ['required', 'string', 'max:1000'],
+        ]);
+
+        $college      = $this->college();
+        $officeEmail  = $college->email ?? CollegeSetting::get('college_email', 'jinnahschooldegreecollege@gmail.com');
+
+        try {
+            Mail::raw(
+                "New Job Application Received\n\n"
+                . "Position Applied For: {$data['position']}\n"
+                . "Name: {$data['name']}\n"
+                . "Email: {$data['email']}\n"
+                . "Phone: {$data['phone']}\n"
+                . "Education: {$data['education']}\n"
+                . "Experience: " . ($data['experience'] ?? 'Not specified') . "\n"
+                . "Cover Letter:\n{$data['message']}\n\n"
+                . "Submitted at: " . now()->format('d M Y, h:i A'),
+                fn ($m) => $m->to($officeEmail)
+                             ->replyTo($data['email'], $data['name'])
+                             ->subject("Job Application: {$data['position']} — {$data['name']}")
+            );
+        } catch (\Throwable) {
+            // Mail failure silently — application still acknowledged
+        }
+
+        return back()->with('job_applied', $data['name']);
     }
 }

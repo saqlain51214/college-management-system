@@ -10,6 +10,7 @@ use App\Models\AcademicYear;
 use App\Models\FeePayment;
 use App\Models\FeeStructure;
 use App\Models\Student;
+use App\Services\NotificationService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -22,7 +23,7 @@ class FeePaymentResource extends Resource
     protected static ?string $model = FeePayment::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-credit-card';
-    protected static ?string $navigationGroup = 'Students & Admissions';
+    protected static ?string $navigationGroup = 'Finance';
     protected static ?string $navigationLabel = 'Fee Payments';
     protected static ?int    $navigationSort  = 4;
 
@@ -35,7 +36,7 @@ class FeePaymentResource extends Resource
                     Forms\Components\Select::make('student_id')
                         ->label('Student')
                         ->options(fn() => Student::where('is_active', true)->orderBy('name')
-                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' — ' . $s->name]))
+                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' â€” ' . $s->name]))
                         ->searchable()
                         ->preload()
                         ->required(),
@@ -95,6 +96,16 @@ class FeePaymentResource extends Resource
                     Forms\Components\TextInput::make('bank_name')->label('Bank Name')->maxLength(100)->placeholder('e.g. HBL, MCB'),
 
                     Forms\Components\Textarea::make('remarks')->label('Remarks')->rows(2)->columnSpanFull(),
+
+                    Forms\Components\FileUpload::make('payment_proof_path')
+                        ->label('Payment Proof')
+                        ->disk('public')
+                        ->directory('payment-proofs')
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                        ->downloadable()
+                        ->openable()
+                        ->columnSpanFull()
+                        ->helperText('Student-uploaded bank receipt or payment proof'),
                 ]),
         ]);
     }
@@ -104,13 +115,22 @@ class FeePaymentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('challan_number')->label('Challan No.')->searchable()->badge()->color('gray'),
+                Tables\Columns\ImageColumn::make('payment_proof_path')
+                    ->label('Proof')
+                    ->disk('public')
+                    ->circular(false)
+                    ->width(40)
+                    ->height(30)
+                    ->defaultImageUrl(null)
+                    ->toggleable()
+                    ->tooltip('Payment proof uploaded by student'),
                 Tables\Columns\TextColumn::make('student.roll_number')->label('Roll No.')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('student.name')->label('Student')->searchable()->wrap(),
                 Tables\Columns\TextColumn::make('fee_type')
                     ->badge()
                     ->formatStateUsing(fn($state) => $state instanceof FeeTypeEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof FeeTypeEnum ? $state->color() : 'gray'),
-                Tables\Columns\TextColumn::make('semester_number')->label('Sem')->prefix('S')->placeholder('—'),
+                Tables\Columns\TextColumn::make('semester_number')->label('Sem')->prefix('S')->placeholder('â€”'),
                 Tables\Columns\TextColumn::make('amount_due')->label('Due')->money('PKR')->sortable(),
                 Tables\Columns\TextColumn::make('amount_paid')->label('Paid')->money('PKR')->sortable(),
                 Tables\Columns\TextColumn::make('payment_status')
@@ -118,39 +138,99 @@ class FeePaymentResource extends Resource
                     ->formatStateUsing(fn($state) => $state instanceof PaymentStatusEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof PaymentStatusEnum ? $state->color() : 'gray'),
                 Tables\Columns\TextColumn::make('due_date')->label('Due Date')->date('d M Y')->sortable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('payment_date')->label('Paid On')->date('d M Y')->sortable()->placeholder('—'),
+                Tables\Columns\TextColumn::make('payment_date')->label('Paid On')->date('d M Y')->sortable()->placeholder('â€”'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('payment_status')->options(PaymentStatusEnum::options()),
                 Tables\Filters\SelectFilter::make('fee_type')->options(FeeTypeEnum::options()),
+                Tables\Filters\Filter::make('has_proof')
+                    ->label('Has Payment Proof')
+                    ->query(fn($query) => $query->whereNotNull('payment_proof_path')),
+                Tables\Filters\Filter::make('proof_pending_verification')
+                    ->label('Proof — Awaiting Verification')
+                    ->query(fn($query) => $query->whereNotNull('payment_proof_path')
+                        ->where('payment_status', '!=', PaymentStatusEnum::Paid->value)),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('previewChallan')
+                    ->label('Preview Challan')
+                    ->icon('heroicon-o-eye')
+                    ->color('gray')
+                    ->iconButton()
+                    ->url(fn(FeePayment $r) => route('pdf.challan.preview', $r))
+                    ->openUrlInNewTab(),
                 Tables\Actions\Action::make('printChallan')
-                    ->label('Print Challan')
+                    ->label('Download PDF')
                     ->icon('heroicon-o-printer')
                     ->color('info')
                     ->iconButton()
                     ->url(fn(FeePayment $r) => route('pdf.challan', $r))
                     ->openUrlInNewTab(),
+                Tables\Actions\Action::make('viewProof')
+                    ->label('View Proof')
+                    ->icon('heroicon-o-paper-clip')
+                    ->color('warning')
+                    ->iconButton()
+                    ->visible(fn(FeePayment $r) => !empty($r->payment_proof_path))
+                    ->url(fn(FeePayment $r) => asset('storage/' . $r->payment_proof_path))
+                    ->openUrlInNewTab()
+                    ->tooltip('View student-uploaded payment proof'),
+
                 Tables\Actions\Action::make('markPaid')
                     ->label('Mark Paid')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->iconButton()
                     ->requiresConfirmation()
+                    ->modalHeading('Mark as Paid')
+                    ->modalDescription('This will mark the fee as paid and notify the student.')
                     ->visible(fn(FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid)
-                    ->action(fn(FeePayment $r) => $r->update([
-                        'payment_status' => PaymentStatusEnum::Paid->value,
-                        'payment_date'   => now()->toDateString(),
-                        'amount_paid'    => $r->amount_due,
-                    ])),
+                    ->action(function (FeePayment $r) {
+                        $r->update([
+                            'payment_status' => PaymentStatusEnum::Paid->value,
+                            'payment_date'   => now()->toDateString(),
+                            'amount_paid'    => $r->amount_due,
+                        ]);
+                        if ($r->student) {
+                            $feeType = $r->fee_type instanceof FeeTypeEnum ? $r->fee_type->label() : ($r->fee_type ?? 'Fee');
+                            app(NotificationService::class)->send($r->student, 'fee_payment_confirmed', [
+                                'student_name' => $r->student->name,
+                                'amount'       => number_format((float) $r->amount_due),
+                                'fee_type'     => $feeType,
+                                'payment_date' => now()->format('d M Y'),
+                            ]);
+                        }
+                    }),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
             ])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\BulkAction::make('bulkMarkPaid')
+                    ->label('Mark as Paid')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Mark Selected as Paid')
+                    ->modalDescription('This will mark all selected fee payments as Paid and set today as payment date.')
+                    ->action(function (\Illuminate\Support\Collection $records) {
+                        $records->each(function (FeePayment $r) {
+                            if ($r->payment_status !== PaymentStatusEnum::Paid) {
+                                $r->update([
+                                    'payment_status' => PaymentStatusEnum::Paid->value,
+                                    'payment_date'   => now()->toDateString(),
+                                    'amount_paid'    => $r->amount_due,
+                                ]);
+                            }
+                        });
+                        \Filament\Notifications\Notification::make()
+                            ->title($records->count() . ' payments marked as paid.')
+                            ->success()->send();
+                    }),
+                Tables\Actions\DeleteBulkAction::make(),
+            ])])
             ->defaultSort('created_at', 'desc')
             ->paginated([10, 25, 50, 100])
             ->striped();

@@ -64,42 +64,129 @@ class AdmissionInquiryResource extends Resource
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist->schema([
-            Infolists\Components\Section::make('Inquiry Details')->columns(2)->schema([
-                Infolists\Components\TextEntry::make('reference_no')->label('Reference No'),
-                Infolists\Components\TextEntry::make('name'),
-                Infolists\Components\TextEntry::make('father_name')->label("Father's Name"),
-                Infolists\Components\TextEntry::make('phone'),
-                Infolists\Components\TextEntry::make('student_phone')->label('Student Mobile'),
-                Infolists\Components\TextEntry::make('email'),
-                Infolists\Components\TextEntry::make('cnic')->label('CNIC / B-Form'),
-                Infolists\Components\TextEntry::make('dob')->date(),
-                Infolists\Components\TextEntry::make('entry_path')->label('Applying For')->formatStateUsing(fn ($state) => ucfirst((string) $state)),
-                Infolists\Components\TextEntry::make('gender')->formatStateUsing(fn ($state) => ucfirst((string) $state)),
-                Infolists\Components\TextEntry::make('campus'),
-                Infolists\Components\TextEntry::make('city'),
-                Infolists\Components\TextEntry::make('program.name')->label('Program'),
-                Infolists\Components\TextEntry::make('qualification')->formatStateUsing(fn($state)=>ucfirst($state??'')),
-                Infolists\Components\IconEntry::make('declare_true')->label('Declaration')->boolean(),
-                Infolists\Components\TextEntry::make('status')->badge()
+
+            // ── Row 1: Status strip ─────────────────────────────────────
+            Infolists\Components\Section::make()->columns(3)->schema([
+                Infolists\Components\TextEntry::make('reference_no')
+                    ->label('Reference No')
+                    ->weight('bold')
+                    ->copyable(),
+                Infolists\Components\TextEntry::make('status')
+                    ->label('Status')
+                    ->badge()
                     ->color(fn ($state) => match ($state) {
-                        'new'=>'info','contacted'=>'warning','enrolled'=>'success','rejected'=>'danger',default=>'gray'
+                        'new'       => 'info',
+                        'contacted' => 'warning',
+                        'enrolled'  => 'success',
+                        'rejected'  => 'danger',
+                        default     => 'gray',
                     }),
-                Infolists\Components\TextEntry::make('created_at')->label('Submitted')->dateTime('d M Y, H:i'),
-                Infolists\Components\TextEntry::make('address')->columnSpanFull(),
-                Infolists\Components\TextEntry::make('academic_details')
-                    ->label('Academic Details')
-                    ->columnSpanFull()
-                    ->state(function ($record): string {
-                        $details = $record->academic_details;
-
-                        if (blank($details)) {
-                            return '';
-                        }
-
-                        return json_encode($details, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '';
-                    }),
-                Infolists\Components\TextEntry::make('message')->columnSpanFull(),
+                Infolists\Components\TextEntry::make('created_at')
+                    ->label('Submitted')
+                    ->dateTime('d M Y, H:i'),
             ]),
+
+            // ── Row 2: Personal information ─────────────────────────────
+            Infolists\Components\Section::make('Personal Information')
+                ->columns(3)
+                ->schema([
+                    Infolists\Components\TextEntry::make('name')->label('Full Name'),
+                    Infolists\Components\TextEntry::make('father_name')->label("Father's Name"),
+                    Infolists\Components\TextEntry::make('gender')
+                        ->formatStateUsing(fn ($state) => ucfirst((string) $state)),
+
+                    Infolists\Components\TextEntry::make('dob')->label('Date of Birth')->date('d M Y'),
+                    Infolists\Components\TextEntry::make('cnic')->label('CNIC / B-Form'),
+                    Infolists\Components\TextEntry::make('city'),
+
+                    Infolists\Components\TextEntry::make('phone')->label('Phone'),
+                    Infolists\Components\TextEntry::make('student_phone')->label('Student Mobile'),
+                    Infolists\Components\TextEntry::make('email'),
+
+                    Infolists\Components\TextEntry::make('campus'),
+                    Infolists\Components\TextEntry::make('address')->columnSpan(2),
+                ]),
+
+            // ── Row 3: Academic background ──────────────────────────────
+            Infolists\Components\Section::make('Academic Background')
+                ->columns(4)
+                ->schema([
+                    Infolists\Components\TextEntry::make('entry_path')
+                        ->label('Applying For')
+                        ->formatStateUsing(fn ($state) => ucfirst((string) $state))
+                        ->badge()
+                        ->color('primary'),
+                    Infolists\Components\TextEntry::make('qualification')
+                        ->formatStateUsing(fn ($state) => ucwords(str_replace('_', ' ', $state ?? '')))
+                        ->badge()
+                        ->color('gray'),
+                    Infolists\Components\TextEntry::make('program.name')->label('Program Interested'),
+                    Infolists\Components\IconEntry::make('declare_true')
+                        ->label('Declaration Accepted')
+                        ->boolean(),
+                ]),
+
+            // ── Row 4: Academic record table ────────────────────────────
+            Infolists\Components\Section::make('Academic Record')
+                ->schema([
+                    Infolists\Components\TextEntry::make('academic_details')
+                        ->label('')
+                        ->columnSpanFull()
+                        ->html()
+                        ->state(function ($record): string {
+                            $details = $record->academic_details;
+
+                            if (blank($details)) {
+                                return '<p class="text-sm text-gray-400 italic">No academic details provided.</p>';
+                            }
+
+                            $rows = [
+                                'ssc'       => 'SSC / O Level',
+                                'hssc'      => 'HSSC / A Level',
+                                'bachelors' => 'Bachelors',
+                                'mabs'      => 'MA / BS',
+                            ];
+
+                            $html  = '<div class="overflow-x-auto">';
+                            $html .= '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+                            $html .= '<thead>';
+                            $html .= '<tr style="background:#f3f4f6;text-align:left;font-size:11px;font-weight:600;color:#6b7280;">';
+                            foreach (['Examination','Year','Division','Marks Obtained','Total Marks','Major Subjects','Board / University'] as $h) {
+                                $html .= '<th style="padding:8px 12px;border:1px solid #e5e7eb;">' . e($h) . '</th>';
+                            }
+                            $html .= '</tr></thead><tbody>';
+
+                            foreach ($rows as $key => $label) {
+                                $d = is_array($details) ? ($details[$key] ?? null) : null;
+                                $empty = !$d || empty(array_filter($d));
+                                $bg = $empty ? 'background:#fafafa;color:#9ca3af;' : '';
+                                $html .= '<tr style="border-bottom:1px solid #f3f4f6;' . $bg . '">';
+                                $html .= '<td style="padding:8px 12px;border:1px solid #e5e7eb;font-weight:600;white-space:nowrap;">' . e($label) . '</td>';
+                                $html .= '<td style="padding:8px 12px;border:1px solid #e5e7eb;">' . e($d['year']     ?? '—') . '</td>';
+                                $html .= '<td style="padding:8px 12px;border:1px solid #e5e7eb;">' . e(ucfirst($d['division'] ?? '—')) . '</td>';
+                                $html .= '<td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;">' . e($d['obtained'] ?? '—') . '</td>';
+                                $html .= '<td style="padding:8px 12px;border:1px solid #e5e7eb;text-align:right;">' . e($d['total']    ?? '—') . '</td>';
+                                $html .= '<td style="padding:8px 12px;border:1px solid #e5e7eb;">' . e($d['major']    ?? '—') . '</td>';
+                                $html .= '<td style="padding:8px 12px;border:1px solid #e5e7eb;">' . e($d['board']    ?? '—') . '</td>';
+                                $html .= '</tr>';
+                            }
+
+                            $html .= '</tbody></table></div>';
+                            return $html;
+                        }),
+                ]),
+
+            // ── Row 5: Message & Notes ──────────────────────────────────
+            Infolists\Components\Section::make('Message & Notes')
+                ->columns(2)
+                ->schema([
+                    Infolists\Components\TextEntry::make('message')
+                        ->label('Student Message')
+                        ->placeholder('—'),
+                    Infolists\Components\TextEntry::make('admin_notes')
+                        ->label('Admin Notes')
+                        ->placeholder('—'),
+                ]),
         ]);
     }
 

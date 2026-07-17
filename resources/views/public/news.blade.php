@@ -39,7 +39,7 @@
         <h2 class="text-xl font-semibold text-ink">Featured Story</h2>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 rounded-xl overflow-hidden shadow-lg border border-stone-200/80">
-        <div class="relative min-h-64 flex items-end p-8" style="background:linear-gradient(135deg,#6b2d39,#5a2430)">
+        <div class="relative min-h-48 sm:min-h-64 flex items-end p-4 sm:p-8" style="background:linear-gradient(135deg,#6b2d39,#5a2430)">
           @if(!empty($featured->featured_image))
           @php
             $featuredImage = str_starts_with($featured->featured_image, 'assets/')
@@ -60,7 +60,7 @@
           </div>
           @endif
         </div>
-        <div class="bg-white p-8 flex flex-col justify-center">
+        <div class="bg-white p-5 sm:p-8 flex flex-col justify-center">
           <div class="flex items-center gap-3 mb-4">
             <span class="flex items-center gap-1.5 text-xs text-stone-500">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>

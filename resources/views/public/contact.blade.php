@@ -94,7 +94,7 @@
 
       {{-- Right: contact form (3/5) --}}
       <div class="lg:col-span-3">
-        <div class="bg-white rounded-xl shadow-lg border border-stone-200/80 p-8 md:p-10" id="contact-form">
+        <div class="bg-white rounded-xl shadow-lg border border-stone-200/80 p-5 sm:p-8 md:p-10" id="contact-form">
           <h2 class="font-display text-xl sm:text-2xl font-semibold mb-5 text-ink">Send Us a Message</h2>
 
           {{-- Success alert --}}

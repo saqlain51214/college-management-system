@@ -18,7 +18,7 @@ class FeeStructureResource extends Resource
     protected static ?string $model = FeeStructure::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-banknotes';
-    protected static ?string $navigationGroup = 'Students & Admissions';
+    protected static ?string $navigationGroup = 'Finance';
     protected static ?string $navigationLabel = 'Fee Structure';
     protected static ?int    $navigationSort  = 3;
 
@@ -105,10 +105,10 @@ class FeeStructureResource extends Resource
                     ->formatStateUsing(fn($state) => $state instanceof FeeTypeEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof FeeTypeEnum ? $state->color() : 'gray'),
                 Tables\Columns\TextColumn::make('academicProgram.short_name')->label('Program')->badge()->color('info')->placeholder('All'),
-                Tables\Columns\TextColumn::make('academicYear.name')->label('Year')->placeholder('—'),
+                Tables\Columns\TextColumn::make('academicYear.name')->label('Year')->placeholder('â€”'),
                 Tables\Columns\TextColumn::make('semester_number')->label('Sem')->prefix('S')->placeholder('All'),
                 Tables\Columns\TextColumn::make('amount')->label('Amount')->money('PKR')->sortable(),
-                Tables\Columns\TextColumn::make('due_date')->label('Due Date')->date('d M Y')->placeholder('—'),
+                Tables\Columns\TextColumn::make('due_date')->label('Due Date')->date('d M Y')->placeholder('â€”'),
                 Tables\Columns\IconColumn::make('is_mandatory')->label('Mandatory')->boolean(),
                 Tables\Columns\IconColumn::make('is_active')->label('Active')->boolean()->toggleable(isToggledHiddenByDefault: true),
             ])

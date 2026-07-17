@@ -8,6 +8,7 @@ use App\Models\AcademicYear;
 use App\Models\Scholarship;
 use App\Models\ScholarshipAward;
 use App\Models\Student;
+use App\Services\NotificationService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -19,7 +20,7 @@ class ScholarshipAwardResource extends Resource
     protected static ?string $model = ScholarshipAward::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-trophy';
-    protected static ?string $navigationGroup = 'Students & Admissions';
+    protected static ?string $navigationGroup = 'Finance';
     protected static ?string $navigationLabel = 'Scholarship Awards';
     protected static ?int    $navigationSort  = 6;
 
@@ -39,7 +40,7 @@ class ScholarshipAwardResource extends Resource
                     Forms\Components\Select::make('student_id')
                         ->label('Student')
                         ->options(fn() => Student::where('is_active', true)->orderBy('name')
-                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' — ' . $s->name]))
+                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' â€” ' . $s->name]))
                         ->searchable()
                         ->preload()
                         ->required(),
@@ -75,12 +76,12 @@ class ScholarshipAwardResource extends Resource
                 Tables\Columns\TextColumn::make('student.roll_number')->label('Roll No.')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('student.name')->label('Student')->searchable()->wrap(),
                 Tables\Columns\TextColumn::make('scholarship.name')->label('Scholarship')->wrap()->sortable(),
-                Tables\Columns\TextColumn::make('academicYear.name')->label('Year')->placeholder('—'),
+                Tables\Columns\TextColumn::make('academicYear.name')->label('Year')->placeholder('â€”'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->formatStateUsing(fn($state) => $state instanceof ScholarshipStatusEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof ScholarshipStatusEnum ? $state->color() : 'gray'),
-                Tables\Columns\TextColumn::make('amount_awarded')->label('Amount')->money('PKR')->placeholder('—'),
+                Tables\Columns\TextColumn::make('amount_awarded')->label('Amount')->money('PKR')->placeholder('â€”'),
                 Tables\Columns\TextColumn::make('application_date')->label('Applied')->date('d M Y')->sortable(),
             ])
             ->filters([
@@ -96,7 +97,17 @@ class ScholarshipAwardResource extends Resource
                     ->iconButton()
                     ->requiresConfirmation()
                     ->visible(fn(ScholarshipAward $r) => $r->status === ScholarshipStatusEnum::Applied || $r->status === ScholarshipStatusEnum::UnderReview)
-                    ->action(fn(ScholarshipAward $r) => $r->update(['status' => ScholarshipStatusEnum::Approved->value, 'approval_date' => now()->toDateString()])),
+                    ->action(function (ScholarshipAward $r) {
+                        $r->load(['student', 'scholarship']);
+                        $r->update(['status' => ScholarshipStatusEnum::Approved->value, 'approval_date' => now()->toDateString()]);
+                        if ($r->student && $r->scholarship) {
+                            app(NotificationService::class)->send($r->student, 'scholarship_awarded', [
+                                'student_name'     => $r->student->name,
+                                'scholarship_name' => $r->scholarship->name,
+                                'amount'           => number_format((float) ($r->amount_awarded ?? $r->scholarship->amount ?? 0)),
+                            ]);
+                        }
+                    }),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])

@@ -51,7 +51,7 @@
         @apply inline-flex items-center justify-center rounded-md bg-gradient-to-r from-gold to-gold-dark px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-gold/30 transition hover:shadow-lg hover:shadow-gold/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand;
     }
     .nav-link {
-        @apply rounded-lg px-2.5 py-2 transition-colors duration-200 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand;
+        @apply inline-flex items-center rounded-lg px-2.5 py-2 text-white font-medium transition-colors duration-200 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand;
     }
     .dropdown-link {
         @apply block rounded-md px-4 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-50 hover:text-brand;
