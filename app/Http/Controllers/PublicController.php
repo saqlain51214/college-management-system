@@ -56,7 +56,7 @@ class PublicController extends Controller
             'college_name'     => $name,
             'college_short'    => $short,
             'principal_name'   => $principal,
-            'established_year' => 2010,
+            'established_year' => (int) CollegeSetting::get('college_established', 2010),
         ];
     }
 
@@ -120,11 +120,13 @@ class PublicController extends Controller
         $notices  = Announcement::where('is_published', true)
             ->where(fn($q) => $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()))
             ->orderByDesc('publish_date')->limit(5)->get();
+        $establishedYear = (int) CollegeSetting::get('college_established', 2010);
         $stats = [
             'students' => Student::where('status', 'active')->count(),
             'teachers' => Teacher::where('is_active', true)->count(),
             'programs' => AcademicProgram::active()->count(),
-            'years_of_excellence' => now()->year - 2010,
+            'departments' => Department::where('is_active', true)->where('show_on_website', true)->count(),
+            'years_of_excellence' => max(0, now()->year - $establishedYear),
         ];
         $pageContent['programs']['stats'] = [
             ['value' => number_format($stats['students']) . '+', 'label' => 'Active Students'],
