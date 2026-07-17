@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schema.railpack.com",
+    "provider": "php",
+    "phpExtensions": [
+        "intl",
+        "gd",
+        "zip",
+        "bcmath",
+        "exif",
+        "pdo_mysql"
+    ]
+}
