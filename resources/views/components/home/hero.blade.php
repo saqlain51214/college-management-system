@@ -11,11 +11,13 @@
 @endphp
 
 <div class="flex w-full overflow-hidden"
-     style="height:calc(100vh - var(--site-header-offset,6rem)); min-height:520px; max-height:880px;"
+     style="height:calc(100vh - var(--site-header-offset,6rem)); height:calc(100dvh - var(--site-header-offset,6rem)); min-height:520px; max-height:880px;"
      x-data="heroSlider()"
      x-init="startAutoPlay()"
      @mouseenter="stopAutoPlay()"
-     @mouseleave="startAutoPlay()">
+     @mouseleave="startAutoPlay()"
+     @touchstart.passive="onTouchStart($event)"
+     @touchend="onTouchEnd($event)">
 
     {{-- ══ SLIDER — flex-1, image fills this area only ══ --}}
     <div class="relative flex-1 overflow-hidden">
@@ -36,7 +38,7 @@
              style="background:linear-gradient(to top,rgba(0,0,0,.45) 0%,transparent 38%)"></div>
 
         {{-- Slide text content --}}
-        <div class="absolute inset-0 flex flex-col justify-end px-4 pb-8 sm:px-7 sm:pb-10 lg:px-12 lg:pb-12 xl:px-14">
+        <div class="absolute inset-0 flex flex-col justify-end px-4 pb-20 sm:px-7 lg:px-12 lg:pb-12 xl:px-14">
 
             {{-- Slides text --}}
             <div>
@@ -65,51 +67,61 @@
                 </template>
             </div>
 
-            {{-- Controls --}}
+            {{-- Controls (larger tap targets on mobile) --}}
             <div class="flex items-center gap-2.5 mt-5">
-                <button @click="prev()" class="h-8 w-8 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition" aria-label="Prev">
-                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                <button @click="prev()" class="h-11 w-11 sm:h-9 sm:w-9 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition" aria-label="Previous slide">
+                    <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <div class="flex gap-1.5">
+                <div class="flex items-center">
                     <template x-for="(_,i) in slides" :key="'d'+i">
-                        <button @click="goToSlide(i)"
-                                :class="activeSlide===i?'w-6 bg-white':'w-2 bg-white/35 hover:bg-white/60'"
-                                class="h-1.5 rounded-full transition-all duration-300"></button>
+                        <button @click="goToSlide(i)" class="flex items-center justify-center px-1.5 py-3 -my-1" :aria-label="'Go to slide '+(i+1)">
+                            <span :class="activeSlide===i?'w-6 bg-white':'w-2 bg-white/35 hover:bg-white/60'"
+                                  class="block h-1.5 rounded-full transition-all duration-300"></span>
+                        </button>
                     </template>
                 </div>
-                <button @click="next()" class="h-8 w-8 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition" aria-label="Next">
-                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                <button @click="next()" class="h-11 w-11 sm:h-9 sm:w-9 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition" aria-label="Next slide">
+                    <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
     </div>
 
-    {{-- ══ MOBILE LATEST UPDATES — horizontal scroll strip, hidden on lg+ ══ --}}
-    @if($panelItems->isNotEmpty())
+    {{-- ══ MOBILE BOTTOM BAR — updates strip + persistent Apply CTA, hidden on lg+ ══ --}}
     <div class="absolute bottom-0 left-0 right-0 z-10 lg:hidden"
          style="background:linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 100%)">
-        <div class="flex items-center gap-0 overflow-x-auto px-3 py-2.5"
-             style="scrollbar-width:none; -ms-overflow-style:none;">
-            <span class="shrink-0 flex items-center gap-1.5 pr-3 mr-2 border-r border-white/15">
-                <span class="relative flex h-1.5 w-1.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-500"></span>
+        <div class="flex items-center gap-2 px-3 py-2.5">
+            @if($panelItems->isNotEmpty())
+            <div class="flex items-center gap-0 overflow-x-auto flex-1 min-w-0"
+                 style="scrollbar-width:none; -ms-overflow-style:none;">
+                <span class="shrink-0 flex items-center gap-1.5 pr-3 mr-2 border-r border-white/15">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                    </span>
+                    <span class="text-[9px] font-bold uppercase tracking-[.14em] text-white/45 whitespace-nowrap">Updates</span>
                 </span>
-                <span class="text-[9px] font-bold uppercase tracking-[.14em] text-white/45 whitespace-nowrap">Updates</span>
-            </span>
-            <div class="flex gap-1.5">
-                @foreach($panelItems as $item)
-                <a href="{{ $item['type']==='event' ? route('events') : route('notices') }}"
-                   class="shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
-                   style="{{ $item['type']==='event' ? 'background:rgba(196,151,58,.22)' : 'background:rgba(107,45,57,.35)' }}">
-                    @if($item['date'])<span class="text-white/35 text-[9px] mr-0.5">{{ $item['date'] }}</span>@endif
-                    {{ \Illuminate\Support\Str::limit($item['title'], 32) }}
-                </a>
-                @endforeach
+                <div class="flex gap-1.5">
+                    @foreach($panelItems as $item)
+                    <a href="{{ $item['type']==='event' ? route('events') : route('notices') }}"
+                       class="shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
+                       style="{{ $item['type']==='event' ? 'background:rgba(196,151,58,.22)' : 'background:rgba(107,45,57,.35)' }}">
+                        @if($item['date'])<span class="text-white/35 text-[9px] mr-0.5">{{ $item['date'] }}</span>@endif
+                        {{ \Illuminate\Support\Str::limit($item['title'], 32) }}
+                    </a>
+                    @endforeach
+                </div>
             </div>
+            @else
+            <span class="flex-1 min-w-0 truncate text-[11px] font-semibold text-white/70">Admissions are open — apply now</span>
+            @endif
+            <a href="{{ route('admissions') }}"
+               class="shrink-0 rounded-full px-4 py-2 text-[11px] font-bold text-white transition hover:opacity-90"
+               style="background:var(--site-brand)">
+                Apply Now
+            </a>
         </div>
     </div>
-    @endif
 
     {{-- ══ LATEST UPDATES PANEL — fixed width, solid dark ══ --}}
     <aside class="hidden lg:flex w-72 xl:w-80 shrink-0 flex-col"
@@ -177,7 +189,7 @@
 <script>
 document.addEventListener('alpine:init',()=>{
     Alpine.data('heroSlider',()=>({
-        activeSlide:0, _t:null,
+        activeSlide:0, _t:null, _tx:null,
         slides:[
             @foreach($heroSlides as $slide)
             {
@@ -192,11 +204,22 @@ document.addEventListener('alpine:init',()=>{
             }@if(!$loop->last),@endif
             @endforeach
         ],
-        startAutoPlay(){this.stopAutoPlay();this._t=setInterval(()=>this.next(),6000);},
+        startAutoPlay(){
+            this.stopAutoPlay();
+            if(this.slides.length<=1)return;
+            if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+            this._t=setInterval(()=>this.next(),6000);
+        },
         stopAutoPlay(){if(this._t){clearInterval(this._t);this._t=null;}},
-        next(){this.activeSlide=(this.activeSlide+1)%this.slides.length;},
-        prev(){this.activeSlide=(this.activeSlide-1+this.slides.length)%this.slides.length;},
-        goToSlide(i){this.activeSlide=i;this.startAutoPlay();}
+        next(){if(!this.slides.length)return;this.activeSlide=(this.activeSlide+1)%this.slides.length;},
+        prev(){if(!this.slides.length)return;this.activeSlide=(this.activeSlide-1+this.slides.length)%this.slides.length;},
+        goToSlide(i){this.activeSlide=i;this.startAutoPlay();},
+        onTouchStart(e){this._tx=e.changedTouches[0].screenX;this.stopAutoPlay();},
+        onTouchEnd(e){
+            const dx=e.changedTouches[0].screenX-(this._tx??0);
+            if(Math.abs(dx)>40){dx<0?this.next():this.prev();}
+            this.startAutoPlay();
+        }
     }));
 });
 </script>
