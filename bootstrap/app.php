@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -18,6 +19,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health:   '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust the platform proxy (Railway/Vercel/etc.) so Laravel detects
+        // the original HTTPS scheme and handles secure session/CSRF cookies.
+        $middleware->trustProxies(at: '*', headers:
+            Request::HEADER_X_FORWARDED_FOR
+            | Request::HEADER_X_FORWARDED_HOST
+            | Request::HEADER_X_FORWARDED_PORT
+            | Request::HEADER_X_FORWARDED_PROTO
+            | Request::HEADER_X_FORWARDED_AWS_ELB
+        );
+
         $middleware->redirectGuestsTo(fn () => url('/admin/login'));
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 
