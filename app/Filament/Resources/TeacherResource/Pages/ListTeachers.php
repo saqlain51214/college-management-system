@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\TeacherResource\Pages;
 
+use App\Filament\Actions\DownloadTeacherTemplateAction;
+use App\Filament\Actions\ImportTeachersFromExcelAction;
 use App\Filament\Resources\TeacherResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -34,6 +36,8 @@ class ListTeachers extends ListRecords
                         Column::make('joining_date')->heading('Joining Date'),
                     ]),
             ]),
+            DownloadTeacherTemplateAction::make(),
+            ImportTeachersFromExcelAction::make(),
             Actions\CreateAction::make(),
         ];
     }
