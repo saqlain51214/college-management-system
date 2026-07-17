@@ -1,0 +1,8 @@
+/node_modules
+/.git
+/tests
+/storage/app/public/*
+/storage/logs/*
+.env
+*.xlsx
+Combine-Fee Summary--Jinah Degree College Astore.xlsx
