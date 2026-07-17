@@ -59,9 +59,23 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => extension_loaded('pdo_mysql') ? (function () {
+                $options = [];
+
+                if ($ca = env('MYSQL_ATTR_SSL_CA')) {
+                    $options[PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA] = $ca;
+                }
+
+                // Managed MySQL providers (e.g. Aiven) require TLS but ship a
+                // managed CA. Enable TLS and — when no CA file is supplied —
+                // skip server-cert verification so the connection still works.
+                if (filter_var(env('DB_SSL_ENABLED', false), FILTER_VALIDATE_BOOL)) {
+                    $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] =
+                        filter_var(env('DB_SSL_VERIFY', false), FILTER_VALIDATE_BOOL);
+                }
+
+                return $options;
+            })() : [],
         ],
 
         'mariadb' => [
@@ -79,9 +93,23 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => extension_loaded('pdo_mysql') ? (function () {
+                $options = [];
+
+                if ($ca = env('MYSQL_ATTR_SSL_CA')) {
+                    $options[PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA] = $ca;
+                }
+
+                // Managed MySQL providers (e.g. Aiven) require TLS but ship a
+                // managed CA. Enable TLS and — when no CA file is supplied —
+                // skip server-cert verification so the connection still works.
+                if (filter_var(env('DB_SSL_ENABLED', false), FILTER_VALIDATE_BOOL)) {
+                    $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] =
+                        filter_var(env('DB_SSL_VERIFY', false), FILTER_VALIDATE_BOOL);
+                }
+
+                return $options;
+            })() : [],
         ],
 
         'pgsql' => [
