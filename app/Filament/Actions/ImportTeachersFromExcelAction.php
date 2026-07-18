@@ -387,6 +387,9 @@ class ImportTeachersFromExcelAction extends Action
                 $fillable = (new Teacher)->getFillable();
                 $attrs    = array_intersect_key($mapped, array_flip($fillable));
 
+                // Blank cells must become NULL — an empty string breaks date/enum columns.
+                $attrs = array_map(fn ($v) => (is_string($v) && trim($v) === '') ? null : $v, $attrs);
+
                 // Find existing record by any unique key
                 $teacher = null;
                 if (!empty($mapped['employee_id'])) {
