@@ -38,7 +38,7 @@ class PublicContentSeeder extends Seeder
                 'title'    => 'Admissions Open for the New Academic Session',
                 'category' => 'admissions',
                 'excerpt'  => 'Applications are now open for Intermediate, ADP and BS programmes. Apply online through the college website before the deadline.',
-                'content'  => 'Jinnah School & Degree College Astore is pleased to announce that admissions are now open for the new academic session across all Intermediate, Associate Degree (ADP) and Bachelor (BS) programmes. Prospective students can submit their applications online through the official college website. Merit lists will be displayed on the notice board and shared with applicants via SMS and email.',
+                'content'  => 'Jinnah Degree College Astore is pleased to announce that admissions are now open for the new academic session across all Intermediate, Associate Degree (ADP) and Bachelor (BS) programmes. Prospective students can submit their applications online through the official college website. Merit lists will be displayed on the notice board and shared with applicants via SMS and email.',
                 'featured' => true,
                 'days_ago' => 3,
             ],

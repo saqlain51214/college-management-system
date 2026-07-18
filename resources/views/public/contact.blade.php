@@ -197,7 +197,7 @@
       <div class="w-14 h-14 rounded-full flex items-center justify-center mb-4" style="background:#c4973a">
         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
       </div>
-      <p class="text-white font-bold text-lg mb-1">{{ $college->college_name ?? 'Jinnah School & Degree College Astore' }}</p>
+      <p class="text-white font-bold text-lg mb-1">{{ $college->college_name ?? 'Jinnah Degree College Astore' }}</p>
       <p class="text-sm mb-1 text-white/70">{{ $college->address ?? 'Astore, Gilgit-Baltistan' }}</p>
       <p class="text-xs mb-6 text-white/50">35.3753° N, 74.8589° E</p>
       <a href="https://www.google.com/maps/search/Astore+Gilgit-Baltistan" target="_blank" rel="noopener"

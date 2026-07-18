@@ -14,7 +14,7 @@
     </nav>
     <h1 id="page-title" class="font-display text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">{{ $pageContent['intro_title'] ?? 'News & Updates' }}</h1>
     <p class="mt-3 max-w-2xl text-sm leading-relaxed text-white/90 sm:text-base">
-      {{ $pageContent['intro_text'] ?? ('Stay informed with the latest announcements, events, and academic updates from ' . ($college->college_name ?? 'Jinnah School & Degree College') . '.') }}
+      {{ $pageContent['intro_text'] ?? ('Stay informed with the latest announcements, events, and academic updates from ' . ($college->college_name ?? 'Jinnah Degree College') . '.') }}
     </p>
   </div>
 </section>

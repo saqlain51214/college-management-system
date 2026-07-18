@@ -26,7 +26,7 @@ class WebsitePage extends Model
         'faculty'             => ['title' => 'Faculty Profile',         'route_name' => 'faculty',                 'sort' =>  8, 'in_menu' => false],
         'campus-facilities'   => ['title' => 'Campus Facilities',       'route_name' => 'campus-facilities',       'sort' =>  9, 'in_menu' => false],
         'downloads'           => ['title' => 'Downloads',               'route_name' => 'downloads',               'sort' => 10, 'in_menu' => false],
-        'gallery'             => ['title' => 'College Gallery',         'route_name' => 'gallery',                 'sort' => 11, 'in_menu' => false],
+        'gallery'             => ['title' => 'College Gallery',         'route_name' => 'gallery',                 'sort' => 11, 'in_menu' => true],
 
         // ── Admission ─────────────────────────────────────────────────
         'admissions'          => ['title' => 'Online Admission Form',   'route_name' => 'admissions',              'sort' => 12, 'in_menu' => true],
@@ -162,7 +162,7 @@ class WebsitePage extends Model
                 ],
             ],
             'about' => [
-                'intro_title' => 'About Jinnah School & Degree College',
+                'intro_title' => 'About Jinnah Degree College',
                 'intro_text' => 'A premier college combining board-focused intermediate programmes with modern labs, digital learning, and pathways into Pakistan top universities and professions.',
                 'body_html' => '<p>Use this section to update the introduction, story, or any important overview for the About page.</p>',
             ],
@@ -236,10 +236,10 @@ class WebsitePage extends Model
             ],
             'about-message' => [
                 'intro_title' => 'Message from the Principal',
-                'intro_text' => 'A personal message from the Principal of Jinnah School & Degree College Astore.',
+                'intro_text' => 'A personal message from the Principal of Jinnah Degree College Astore.',
                 'principal_name' => 'Arif Ali',
                 'principal_title' => 'Principal, JDCA',
-                'message_html' => '<p>On behalf of the faculty and staff of Jinnah School & Degree College Astore, I warmly welcome you to our institution. We are committed to providing quality education and nurturing every student to realise their full potential. Our aim is to create a supportive learning environment that prepares students for success in higher education and professional life.</p><p>We believe that education is not only about academic achievement, but also about character, service, and contribution to society. I invite you to explore our programmes and join the JDCA family.</p>',
+                'message_html' => '<p>On behalf of the faculty and staff of Jinnah Degree College Astore, I warmly welcome you to our institution. We are committed to providing quality education and nurturing every student to realise their full potential. Our aim is to create a supportive learning environment that prepares students for success in higher education and professional life.</p><p>We believe that education is not only about academic achievement, but also about character, service, and contribution to society. I invite you to explore our programmes and join the JDCA family.</p>',
             ],
             'departments' => [
                 'intro_title' => 'Our Departments',
@@ -261,7 +261,7 @@ class WebsitePage extends Model
             ],
             'downloads' => [
                 'intro_title' => 'Downloads',
-                'intro_text' => 'Download official forms, notices, syllabi, and other academic documents from Jinnah School & Degree College Astore.',
+                'intro_text' => 'Download official forms, notices, syllabi, and other academic documents from Jinnah Degree College Astore.',
                 'body_html' => '<p>Use this section to provide guidance on available downloads.</p>',
             ],
             'admission-procedure' => [
@@ -279,7 +279,7 @@ class WebsitePage extends Model
             ],
             'fee-structure' => [
                 'intro_title' => 'Fee Structure',
-                'intro_text' => 'Transparent fee information for all programmes offered at Jinnah School & Degree College Astore.',
+                'intro_text' => 'Transparent fee information for all programmes offered at Jinnah Degree College Astore.',
                 'body_html' => '<p>Fee details are updated each academic session. Contact the college office for the most current information.</p>',
             ],
             'semester-rules' => [

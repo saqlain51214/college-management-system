@@ -192,7 +192,7 @@
   </main>
 
   <footer class="portal-footer text-xs text-slate-500 text-center py-3 px-6 flex-shrink-0">
-    &copy; {{ date('Y') }} Jinnah School &amp; Degree College Astore &mdash; Student Portal
+    &copy; {{ date('Y') }} Jinnah Degree College Astore &mdash; Student Portal
   </footer>
 </div>
 

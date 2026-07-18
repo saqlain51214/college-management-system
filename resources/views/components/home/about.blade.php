@@ -29,7 +29,7 @@
                 {{$s['title'] ?? 'Educating Minds, Shaping Futures in Gilgit-Baltistan'}}
             </h2>
             <p class="mb-8 text-base leading-relaxed text-white/55 sm:text-[1.05rem]">
-                {{$s['description'] ?? 'Jinnah School & Degree College Astore has served the Karakoram region for over a decade — providing quality intermediate and degree education to students from Astore and surrounding valleys, affiliated with Karakoram International University.'}}
+                {{$s['description'] ?? 'Jinnah Degree College Astore has served the Karakoram region for over a decade — providing quality intermediate and degree education to students from Astore and surrounding valleys, affiliated with Karakoram International University.'}}
             </p>
 
             @if(!empty($s['stats']))

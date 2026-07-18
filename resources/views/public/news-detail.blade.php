@@ -65,7 +65,7 @@
   <div class="mx-auto max-w-2xl px-4 sm:px-6">
     <h2 class="font-display text-2xl font-semibold sm:text-3xl">More News & Updates</h2>
     <p class="mt-3 text-sm text-white/90 sm:text-base">
-      Check out more latest news and updates from {{ $college->college_name ?? 'Jinnah School & Degree College' }}.
+      Check out more latest news and updates from {{ $college->college_name ?? 'Jinnah Degree College' }}.
     </p>
     <div class="mt-6">
       <a href="{{ route('news') }}" class="inline-flex items-center justify-center rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-brand shadow-lg transition hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand">

@@ -34,7 +34,7 @@
         <div class="lg:col-span-2">
             <h2 class="text-2xl font-bold text-stone-800 font-display mb-6">Dear Students &amp; Community,</h2>
             <div class="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-5">
-                <p>Assalam-o-Alaikum and welcome to Jinnah School &amp; Degree College Astore. As Principal, I am honoured to lead an institution that has become a beacon of hope and opportunity for the youth of Astore district.</p>
+                <p>Assalam-o-Alaikum and welcome to Jinnah Degree College Astore. As Principal, I am honoured to lead an institution that has become a beacon of hope and opportunity for the youth of Astore district.</p>
                 <p>We believe that education is not merely about degrees — it is about character, service, and the ability to contribute meaningfully to society. Our mission is to nurture well-rounded graduates who carry the values of integrity, hard work, and compassion into everything they do.</p>
                 <p>At JDCA, our dedicated faculty is committed to your success. We continuously improve our teaching methods, facilities, and student support systems to ensure that every student receives the attention and guidance they deserve.</p>
                 <p>To parents: we are your partners in this journey. Your trust motivates us to maintain the highest standards of education and discipline.</p>

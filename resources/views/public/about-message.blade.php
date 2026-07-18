@@ -52,7 +52,7 @@
 
             <div class="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-5">
                 <p>
-                    It is with great pride and a sense of deep responsibility that I welcome you to Jinnah School &amp; Degree College Astore. This institution was founded on the belief that every student, regardless of their geographic or socioeconomic circumstances, deserves access to quality education.
+                    It is with great pride and a sense of deep responsibility that I welcome you to Jinnah Degree College Astore. This institution was founded on the belief that every student, regardless of their geographic or socioeconomic circumstances, deserves access to quality education.
                 </p>
                 <p>
                     The Astore Valley, with its remarkable natural beauty and resilient people, has always valued knowledge as the key to progress. At JDCA, we are committed to honoring that tradition by providing an environment where students can grow intellectually, morally, and professionally.

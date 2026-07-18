@@ -145,7 +145,7 @@ class FeeSlipTemplateResource extends Resource
 
                             Forms\Components\TextInput::make('bank_account_title')
                                 ->label('Account Title')
-                                ->placeholder('e.g. Jinnah School & Degree College Astore')
+                                ->placeholder('e.g. Jinnah Degree College Astore')
                                 ->maxLength(200)
                                 ->columnSpanFull(),
 

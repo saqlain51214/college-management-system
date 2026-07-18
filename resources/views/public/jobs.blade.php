@@ -1,6 +1,6 @@
 @extends('layouts.public')
 @section('title', 'Job Opportunities — ' . ($college->college_name ?? 'JDCA'))
-@section('meta_description', 'Career opportunities and job vacancies at Jinnah School & Degree College Astore (JDCA).')
+@section('meta_description', 'Career opportunities and job vacancies at Jinnah Degree College Astore (JDCA).')
 
 @section('content')
 
@@ -15,7 +15,7 @@
     </nav>
     <h1 id="page-title" class="font-display text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">Job Opportunities</h1>
     <p class="mt-3 max-w-2xl text-sm leading-relaxed text-white/90 sm:text-base">
-      Join our team at {{ $college->college_name ?? 'Jinnah School & Degree College Astore' }}.
+      Join our team at {{ $college->college_name ?? 'Jinnah Degree College Astore' }}.
     </p>
   </div>
 </section>

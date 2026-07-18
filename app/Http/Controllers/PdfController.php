@@ -19,7 +19,7 @@ class PdfController extends Controller
     private function college(): array
     {
         return [
-            'name'        => CollegeSetting::get('college_name',        'Jinnah School & Degree College Astore'),
+            'name'        => CollegeSetting::get('college_name',        'Jinnah Degree College Astore'),
             'short_name'  => CollegeSetting::get('college_short_name',  'JDCA'),
             'address'     => CollegeSetting::get('college_address',     'Distt. Astore Village Eidgah, Astore'),
             'city'        => CollegeSetting::get('college_city',        'Astore, Gilgit Baltistan 14300'),
@@ -181,7 +181,7 @@ class PdfController extends Controller
         $refNo     = $refPfx . '-' . $sn;
         $billNo    = $billPfx ? e($billPfx . $payment->challan_number) : '';
 
-        $college   = e(CollegeSetting::get('college_name', 'Jinnah School & Degree College Astore'));
+        $college   = e(CollegeSetting::get('college_name', 'Jinnah Degree College Astore'));
         $city      = e(CollegeSetting::get('college_city', 'Astore, Gilgit-Baltistan'));
         $phone     = e(CollegeSetting::get('college_phone',''));
 

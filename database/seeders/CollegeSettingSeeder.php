@@ -11,8 +11,8 @@ class CollegeSettingSeeder extends Seeder
     {
         $settings = [
             // College Info
-            ['key' => 'college_name',          'value' => 'Jinnah School & Degree College Astore', 'group' => 'college'],
-            ['key' => 'college_name_urdu',      'value' => 'جناح اسکول اینڈ ڈگری کالج آستور',       'group' => 'college'],
+            ['key' => 'college_name',          'value' => 'Jinnah Degree College Astore', 'group' => 'college'],
+            ['key' => 'college_name_urdu',      'value' => 'جناح ڈگری کالج آستور',       'group' => 'college'],
             ['key' => 'college_short_name',     'value' => 'JDCA',                                  'group' => 'college'],
             ['key' => 'college_address',        'value' => 'Distt.Astore Village Eidgah Near Ali Murtaza Chowk Astore', 'group' => 'college'],
             ['key' => 'college_city',           'value' => 'Astore, Gilgit Baltistan 14300',        'group' => 'college'],
@@ -56,15 +56,15 @@ class CollegeSettingSeeder extends Seeder
 
             // Website Appearance
             ['key' => 'website_footer_about',      'value' => 'Intermediate and college programmes in Astore, Gilgit-Baltistan, aligned with national standards, student welfare, and pathways to universities across Pakistan.', 'group' => 'website'],
-            ['key' => 'website_footer_copyright',  'value' => 'Jinnah School & Degree College Astore. All rights reserved.', 'group' => 'website'],
-            ['key' => 'website_theme_brand',       'value' => '#0F766E',    'group' => 'website'],
-            ['key' => 'website_theme_brand_dark',  'value' => '#115E59',    'group' => 'website'],
+            ['key' => 'website_footer_copyright',  'value' => 'Jinnah Degree College Astore. All rights reserved.', 'group' => 'website'],
+            ['key' => 'website_theme_brand',       'value' => '#1A3A5F',    'group' => 'website'],
+            ['key' => 'website_theme_brand_dark',  'value' => '#122A45',    'group' => 'website'],
             ['key' => 'website_theme_gold',        'value' => '#C4973A',    'group' => 'website'],
             ['key' => 'website_theme_footer_bg',   'value' => '#1A1A1A',    'group' => 'website'],
             ['key' => 'website_theme_body_bg',     'value' => '#F8FAFC',    'group' => 'website'],
             ['key' => 'website_theme_surface',     'value' => '#F1F5F9',    'group' => 'website'],
-            ['key' => 'website_font_sans',         'value' => 'open-sans',  'group' => 'website'],
-            ['key' => 'website_font_display',      'value' => 'playfair-display', 'group' => 'website'],
+            ['key' => 'website_font_sans',         'value' => 'inter',  'group' => 'website'],
+            ['key' => 'website_font_display',      'value' => 'inter', 'group' => 'website'],
         ];
 
         foreach ($settings as $s) {

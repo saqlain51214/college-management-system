@@ -178,7 +178,7 @@ class Settings extends Page implements HasForms
 
                         TextInput::make('fee_bank_account_title')
                             ->label('Account Title')
-                            ->placeholder('Jinnah School & Degree College Astore')
+                            ->placeholder('Jinnah Degree College Astore')
                             ->columnSpan(1),
 
                         TextInput::make('fee_bank_branch')

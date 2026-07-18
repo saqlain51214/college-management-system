@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Jinnah School & Degree College Astore') — JDCA</title>
-    <meta name="description" content="@yield('meta_description', 'Jinnah School & Degree College Astore (JDCA) — Quality education in Gilgit-Baltistan, Pakistan.')">
+    <title>@yield('title', 'Jinnah Degree College Astore') — JDCA</title>
+    <meta name="description" content="@yield('meta_description', 'Jinnah Degree College Astore (JDCA) — Quality education in Gilgit-Baltistan, Pakistan.')">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Favicon: uploaded college logo when set, otherwise the bundled JDCA mark --}}
@@ -31,18 +31,18 @@
             'lora' => '"Lora", Georgia, ui-serif, serif',
             'source-serif-4' => '"Source Serif 4", Georgia, ui-serif, serif',
         ];
-        $siteBrand = \App\Models\CollegeSetting::get('website_theme_brand', '#0F766E');
-        $siteBrandDark = \App\Models\CollegeSetting::get('website_theme_brand_dark', '#115E59');
+        $siteBrand = \App\Models\CollegeSetting::get('website_theme_brand', '#1A3A5F');
+        $siteBrandDark = \App\Models\CollegeSetting::get('website_theme_brand_dark', '#122A45');
         $siteGold = \App\Models\CollegeSetting::get('website_theme_gold', '#c4973a');
         $siteFooterBg = \App\Models\CollegeSetting::get('website_theme_footer_bg', '#1A1A1A');
         $siteBodyBg = \App\Models\CollegeSetting::get('website_theme_body_bg', '#F8FAFC');
         $siteSurface = \App\Models\CollegeSetting::get('website_theme_surface', '#F1F5F9');
-        $siteSansFontKey = \App\Models\CollegeSetting::get('website_font_sans', 'open-sans');
-        $siteDisplayFontKey = \App\Models\CollegeSetting::get('website_font_display', 'playfair-display');
+        $siteSansFontKey = \App\Models\CollegeSetting::get('website_font_sans', 'inter');
+        $siteDisplayFontKey = \App\Models\CollegeSetting::get('website_font_display', 'inter');
         $siteSansFont = $fontStacks[$siteSansFontKey] ?? $fontStacks['open-sans'];
         $siteDisplayFont = $fontStacks[$siteDisplayFontKey] ?? $fontStacks['playfair-display'];
         $siteFooterAbout = \App\Models\CollegeSetting::get('website_footer_about', 'Intermediate and college programmes in Astore, Gilgit-Baltistan, aligned with national standards, student welfare, and pathways to universities across Pakistan.');
-        $siteFooterCopyright = \App\Models\CollegeSetting::get('website_footer_copyright', 'Jinnah School & Degree College Astore. All rights reserved.');
+        $siteFooterCopyright = \App\Models\CollegeSetting::get('website_footer_copyright', 'Jinnah Degree College Astore. All rights reserved.');
     @endphp
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -147,7 +147,7 @@
                     </svg>
                 @endif
                 <div class="min-w-0">
-                    <div class="font-display font-bold leading-tight text-sm sm:text-base">{{ $college->college_name ?? 'Jinnah School & Degree College Astore' }}</div>
+                    <div class="font-display font-bold leading-tight text-base sm:text-lg lg:text-xl">{{ $college->college_name ?? 'Jinnah Degree College Astore' }}</div>
                     <div class="hidden sm:block text-[10px] text-white/65 mt-0.5">Astore, Gilgit-Baltistan</div>
                 </div>
             </a>
@@ -266,6 +266,7 @@
                         <li><a href="{{ route('admissions') }}"              class="dropdown-link">Online Admission</a></li>
                         <li><a href="{{ route('admissions') }}"              class="dropdown-link">Admission Form</a></li>
                         <li><a href="{{ route('admissions.fee-structure') }}" class="dropdown-link">Fee Structure</a></li>
+                        <li><a href="{{ route('fee-challan.download') }}" class="dropdown-link">Download Fee Challan</a></li>
                         <li class="group/schol relative">
                             <a href="{{ route('scholarships') }}" class="dropdown-link flex items-center justify-between">
                                 Scholarships<svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -380,7 +381,7 @@
                         <text x="100" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" letter-spacing="1.5" fill="white" opacity="0.6">JINNAH DEGREE COLLEGE ASTORE</text>
                     </svg>
                 @endif
-                <span class="font-display text-xl font-semibold">{{ $college->college_name ?? 'Jinnah School & Degree College' }}</span>
+                <span class="font-display text-xl font-semibold">{{ $college->college_name ?? 'Jinnah Degree College' }}</span>
             </div>
             <p class="text-sm leading-relaxed text-stone-400">
                 {{ $siteFooterAbout }}

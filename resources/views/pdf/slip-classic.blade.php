@@ -126,7 +126,7 @@ if ($payment !== null) {
 }
 
 // ── Template settings ─────────────────────────────────────────────────
-$college      = $template->college_name       ?? \App\Models\CollegeSetting::get('college_name', 'Jinnah School & Degree College Astore');
+$college      = $template->college_name       ?? \App\Models\CollegeSetting::get('college_name', 'Jinnah Degree College Astore');
 $collegeSub   = $template->college_subtitle   ?? \App\Models\CollegeSetting::get('college_subtitle', '(EIDGAH ASTORE)');
 $collegeShort = $template->college_short_name ?? \App\Models\CollegeSetting::get('college_short_name', 'JDCA');
 $bankName     = $template->bank_name          ?? \App\Models\CollegeSetting::get('fee_bank_name', 'KCBL');

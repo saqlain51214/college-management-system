@@ -28,7 +28,7 @@ class PublicController extends Controller
 {
     private function college(): object
     {
-        $name        = CollegeSetting::get('college_name',        'Jinnah School & Degree College Astore');
+        $name        = CollegeSetting::get('college_name',        'Jinnah Degree College Astore');
         $short       = CollegeSetting::get('college_short_name',  'JDCA');
         $address     = CollegeSetting::get('college_address',     'Distt. Astore Village Eidgah, Near Ali Murtaza Chowk, Astore, GB');
         $phone       = CollegeSetting::get('college_phone',       '+923129776585');
@@ -543,6 +543,68 @@ class PublicController extends Controller
             abort(404);
         }
         return view('public.scholarship-detail', compact('college', 'type'));
+    }
+
+    // ─── Fee Challan self-service download ────────────────────────────────────
+
+    public function feeChallanDownload()
+    {
+        $college = $this->college();
+
+        return view('public.fee-challan-download', compact('college'));
+    }
+
+    public function feeChallanLookup(Request $request)
+    {
+        $request->validate([
+            'identifier' => ['required', 'string', 'max:60'],
+        ]);
+
+        $college = $this->college();
+        $identifier = trim($request->input('identifier'));
+
+        $student = Student::where('roll_number', $identifier)
+            ->orWhere('registration_number', $identifier)
+            ->first();
+
+        $result = null;
+        if ($student) {
+            $unpaid = \App\Models\FeePayment::where('student_id', $student->id)
+                ->where('payment_status', '!=', 'paid')
+                ->orderByRaw('due_date is null, due_date asc')
+                ->get();
+
+            $paidThisMonth = \App\Models\FeePayment::where('student_id', $student->id)
+                ->where('payment_status', 'paid')
+                ->whereMonth('payment_date', now()->month)
+                ->whereYear('payment_date', now()->year)
+                ->orderByDesc('payment_date')
+                ->get();
+
+            $result = compact('student', 'unpaid', 'paidThisMonth');
+        }
+
+        return view('public.fee-challan-download', [
+            'college'    => $college,
+            'result'     => $result,
+            'searched'   => true,
+            'identifier' => $identifier,
+            'notFound'   => $student === null,
+        ]);
+    }
+
+    public function feeChallanPdf(Request $request, \App\Models\FeePayment $payment)
+    {
+        // Light guard: the roll/registration number must be supplied and match,
+        // so challan PDFs cannot be enumerated by guessing IDs.
+        $ref = trim((string) $request->query('ref', ''));
+        $student = $payment->student;
+
+        if (! $student || ($ref !== $student->roll_number && $ref !== $student->registration_number)) {
+            abort(403);
+        }
+
+        return app(PdfController::class)->feeChallan($payment);
     }
 
     // ─── Jobs ────────────────────────────────────────────────────────────────

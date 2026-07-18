@@ -17,7 +17,7 @@
       <span class="text-white font-bold text-lg">JDCA</span>
     </div>
     <h1 class="text-2xl font-bold text-slate-50">Student Portal</h1>
-    <p class="text-slate-400 text-sm mt-1">Jinnah School & Degree College Astore</p>
+    <p class="text-slate-400 text-sm mt-1">Jinnah Degree College Astore</p>
   </div>
 
   {{-- Card --}}

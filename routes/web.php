@@ -29,6 +29,11 @@ Route::get('/campus-facilities',   [PublicController::class, 'campusFacilities']
 Route::get('/downloads',           [PublicController::class, 'downloads'])->name('downloads');
 Route::get('/search',              [PublicController::class, 'search'])->name('search');
 
+// Public fee challan self-service download (student enters roll/registration number)
+Route::get('/fee-challan',              [PublicController::class, 'feeChallanDownload'])->name('fee-challan.download');
+Route::post('/fee-challan',             [PublicController::class, 'feeChallanLookup'])->name('fee-challan.lookup');
+Route::get('/fee-challan/{payment}/pdf', [PublicController::class, 'feeChallanPdf'])->name('fee-challan.pdf');
+
 // Admissions
 Route::get('/admissions',             [PublicController::class, 'admissions'])->name('admissions');
 Route::post('/admissions/inquiry',    [PublicController::class, 'admissionInquiry'])->middleware('throttle:public-admissions')->name('admissions.inquiry');

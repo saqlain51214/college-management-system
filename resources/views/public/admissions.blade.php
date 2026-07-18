@@ -15,7 +15,7 @@
                 <span class="text-white">Admission Form</span>
             </nav>
             <h1 id="page-title" class="font-display text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">Online Admission Form</h1>
-            <p class="mt-3 max-w-2xl text-sm text-white/90 sm:text-base">Fall Semester 2026 — {{ $college->college_name ?? 'Jinnah School & Degree College Astore' }}</p>
+            <p class="mt-3 max-w-2xl text-sm text-white/90 sm:text-base">Fall Semester 2026 — {{ $college->college_name ?? 'Jinnah Degree College Astore' }}</p>
         </div>
     </section>
 
@@ -486,7 +486,7 @@
                 <div class="rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-5 sm:px-6">
                     <p class="mb-3 text-sm font-semibold text-ink">Declaration</p>
                     <p class="mb-4 text-xs leading-relaxed text-stone-600">
-                        I declare that the information provided in this form is true and correct. I agree to abide by the rules and regulations of {{ $college->college_name ?? 'Jinnah School & Degree College Astore' }}. I undertake to maintain minimum 75% attendance, pay all dues on time, and accept that the Principal is authorised to take disciplinary action, including cancellation of admission, for violation of college rules or submission of forged documents.
+                        I declare that the information provided in this form is true and correct. I agree to abide by the rules and regulations of {{ $college->college_name ?? 'Jinnah Degree College Astore' }}. I undertake to maintain minimum 75% attendance, pay all dues on time, and accept that the Principal is authorised to take disciplinary action, including cancellation of admission, for violation of college rules or submission of forged documents.
                     </p>
                     <label class="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-stone-700">
                         <input type="checkbox" name="declare_true" required value="1" @checked(old('declare_true'))
@@ -518,7 +518,7 @@
                 <div>
                     <h2 class="font-display text-lg font-semibold text-ink">Admission Office</h2>
                     <address class="mt-3 space-y-1 text-sm not-italic text-stone-600">
-                        <p>{{ $college->college_name ?? 'Jinnah School & Degree College Astore' }}</p>
+                        <p>{{ $college->college_name ?? 'Jinnah Degree College Astore' }}</p>
                         <p>Near Ali Murtaza Chowk, Eidgah Astore</p>
                         <p>Gilgit-Baltistan, Pakistan</p>
                     </address>

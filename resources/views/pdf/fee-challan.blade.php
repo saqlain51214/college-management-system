@@ -112,7 +112,7 @@ $refNo      = $refPfx . '-' . $sn;
 $billNo     = $billPfx ? $billPfx . $sn : '';
 $consumerNo = $billNo ?: $sn;
 
-$college      = CollegeSetting::get('college_name',        'Jinnah School &amp; Degree College Astore');
+$college      = CollegeSetting::get('college_name',        'Jinnah Degree College Astore');
 $collegeShort = CollegeSetting::get('college_short_name',  'JDCA');
 $city         = CollegeSetting::get('college_city',        'Astore, Gilgit-Baltistan');
 $phone        = CollegeSetting::get('college_phone',       '');

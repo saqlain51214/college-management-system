@@ -32,7 +32,7 @@
         <div class="lg:col-span-2">
             <h2 class="text-2xl font-bold text-stone-800 font-display mb-6">Message from the Director</h2>
             <div class="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-5">
-                <p>On behalf of the Directorate of Colleges, Gilgit-Baltistan, I extend my warmest greetings to the students, faculty, and community of Jinnah School &amp; Degree College Astore.</p>
+                <p>On behalf of the Directorate of Colleges, Gilgit-Baltistan, I extend my warmest greetings to the students, faculty, and community of Jinnah Degree College Astore.</p>
                 <p>The Government of Gilgit-Baltistan is deeply committed to expanding access to quality higher education in all districts, including the remote valleys of Astore. JDCA represents our vision of bringing world-class education to the doorstep of every deserving student in the region.</p>
                 <p>I call upon all students to seize the opportunities provided at JDCA and work diligently toward building a knowledge-based future. The faculty and administration are here to support you at every step of your academic journey.</p>
                 <p>I congratulate the college leadership on their continued efforts and look forward to seeing JDCA grow as a center of excellence in the years to come.</p>

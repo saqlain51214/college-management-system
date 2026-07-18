@@ -103,7 +103,7 @@ if ($payment !== null) {
     $feeLabel = $d['fee_label'] ?? 'Semester Fee';
 }
 
-$college      = $template->college_name ?? \App\Models\CollegeSetting::get('college_name', 'Jinnah School & Degree College Astore');
+$college      = $template->college_name ?? \App\Models\CollegeSetting::get('college_name', 'Jinnah Degree College Astore');
 $collegeSub   = $template->college_subtitle ?? '';
 $collegeShort = $template->college_short_name ?? 'JDCA';
 $bankName     = $template->bank_name ?? 'KCBL';

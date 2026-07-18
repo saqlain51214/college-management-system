@@ -289,7 +289,7 @@ $dueDate      = $d['due_date'] ?? '30-06-2026';
 $sn           = $d['challan_number'] ?? 'JDCA-2026-0042';
 $feeLabel     = $d['fee_label'] ?? 'Semester Fee';
 
-$college      = $template->college_name ?? 'Jinnah School & Degree College Astore';
+$college      = $template->college_name ?? 'Jinnah Degree College Astore';
 $collegeSub   = $template->college_subtitle ?? '';
 $collegeShort = $template->college_short_name ?? 'JDCA';
 $bankName     = $template->bank_name ?? 'KCBL';

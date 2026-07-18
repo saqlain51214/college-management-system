@@ -24,7 +24,7 @@
                 <h2 class="text-xl font-bold text-stone-800 pb-2 mb-4 border-b-2" style="border-color:var(--site-brand)">Our History</h2>
                 <div class="prose prose-stone max-w-none text-stone-700 leading-relaxed space-y-4">
                     <p>
-                        Jinnah School &amp; Degree College Astore (JDCA) was established with the vision of providing quality education to the people of Astore District, one of the most scenic yet educationally underserved regions of Gilgit-Baltistan, Pakistan. The college is affiliated with Karakoram International University (KIU), Gilgit, and offers programs in education and related disciplines.
+                        Jinnah Degree College Astore (JDCA) was established with the vision of providing quality education to the people of Astore District, one of the most scenic yet educationally underserved regions of Gilgit-Baltistan, Pakistan. The college is affiliated with Karakoram International University (KIU), Gilgit, and offers programs in education and related disciplines.
                     </p>
                     <p>
                         Since its inception, JDCA has grown from a modest institution to a recognized centre of learning in the Astore Valley, committed to nurturing the next generation of educators, leaders, and professionals from the region.

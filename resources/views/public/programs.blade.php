@@ -29,7 +29,7 @@
 
 <section class="border-b border-stone-200/80 bg-white py-12 md:py-16">
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
-    <p class="mx-auto max-w-3xl text-center text-sm leading-relaxed text-stone-600 sm:text-base">{{ $college->college_name ?? 'Jinnah School & Degree College Astore' }} delivers <strong class="text-ink">intermediate (FSc, FA, ICS, I.Com)</strong> streams plus affiliated <strong class="text-ink">BS / ADP</strong> routes where formally approved. Curriculum, assessment patterns, and practical schemes follow board notifications and HEC guidelines for higher programmes.</p>
+    <p class="mx-auto max-w-3xl text-center text-sm leading-relaxed text-stone-600 sm:text-base">{{ $college->college_name ?? 'Jinnah Degree College Astore' }} delivers <strong class="text-ink">intermediate (FSc, FA, ICS, I.Com)</strong> streams plus affiliated <strong class="text-ink">BS / ADP</strong> routes where formally approved. Curriculum, assessment patterns, and practical schemes follow board notifications and HEC guidelines for higher programmes.</p>
   </div>
 </section>
 

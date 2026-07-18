@@ -223,7 +223,7 @@ $paidDate = $isPaid && $payment->payment_date ? Carbon::parse($payment->payment_
 $dueDate  = $payment->due_date ? Carbon::parse($payment->due_date)->format('d-m-Y') : '';
 
 // ── Template-aware settings (fall back to CollegeSetting) ─────────────
-$college      = $t?->college_name       ?? CollegeSetting::get('college_name',       'Jinnah School & Degree College Astore');
+$college      = $t?->college_name       ?? CollegeSetting::get('college_name',       'Jinnah Degree College Astore');
 $collegeSub   = $t?->college_subtitle   ?? CollegeSetting::get('college_subtitle',   '');
 $collegeShort = $t?->college_short_name ?? CollegeSetting::get('college_short_name', 'JDCA');
 $city         = CollegeSetting::get('college_city', 'Astore, Gilgit-Baltistan');
