@@ -115,6 +115,7 @@ class FeePaymentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('challan_number')->label('Challan No.')->searchable()->badge()->color('gray'),
+                Tables\Columns\TextColumn::make('receipt_number')->label('Receipt No.')->searchable()->badge()->color('success')->placeholder('—')->toggleable(),
                 Tables\Columns\ImageColumn::make('payment_proof_path')
                     ->label('Proof')
                     ->disk('public')
@@ -153,7 +154,8 @@ class FeePaymentResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn(FeePayment $r) => ! $r->isLocked() || (auth()->user()?->hasRole('super_admin') ?? false)),
                 Tables\Actions\Action::make('previewChallan')
                     ->label('Preview Challan')
                     ->icon('heroicon-o-eye')
@@ -188,11 +190,7 @@ class FeePaymentResource extends Resource
                     ->modalDescription('This will mark the fee as paid and notify the student.')
                     ->visible(fn(FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid)
                     ->action(function (FeePayment $r) {
-                        $r->update([
-                            'payment_status' => PaymentStatusEnum::Paid->value,
-                            'payment_date'   => now()->toDateString(),
-                            'amount_paid'    => $r->amount_due,
-                        ]);
+                        $r->markAsPaid(auth()->id());
                         if ($r->student) {
                             $feeType = $r->fee_type instanceof FeeTypeEnum ? $r->fee_type->label() : ($r->fee_type ?? 'Fee');
                             app(NotificationService::class)->send($r->student, 'fee_payment_confirmed', [
@@ -203,8 +201,10 @@ class FeePaymentResource extends Resource
                             ]);
                         }
                     }),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn(FeePayment $r) => ! $r->isLocked()),
+                Tables\Actions\ForceDeleteAction::make()
+                    ->visible(fn(FeePayment $r) => ! $r->isLocked()),
                 Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([
@@ -218,11 +218,7 @@ class FeePaymentResource extends Resource
                     ->action(function (\Illuminate\Support\Collection $records) {
                         $records->each(function (FeePayment $r) {
                             if ($r->payment_status !== PaymentStatusEnum::Paid) {
-                                $r->update([
-                                    'payment_status' => PaymentStatusEnum::Paid->value,
-                                    'payment_date'   => now()->toDateString(),
-                                    'amount_paid'    => $r->amount_due,
-                                ]);
+                                $r->markAsPaid(auth()->id());
                             }
                         });
                         \Filament\Notifications\Notification::make()

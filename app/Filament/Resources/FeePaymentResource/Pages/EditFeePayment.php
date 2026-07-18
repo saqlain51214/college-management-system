@@ -15,7 +15,11 @@ class EditFeePayment extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [Actions\DeleteAction::make(), Actions\RestoreAction::make()];
+        return [
+            Actions\DeleteAction::make()
+                ->visible(fn (): bool => ! $this->getRecord()->isLocked()),
+            Actions\RestoreAction::make(),
+        ];
     }
 
     protected function getRedirectUrl(): string

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class FeePayment extends Model
 {
@@ -16,6 +17,7 @@ class FeePayment extends Model
 
     protected $fillable = [
         'student_id', 'fee_structure_id', 'academic_year_id', 'challan_number',
+        'receipt_number',
         'fee_type', 'semester_number', 'amount_due', 'amount_paid', 'fine_amount',
         'discount_amount', 'payment_status', 'payment_method', 'due_date',
         'payment_date', 'transaction_id', 'bank_name', 'remarks', 'collected_by',
@@ -41,6 +43,57 @@ class FeePayment extends Model
 
     public function getNetAmountAttribute(): float
     {
-        return $this->amount_due + $this->fine_amount - $this->discount_amount;
+        return (float) $this->amount_due + (float) $this->fine_amount - (float) $this->discount_amount;
+    }
+
+    /**
+     * True once the fee is fully paid — such records are locked from deletion.
+     */
+    public function isLocked(): bool
+    {
+        return $this->payment_status === PaymentStatusEnum::Paid;
+    }
+
+    /**
+     * Single source of truth for settling a challan: pay the full net amount
+     * (due + fine − discount), stamp the date, record who collected it, and
+     * issue a receipt number.
+     */
+    public function markAsPaid(?int $collectorId = null): void
+    {
+        $this->amount_paid    = $this->net_amount;
+        $this->payment_status = PaymentStatusEnum::Paid;
+        $this->payment_date   = now()->toDateString();
+
+        if ($collectorId) {
+            $this->collected_by = $collectorId;
+        }
+
+        $this->save();
+    }
+
+    public static function generateReceiptNumber(): string
+    {
+        do {
+            $candidate = 'RCPT-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6));
+        } while (static::withTrashed()->where('receipt_number', $candidate)->exists());
+
+        return $candidate;
+    }
+
+    protected static function booted(): void
+    {
+        // Whenever a challan is saved in a Paid state, guarantee it has a
+        // receipt number and a payment date — regardless of which path set it.
+        static::saving(function (self $payment): void {
+            if ($payment->payment_status === PaymentStatusEnum::Paid) {
+                if (blank($payment->receipt_number)) {
+                    $payment->receipt_number = static::generateReceiptNumber();
+                }
+                if (blank($payment->payment_date)) {
+                    $payment->payment_date = now()->toDateString();
+                }
+            }
+        });
     }
 }

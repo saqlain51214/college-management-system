@@ -21,23 +21,46 @@ class CheckOverdueFees extends Command
     {
         $today = Carbon::today();
 
-        // Collect payments that will become overdue (before mass update so we have the collection)
-        $toMark = FeePayment::where('due_date', '<', $today)
+        // All unpaid challans past their due date — includes already-overdue ones so
+        // their late fine keeps growing each day the command runs.
+        $duePayments = FeePayment::where('due_date', '<', $today)
             ->whereIn('payment_status', [
                 PaymentStatusEnum::Pending->value,
                 PaymentStatusEnum::Partial->value,
+                PaymentStatusEnum::Overdue->value,
             ])
-            ->with('student')
+            ->with(['student', 'feeStructure'])
             ->get();
 
-        if ($toMark->isEmpty()) {
+        if ($duePayments->isEmpty()) {
             $this->info('No overdue payments found.');
             return self::SUCCESS;
         }
 
-        // Mass update status
-        FeePayment::whereIn('id', $toMark->pluck('id'))
-            ->update(['payment_status' => PaymentStatusEnum::Overdue->value]);
+        // Set status to Overdue and auto-calculate the late fine (days late × daily rate).
+        // $toMark = only those NEWLY becoming overdue today (so we notify them once).
+        $toMark = collect();
+
+        foreach ($duePayments as $payment) {
+            $wasOverdue = $payment->payment_status === PaymentStatusEnum::Overdue;
+
+            $rate = (float) ($payment->feeStructure->late_fine_per_day ?? 0);
+            if ($rate > 0 && $payment->due_date) {
+                $daysLate = $payment->due_date->diffInDays($today);
+                $payment->fine_amount = round($daysLate * $rate, 2);
+            }
+            $payment->payment_status = PaymentStatusEnum::Overdue;
+            $payment->saveQuietly(); // skip audit-log spam on daily fine recalculation
+
+            if (! $wasOverdue) {
+                $toMark->push($payment);
+            }
+        }
+
+        if ($toMark->isEmpty()) {
+            $this->info('Late fines updated; no newly overdue payments to notify.');
+            return self::SUCCESS;
+        }
 
         // Notify each student individually
         $svc = app(NotificationService::class);
