@@ -34,7 +34,7 @@
         $siteBrand = \App\Models\CollegeSetting::get('website_theme_brand', '#1A3A5F');
         $siteBrandDark = \App\Models\CollegeSetting::get('website_theme_brand_dark', '#122A45');
         $siteGold = \App\Models\CollegeSetting::get('website_theme_gold', '#c4973a');
-        $siteFooterBg = \App\Models\CollegeSetting::get('website_theme_footer_bg', '#1A1A1A');
+        $siteFooterBg = \App\Models\CollegeSetting::get('website_theme_footer_bg', '#1A3A5F');
         $siteBodyBg = \App\Models\CollegeSetting::get('website_theme_body_bg', '#F8FAFC');
         $siteSurface = \App\Models\CollegeSetting::get('website_theme_surface', '#F1F5F9');
         $siteSansFontKey = \App\Models\CollegeSetting::get('website_font_sans', 'inter');

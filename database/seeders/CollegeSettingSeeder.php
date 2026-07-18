@@ -60,7 +60,7 @@ class CollegeSettingSeeder extends Seeder
             ['key' => 'website_theme_brand',       'value' => '#1A3A5F',    'group' => 'website'],
             ['key' => 'website_theme_brand_dark',  'value' => '#122A45',    'group' => 'website'],
             ['key' => 'website_theme_gold',        'value' => '#C4973A',    'group' => 'website'],
-            ['key' => 'website_theme_footer_bg',   'value' => '#1A1A1A',    'group' => 'website'],
+            ['key' => 'website_theme_footer_bg',   'value' => '#1A3A5F',    'group' => 'website'],
             ['key' => 'website_theme_body_bg',     'value' => '#F8FAFC',    'group' => 'website'],
             ['key' => 'website_theme_surface',     'value' => '#F1F5F9',    'group' => 'website'],
             ['key' => 'website_font_sans',         'value' => 'inter',  'group' => 'website'],
