@@ -119,12 +119,11 @@
             {{-- Logo + College Name --}}
             <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3 self-stretch min-w-0">
                 @php $logoCustom = $college->logo_url ?? null; @endphp
-                <span class="flex h-[60px] w-[60px] sm:h-[72px] sm:w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow ring-1 ring-black/5">
-                    <img src="{{ $logoCustom ?: asset('assets/images/default/cologe-logo-web.png') }}"
-                         alt="{{ $college->short_name ?? 'JDCA' }}"
-                         onerror="this.onerror=null;this.src='{{ asset('assets/images/default/cologe-logo-web.png') }}'"
-                         class="h-full w-full object-contain p-0.5">
-                </span>
+                <img src="{{ $logoCustom ?: asset('assets/images/default/cologe-logo-web.png') }}"
+                     alt="{{ $college->short_name ?? 'JDCA' }}"
+                     onerror="this.onerror=null;this.src='{{ asset('assets/images/default/cologe-logo-web.png') }}'"
+                     class="h-[56px] w-auto sm:h-[68px] shrink-0 object-contain">
+
                 <div class="min-w-0">
                     <div class="font-display font-bold leading-tight text-base sm:text-lg lg:text-xl">{{ $college->college_name ?? 'Jinnah Degree College Astore' }}</div>
                     <div class="hidden sm:block text-[10px] text-white/65 mt-0.5">Astore, Gilgit-Baltistan</div>
@@ -335,12 +334,11 @@
     <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
         <div class="text-left">
             <div class="mb-4 flex items-center gap-3">
-                <span class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow ring-1 ring-white/20">
-                    <img src="{{ $logoCustom ?: asset('assets/images/default/cologe-logo-web.png') }}"
-                         alt="{{ $college->short_name ?? 'JDCA' }}"
-                         onerror="this.onerror=null;this.src='{{ asset('assets/images/default/cologe-logo-web.png') }}'"
-                         class="h-full w-full object-contain p-0.5">
-                </span>
+                <img src="{{ $logoCustom ?: asset('assets/images/default/cologe-logo-web.png') }}"
+                     alt="{{ $college->short_name ?? 'JDCA' }}"
+                     onerror="this.onerror=null;this.src='{{ asset('assets/images/default/cologe-logo-web.png') }}'"
+                     class="h-16 w-auto shrink-0 object-contain">
+
                 <span class="font-display text-xl font-semibold">{{ $college->college_name ?? 'Jinnah Degree College Astore' }}</span>
             </div>
             <p class="text-sm leading-relaxed text-stone-400">

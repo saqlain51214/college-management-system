@@ -221,8 +221,8 @@ if ($showBarcode) {
     <tr>
       {{-- LEFT: School crest or logo ────────────────── --}}
       <td style="width:18%;vertical-align:middle;">
-        @if(!empty($template->logo_path))
-          <img src="{{ public_path('storage/' . $template->logo_path) }}" style="max-width:36pt;max-height:36pt;display:block;"/>
+        @if(!empty($template->logo_path) && is_file(storage_path('app/public/' . $template->logo_path)))
+          <img src="{{ storage_path('app/public/' . $template->logo_path) }}" style="max-width:36pt;max-height:36pt;display:block;"/>
         @else
           <svg width="36" height="36" viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="17" fill="#e8f5e9" stroke="{{ $primaryColor }}" stroke-width="1.5"/>
@@ -255,8 +255,8 @@ if ($showBarcode) {
 {{-- ── Bank name / logo row ── --}}
 <tr>
   <td class="bnk">
-    @if(!empty($template->bank_logo_path))
-      <img src="{{ public_path('storage/' . $template->bank_logo_path) }}" style="max-height:20pt;max-width:70pt;display:inline-block;vertical-align:middle;"/> &nbsp;
+    @if(!empty($template->bank_logo_path) && is_file(storage_path('app/public/' . $template->bank_logo_path)))
+      <img src="{{ storage_path('app/public/' . $template->bank_logo_path) }}" style="max-height:20pt;max-width:70pt;display:inline-block;vertical-align:middle;"/> &nbsp;
       <span style="color:{{ $primaryColor }};font-weight:bold;font-size:6pt;">{{ $bankStr }}</span>
     @else
       <span style="color:{{ $primaryColor }};font-weight:bold;">Bank Name: {{ $bankStr }}</span>

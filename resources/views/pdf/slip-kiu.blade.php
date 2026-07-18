@@ -227,8 +227,8 @@ $bcW = round($bx + 3, 2);
     <tr>
       {{-- LEFT: Bank logo ─────────────────────────────── --}}
       <td style="width:22%;vertical-align:middle;">
-        @if(!empty($template->bank_logo_path) && is_file(public_path('storage/' . $template->bank_logo_path)))
-          <img src="{{ public_path('storage/' . $template->bank_logo_path) }}" style="max-width:52pt;max-height:32pt;display:block;"/>
+        @if(!empty($template->bank_logo_path) && is_file(storage_path('app/public/' . $template->bank_logo_path)))
+          <img src="{{ storage_path('app/public/' . $template->bank_logo_path) }}" style="max-width:52pt;max-height:32pt;display:block;"/>
         @elseif(is_file(public_path('assets/images/default/kcbl-logo-web.png')))
           <img src="{{ public_path('assets/images/default/kcbl-logo-web.png') }}" style="max-width:52pt;max-height:32pt;display:block;"/>
         @else
@@ -254,8 +254,8 @@ $bcW = round($bx + 3, 2);
 
       {{-- RIGHT: College logo or SVG crest ───────────── --}}
       <td style="width:24%;vertical-align:middle;text-align:right;">
-        @if(!empty($template->logo_path) && is_file(public_path('storage/' . $template->logo_path)))
-          <img src="{{ public_path('storage/' . $template->logo_path) }}" style="max-width:44pt;max-height:40pt;display:inline-block;"/>
+        @if(!empty($template->logo_path) && is_file(storage_path('app/public/' . $template->logo_path)))
+          <img src="{{ storage_path('app/public/' . $template->logo_path) }}" style="max-width:44pt;max-height:40pt;display:inline-block;"/>
         @elseif(is_file(public_path('assets/images/default/cologe-logo-web.png')))
           <img src="{{ public_path('assets/images/default/cologe-logo-web.png') }}" style="max-width:44pt;max-height:40pt;display:inline-block;"/>
         @else
