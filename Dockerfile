@@ -48,6 +48,6 @@ RUN composer dump-autoload --optimize --no-interaction \
 ENV PORT=8080
 EXPOSE 8080
 
-# storage:link makes uploaded files reachable; then serve the app
-CMD php artisan storage:link || true; \
+# Migrate + seed-once + storage:link, then serve the app
+CMD php artisan app:deploy || true; \
     php artisan serve --host=0.0.0.0 --port="${PORT:-8080}"
