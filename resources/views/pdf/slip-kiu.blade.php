@@ -229,6 +229,8 @@ $bcW = round($bx + 3, 2);
       <td style="width:22%;vertical-align:middle;">
         @if(!empty($template->bank_logo_path) && is_file(public_path('storage/' . $template->bank_logo_path)))
           <img src="{{ public_path('storage/' . $template->bank_logo_path) }}" style="max-width:52pt;max-height:32pt;display:block;"/>
+        @elseif(is_file(public_path('assets/images/default/kcbl-logo-web.png')))
+          <img src="{{ public_path('assets/images/default/kcbl-logo-web.png') }}" style="max-width:52pt;max-height:32pt;display:block;"/>
         @else
           <div style="background:{{ $primaryColor }};color:#fff;display:inline-block;padding:1pt 5pt 2pt;line-height:1;">
             <span style="font-size:16pt;font-weight:900;letter-spacing:-2.5pt;">{{ strtoupper(substr($bankName,0,3)) }}</span>
@@ -254,6 +256,8 @@ $bcW = round($bx + 3, 2);
       <td style="width:24%;vertical-align:middle;text-align:right;">
         @if(!empty($template->logo_path) && is_file(public_path('storage/' . $template->logo_path)))
           <img src="{{ public_path('storage/' . $template->logo_path) }}" style="max-width:44pt;max-height:40pt;display:inline-block;"/>
+        @elseif(is_file(public_path('assets/images/default/cologe-logo-web.png')))
+          <img src="{{ public_path('assets/images/default/cologe-logo-web.png') }}" style="max-width:44pt;max-height:40pt;display:inline-block;"/>
         @else
           <svg width="40" height="40" viewBox="0 0 40 40" style="opacity:0.55;">
             <circle cx="20" cy="20" r="19" fill="none" stroke="{{ $primaryColor }}" stroke-width="2"/>

@@ -3,15 +3,12 @@
     // Fallback: if no slides are configured, show a bundled default slide so the
     // hero is never empty (also survives Railway's ephemeral uploads).
     if (empty($heroSlides)) {
-        $heroSlides = [[
-            'image'              => 'assets/images/default/slider-default.jpg',
-            'title'              => $college->college_name ?? 'Jinnah Degree College Astore',
-            'description'        => 'Empowering students in Astore, Gilgit-Baltistan.',
-            'primary_btn_text'   => 'Apply for Admission',
-            'primary_btn_link'   => 'admissions',
-            'secondary_btn_text' => 'Explore Programs',
-            'secondary_btn_link' => 'programs',
-        ]];
+        $collegeName = $college->college_name ?? 'Jinnah Degree College Astore';
+        $heroSlides = [
+            ['image' => 'assets/images/default/slider-1.jpeg', 'title' => $collegeName, 'description' => 'Empowering students in Astore, Gilgit-Baltistan.', 'primary_btn_text' => 'Apply for Admission', 'primary_btn_link' => 'admissions', 'secondary_btn_text' => 'Explore Programs', 'secondary_btn_link' => 'programs'],
+            ['image' => 'assets/images/default/slider-2.jpeg', 'title' => 'Quality Education, Bright Futures', 'description' => 'Affiliated with Karakoram International University (KIU).', 'primary_btn_text' => 'Our Programs', 'primary_btn_link' => 'programs', 'secondary_btn_text' => 'Departments', 'secondary_btn_link' => 'departments'],
+            ['image' => 'assets/images/default/slider-3.jpeg', 'title' => 'Join Our Community', 'description' => 'Admissions open for Intermediate, ADP and BS programmes.', 'primary_btn_text' => 'Apply Now', 'primary_btn_link' => 'admissions', 'secondary_btn_text' => 'Contact Us', 'secondary_btn_link' => 'contact'],
+        ];
     }
     $panelItems = collect();
     foreach(($notices ?? []) as $n) {
@@ -52,7 +49,7 @@
                  style="object-position:center center"
                  :class="activeSlide===i?'opacity-100':'opacity-0'"
                  :fetchpriority="i===0?'high':'auto'"
-                 onerror="this.onerror=null;this.src='{{ asset('assets/images/default/slider-default.jpg') }}'">
+                 onerror="this.onerror=null;this.src='{{ asset('assets/images/default/slider-1.jpeg') }}'">
         </template>
 
         {{-- Gradient — left text readable, right image visible --}}
