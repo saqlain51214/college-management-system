@@ -26,6 +26,9 @@ class PublicContentSeeder extends Seeder
         // Departments + all JDCA programmes (both flagged show_on_website).
         $this->call(JdcaProgramsSeeder::class);
 
+        // Faculty list (mapped to departments by subject).
+        $this->call(JdcaTeachersSeeder::class);
+
         $this->seedNews();
         $this->seedEvents();
         $this->seedAnnouncements();
