@@ -109,6 +109,27 @@ class DownloadImportTemplateAction extends Action
                     ['Muhammad Usama', 'Azmat Khan', '2024-KIU-2992'],
                 ],
             ],
+            [
+                // Department of Education → B.Ed 1.5 Year (Fall 2024)
+                'program'  => 'B.Ed 1.5 Year',
+                'session'  => '2024',
+                'semester' => '1',
+                'students' => [
+                    ['Tariq Hussain', 'Juma Khan', '2024-KIU-2993'],
+                    ['Rashid Minhas', 'Shah Zaman', '2024-KIU-2994'],
+                    ['Wajahat Ali', 'Muhammad Ibrahim', '2024-KIU-2995'],
+                    ['Mahnoor Saba', 'Altaf Hussain', '2024-KIU-2996'],
+                    ['Mehrab Banu', 'Ali Muhammad', '2024-KIU-2997'],
+                    ['Saira Akber', 'Akber Ali', '2024-KIU-2998'],
+                    ['Nelofar Nisar', 'Nisar Ali', '2024-KIU-2999'],
+                    ['Abira Murad', 'Murad Khan', '2024-KIU-3000'],
+                    ['Younus Khan', 'Yar Muhammad', '2024-KIU-3001'],
+                    ['Hira Iqbal', 'Khalid Iqbal', '2024-KIU-3002'],
+                    ['Arif Ullah Khan', 'Juma Khan', '2024-KIU-3003'],
+                    ['Muhammad Naveed', 'Muhammad Bashir', '2024-KIU-3004'],
+                    ['Nusrat Fatima', 'Muhammad Yousaf', '2024-KIU-3005'],
+                ],
+            ],
         ];
     }
 
