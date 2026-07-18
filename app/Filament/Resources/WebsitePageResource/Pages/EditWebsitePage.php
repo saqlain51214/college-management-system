@@ -16,7 +16,7 @@ class EditWebsitePage extends EditRecord
             Action::make('preview')
                 ->label('Preview Page')
                 ->icon('heroicon-o-eye')
-                ->url(fn (): string => $this->record->previewUrl())
+                ->url(fn (): string => $this->record->previewUrl(true))
                 ->openUrlInNewTab(),
         ];
     }

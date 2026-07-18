@@ -74,11 +74,11 @@ class WebsitePage extends Model
         return self::STATIC_PAGES;
     }
 
-    public function previewUrl(): string
+    public function previewUrl(bool $preview = false): string
     {
         $routeName = self::STATIC_PAGES[$this->slug]['route_name'] ?? 'home';
 
-        return route($routeName);
+        return route($routeName, $preview ? ['preview' => 1] : []);
     }
 
     public static function defaultContentFor(string $slug): array

@@ -49,7 +49,7 @@ class WebsitePageResource extends Resource
                     Placeholder::make('page_preview_link')
                         ->label('Preview')
                         ->content(fn (?WebsitePage $record): HtmlString => $record
-                            ? new HtmlString('<a href="' . e($record->previewUrl()) . '" target="_blank" class="text-sm font-semibold text-primary-600 underline">Open page preview</a>')
+                            ? new HtmlString('<a href="' . e($record->previewUrl(true)) . '" target="_blank" class="text-sm font-semibold text-primary-600 underline">Open page preview (draft)</a>')
                             : new HtmlString('<span class="text-sm text-gray-500">Save page to preview it.</span>'))
                         ->columnSpanFull(),
                     Forms\Components\FileUpload::make('featured_image')
@@ -269,7 +269,7 @@ class WebsitePageResource extends Resource
                 Tables\Actions\Action::make('view')
                     ->label('View')
                     ->icon('heroicon-m-eye')
-                    ->url(fn (WebsitePage $record): string => $record->previewUrl())
+                    ->url(fn (WebsitePage $record): string => $record->previewUrl(true))
                     ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
             ])

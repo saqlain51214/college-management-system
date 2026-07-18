@@ -64,7 +64,11 @@ class PublicController extends Controller
     {
         $page = WebsitePage::query()->where('slug', $slug)->first();
 
-        if ($page && $slug !== 'home' && ! $page->is_published) {
+        // Admins (logged into the panel) may preview unpublished pages via ?preview=1,
+        // so content can be reviewed privately before it is published to visitors.
+        $isAdminPreview = request()->boolean('preview') && auth()->guard('web')->check();
+
+        if ($page && $slug !== 'home' && ! $page->is_published && ! $isAdminPreview) {
             abort(404);
         }
 
