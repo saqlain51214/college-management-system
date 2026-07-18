@@ -247,33 +247,39 @@ class Settings extends Page implements HasForms
                             ->columnSpanFull(),
                         Select::make('website_theme_brand')
                             ->label('Brand Color')
-                            ->options($this->withCurrentOption($this->themeColorOptions(), CollegeSetting::get('website_theme_brand', '#6B2D39')))
+                            ->options($this->colorSwatches($this->withCurrentOption($this->themeColorOptions(), CollegeSetting::get('website_theme_brand', '#6B2D39'))))
+                            ->allowHtml()
                             ->searchable()
                             ->native(false)
                             ->helperText('Preset list includes the current live value so it is not lost.'),
                         Select::make('website_theme_brand_dark')
                             ->label('Brand Dark Color')
-                            ->options($this->withCurrentOption($this->themeColorOptions(), CollegeSetting::get('website_theme_brand_dark', '#5A2430')))
+                            ->options($this->colorSwatches($this->withCurrentOption($this->themeColorOptions(), CollegeSetting::get('website_theme_brand_dark', '#5A2430'))))
+                            ->allowHtml()
                             ->searchable()
                             ->native(false),
                         Select::make('website_theme_gold')
                             ->label('Accent Color')
-                            ->options($this->withCurrentOption($this->accentColorOptions(), CollegeSetting::get('website_theme_gold', '#C4973A')))
+                            ->options($this->colorSwatches($this->withCurrentOption($this->accentColorOptions(), CollegeSetting::get('website_theme_gold', '#C4973A'))))
+                            ->allowHtml()
                             ->searchable()
                             ->native(false),
                         Select::make('website_theme_footer_bg')
                             ->label('Footer Background')
-                            ->options($this->withCurrentOption($this->footerColorOptions(), CollegeSetting::get('website_theme_footer_bg', '#1A1A1A')))
+                            ->options($this->colorSwatches($this->withCurrentOption($this->footerColorOptions(), CollegeSetting::get('website_theme_footer_bg', '#1A1A1A'))))
+                            ->allowHtml()
                             ->searchable()
                             ->native(false),
                         Select::make('website_theme_body_bg')
                             ->label('Global Body Background')
-                            ->options($this->withCurrentOption($this->backgroundColorOptions(), CollegeSetting::get('website_theme_body_bg', '#F8FAFC')))
+                            ->options($this->colorSwatches($this->withCurrentOption($this->backgroundColorOptions(), CollegeSetting::get('website_theme_body_bg', '#F8FAFC'))))
+                            ->allowHtml()
                             ->searchable()
                             ->native(false),
                         Select::make('website_theme_surface')
                             ->label('Global Surface Background')
-                            ->options($this->withCurrentOption($this->surfaceColorOptions(), CollegeSetting::get('website_theme_surface', '#F1F5F9')))
+                            ->options($this->colorSwatches($this->withCurrentOption($this->surfaceColorOptions(), CollegeSetting::get('website_theme_surface', '#F1F5F9'))))
+                            ->allowHtml()
                             ->searchable()
                             ->native(false),
                         Select::make('website_font_sans')
@@ -490,6 +496,21 @@ class Settings extends Page implements HasForms
             'wine'       => ['label' => 'Wine & Rose Gold',       'brand' => '#7B1E3B', 'dark' => '#5A162B', 'accent' => '#D4A15E', 'footer' => '#3F1D2E'],
             'graphite'   => ['label' => 'Graphite & Amber',       'brand' => '#334155', 'dark' => '#1E293B', 'accent' => '#F59E0B', 'footer' => '#0F172A'],
         ];
+    }
+
+    /**
+     * Wrap [hex => label] options with an inline colour swatch (needs ->allowHtml()).
+     */
+    protected function colorSwatches(array $options): array
+    {
+        $out = [];
+        foreach ($options as $value => $label) {
+            $swatch = '<span style="display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.25);background:'
+                . e((string) $value) . ';vertical-align:middle;margin-right:8px"></span>';
+            $out[$value] = $swatch . e((string) $label);
+        }
+
+        return $out;
     }
 
     protected function themeColorOptions(): array
