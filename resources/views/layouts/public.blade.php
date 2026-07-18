@@ -119,11 +119,11 @@
             {{-- Logo + College Name --}}
             <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3 self-stretch min-w-0">
                 @php $logoCustom = $college->logo_url ?? null; @endphp
-                <span class="flex h-[52px] w-[52px] sm:h-[60px] sm:w-[60px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow ring-1 ring-black/5">
+                <span class="flex h-[60px] w-[60px] sm:h-[72px] sm:w-[72px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow ring-1 ring-black/5">
                     <img src="{{ $logoCustom ?: asset('assets/images/default/cologe-logo-web.png') }}"
                          alt="{{ $college->short_name ?? 'JDCA' }}"
                          onerror="this.onerror=null;this.src='{{ asset('assets/images/default/cologe-logo-web.png') }}'"
-                         class="h-full w-full object-contain p-1">
+                         class="h-full w-full object-contain p-0.5">
                 </span>
                 <div class="min-w-0">
                     <div class="font-display font-bold leading-tight text-base sm:text-lg lg:text-xl">{{ $college->college_name ?? 'Jinnah Degree College Astore' }}</div>
@@ -335,34 +335,13 @@
     <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
         <div class="text-left">
             <div class="mb-4 flex items-center gap-3">
-                @if($logoCustom)
-                    <img src="{{ $logoCustom }}" alt="{{ $college->short_name ?? 'JDCA' }}"
-                         class="h-14 w-auto max-w-[60px] object-contain shrink-0">
-                @else
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none"
-                         style="height:3.5rem;width:auto;max-width:60px;display:block;flex-shrink:0;"
-                         aria-label="{{ $college->short_name ?? 'JDCA' }}" role="img">
-                        <circle cx="100" cy="100" r="96" stroke="white" stroke-width="2.5" fill="none" opacity="0.9"/>
-                        <circle cx="100" cy="100" r="86" stroke="white" stroke-width="1" fill="none" opacity="0.3"/>
-                        <g transform="translate(100,88)">
-                            <path d="M-38,-22 C-38,-22 -20,-28 0,-20 L0,22 C-20,14 -38,20 -38,20 Z" fill="white" opacity="0.9"/>
-                            <path d="M38,-22 C38,-22 20,-28 0,-20 L0,22 C20,14 38,20 38,20 Z" fill="white" opacity="0.75"/>
-                            <line x1="0" y1="-20" x2="0" y2="22" stroke="white" stroke-width="1.5" opacity="0.6"/>
-                            <line x1="-28" y1="-8" x2="-8" y2="-11" stroke="white" stroke-width="1" opacity="0.5"/>
-                            <line x1="-28" y1="-1" x2="-8" y2="-4" stroke="white" stroke-width="1" opacity="0.5"/>
-                            <line x1="-28" y1="6" x2="-8" y2="3" stroke="white" stroke-width="1" opacity="0.5"/>
-                            <line x1="28" y1="-8" x2="8" y2="-11" stroke="white" stroke-width="1" opacity="0.4"/>
-                            <line x1="28" y1="-1" x2="8" y2="-4" stroke="white" stroke-width="1" opacity="0.4"/>
-                            <line x1="28" y1="6" x2="8" y2="3" stroke="white" stroke-width="1" opacity="0.4"/>
-                            <polygon points="0,-36 3,-29 10,-29 5,-24 7,-17 0,-21 -7,-17 -5,-24 -10,-29 -3,-29" fill="white" opacity="0.9"/>
-                        </g>
-                        <text x="100" y="148" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" letter-spacing="5" fill="white" opacity="0.95">JDCA</text>
-                        <line x1="30" y1="155" x2="72" y2="155" stroke="white" stroke-width="0.8" opacity="0.4"/>
-                        <line x1="128" y1="155" x2="170" y2="155" stroke="white" stroke-width="0.8" opacity="0.4"/>
-                        <text x="100" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" letter-spacing="1.5" fill="white" opacity="0.6">JINNAH DEGREE COLLEGE ASTORE</text>
-                    </svg>
-                @endif
-                <span class="font-display text-xl font-semibold">{{ $college->college_name ?? 'Jinnah Degree College' }}</span>
+                <span class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow ring-1 ring-white/20">
+                    <img src="{{ $logoCustom ?: asset('assets/images/default/cologe-logo-web.png') }}"
+                         alt="{{ $college->short_name ?? 'JDCA' }}"
+                         onerror="this.onerror=null;this.src='{{ asset('assets/images/default/cologe-logo-web.png') }}'"
+                         class="h-full w-full object-contain p-0.5">
+                </span>
+                <span class="font-display text-xl font-semibold">{{ $college->college_name ?? 'Jinnah Degree College Astore' }}</span>
             </div>
             <p class="text-sm leading-relaxed text-stone-400">
                 {{ $siteFooterAbout }}
