@@ -10,8 +10,9 @@
     $panelItems = $panelItems->take(9);
 @endphp
 
-<div class="flex w-full overflow-hidden"
-     style="height:calc(100vh - var(--site-header-offset,6rem)); height:calc(100dvh - var(--site-header-offset,6rem)); min-height:520px; max-height:880px;"
+<div class="flex w-full overflow-hidden
+            h-[70dvh] min-h-[460px] max-h-[640px]
+            lg:h-[calc(100dvh_-_var(--site-header-offset,6rem))] lg:min-h-[520px] lg:max-h-[880px]"
      x-data="heroSlider()"
      x-init="startAutoPlay()"
      @mouseenter="stopAutoPlay()"
