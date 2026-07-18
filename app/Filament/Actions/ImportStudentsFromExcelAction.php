@@ -331,7 +331,12 @@ class ImportStudentsFromExcelAction extends Action
                     $prog = AcademicProgram::where('name', 'like', '%' . $mapped['_program_name'] . '%')
                         ->orWhere('short_name', 'like', '%' . $mapped['_program_name'] . '%')
                         ->first();
-                    if ($prog) $mapped['academic_program_id'] = $prog->id;
+                    if ($prog) {
+                        $mapped['academic_program_id'] = $prog->id;
+                        // Link the student to the programme's department too, so the
+                        // record is saved correctly department-wise.
+                        $mapped['department_id'] = $prog->department_id;
+                    }
                     unset($mapped['_program_name']);
                 }
 
