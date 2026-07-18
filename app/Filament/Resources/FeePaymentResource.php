@@ -142,6 +142,18 @@ class FeePaymentResource extends Resource
                 Tables\Columns\TextColumn::make('payment_date')->label('Paid On')->date('d M Y')->sortable()->placeholder('â€”'),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('department')
+                    ->label('Department')
+                    ->options(fn () => \App\Models\Department::orderBy('name')->pluck('name', 'id')->all())
+                    ->query(fn ($query, array $data) => filled($data['value'] ?? null)
+                        ? $query->whereHas('student', fn ($q) => $q->where('department_id', $data['value']))
+                        : $query),
+                Tables\Filters\SelectFilter::make('program')
+                    ->label('Program')
+                    ->options(fn () => \App\Models\AcademicProgram::orderBy('name')->pluck('name', 'id')->all())
+                    ->query(fn ($query, array $data) => filled($data['value'] ?? null)
+                        ? $query->whereHas('student', fn ($q) => $q->where('academic_program_id', $data['value']))
+                        : $query),
                 Tables\Filters\SelectFilter::make('payment_status')->options(PaymentStatusEnum::options()),
                 Tables\Filters\SelectFilter::make('fee_type')->options(FeeTypeEnum::options()),
                 Tables\Filters\Filter::make('has_proof')
@@ -225,6 +237,29 @@ class FeePaymentResource extends Resource
                             ->title($records->count() . ' payments marked as paid.')
                             ->success()->send();
                     }),
+                Tables\Actions\BulkAction::make('downloadChallans')
+                    ->label('Download Challans (1 PDF)')
+                    ->icon('heroicon-o-printer')
+                    ->color('info')
+                    ->modalHeading('Generate Combined Challan PDF')
+                    ->modalDescription('All selected students\' fee challans are combined into a single PDF for one-click printing. Tip: filter by Department first, then Select All.')
+                    ->modalSubmitActionLabel('Download PDF')
+                    ->action(function (\Illuminate\Support\Collection $records) {
+                        if ($records->count() > 200) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Too many at once')
+                                ->body('Please select 200 or fewer challans (e.g. one department at a time) to avoid timeouts.')
+                                ->warning()->send();
+                            return;
+                        }
+                        $pdf = app(\App\Http\Controllers\PdfController::class)->bulkChallansPdf($records);
+                        return response()->streamDownload(
+                            fn () => print($pdf),
+                            'challans-' . now()->format('Y-m-d-His') . '.pdf',
+                            ['Content-Type' => 'application/pdf'],
+                        );
+                    })
+                    ->deselectRecordsAfterCompletion(),
                 Tables\Actions\DeleteBulkAction::make(),
             ])])
             ->defaultSort('created_at', 'desc')

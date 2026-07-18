@@ -694,6 +694,41 @@ class StudentResource extends Resource
                                 ->success()->send();
                         }),
 
+                    Tables\Actions\BulkAction::make('downloadFeeChallans')
+                        ->label('Download Fee Challans (1 PDF)')
+                        ->icon('heroicon-o-printer')
+                        ->color('info')
+                        ->modalHeading('Download Combined Fee Challans')
+                        ->modalDescription('Combines the fee challans of the selected students into a single PDF for one-click printing (works department-wise — filter/select a department first).')
+                        ->modalSubmitActionLabel('Download PDF')
+                        ->action(function (\Illuminate\Support\Collection $records) {
+                            $payments = FeePayment::whereIn('student_id', $records->pluck('id'))
+                                ->orderBy('student_id')->get();
+
+                            if ($payments->isEmpty()) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('No challans found')
+                                    ->body('Generate fee challans for these students first (use "Generate Challans").')
+                                    ->warning()->send();
+                                return;
+                            }
+                            if ($payments->count() > 200) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Too many challans')
+                                    ->body('Select fewer students (max 200 challans) — e.g. one department at a time.')
+                                    ->warning()->send();
+                                return;
+                            }
+
+                            $pdf = app(\App\Http\Controllers\PdfController::class)->bulkChallansPdf($payments);
+                            return response()->streamDownload(
+                                fn () => print($pdf),
+                                'fee-challans-' . now()->format('Y-m-d-His') . '.pdf',
+                                ['Content-Type' => 'application/pdf'],
+                            );
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),

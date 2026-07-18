@@ -81,6 +81,48 @@ class PdfController extends Controller
     }
 
     /**
+     * Build ONE combined PDF containing the fee challans of many students
+     * (bulk / department-wise generation). Reuses the active slip template's
+     * layout for each payment, separated by page breaks.
+     */
+    public function bulkChallansPdf(\Illuminate\Support\Collection $payments): string
+    {
+        @set_time_limit(300);
+
+        $payments->load(['student.academicProgram', 'student.academicYear', 'feeStructure', 'academicYear']);
+
+        $template    = FeeSlipTemplate::active();
+        $orientation = $template?->orientation ?? 'landscape';
+        $view = match ($template?->variant ?? 'kiu') {
+            'classic' => 'pdf.slip-classic',
+            'modern'  => 'pdf.slip-modern',
+            'minimal' => 'pdf.slip-minimal',
+            default   => 'pdf.slip-kiu',
+        };
+
+        $head = '';
+        $bodies = [];
+        foreach ($payments as $payment) {
+            $html = view($view, compact('payment', 'template'))->render();
+
+            if ($head === '' && preg_match('/<head[^>]*>(.*?)<\/head>/is', $html, $hm)) {
+                $head = $hm[1];
+            }
+            $body = preg_match('/<body[^>]*>(.*?)<\/body>/is', $html, $bm) ? $bm[1] : $html;
+            $bodies[] = '<div style="page-break-after:always;">' . $body . '</div>';
+        }
+
+        $combined = '<!DOCTYPE html><html><head><meta charset="utf-8">' . $head . '</head><body>'
+            . implode('', $bodies) . '</body></html>';
+
+        $pdf = Pdf::loadHTML($combined)
+            ->setPaper('a4', $orientation)
+            ->setOption(['defaultFont' => 'dejavu sans', 'isRemoteEnabled' => false, 'isPhpEnabled' => false]);
+
+        return $pdf->output();
+    }
+
+    /**
      * Browser preview of a fee slip template using sample data.
      */
     public function feeSlipPreview(FeeSlipTemplate $template): \Illuminate\Http\Response
