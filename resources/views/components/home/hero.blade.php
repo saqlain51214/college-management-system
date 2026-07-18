@@ -10,6 +10,15 @@
     $panelItems = $panelItems->take(9);
 @endphp
 
+<style>
+@keyframes jdca-mq-up   { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+@keyframes jdca-mq-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.jdca-vtrack { animation: jdca-mq-up var(--vdur, 30s) linear infinite; }
+.jdca-htrack { animation: jdca-mq-left var(--hdur, 40s) linear infinite; will-change: transform; }
+.jdca-mq:hover .jdca-vtrack, .jdca-mq:hover .jdca-htrack { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .jdca-vtrack, .jdca-htrack { animation: none; } }
+</style>
+
 <div class="flex w-full overflow-hidden
             h-[58dvh] min-h-[400px] max-h-[540px]
             lg:h-[calc(100dvh_-_var(--site-header-offset,6rem))] lg:min-h-[520px] lg:max-h-[880px]"
@@ -88,34 +97,11 @@
         </div>
     </div>
 
-    {{-- ══ MOBILE BOTTOM BAR — updates strip + persistent Apply CTA, hidden on lg+ ══ --}}
+    {{-- ══ MOBILE BOTTOM BAR — persistent Apply CTA (updates shown in ticker below), hidden on lg+ ══ --}}
     <div class="absolute bottom-0 left-0 right-0 z-10 lg:hidden"
          style="background:linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 100%)">
         <div class="flex items-center gap-2 px-3 py-2.5">
-            @if($panelItems->isNotEmpty())
-            <div class="flex items-center gap-0 overflow-x-auto flex-1 min-w-0"
-                 style="scrollbar-width:none; -ms-overflow-style:none;">
-                <span class="shrink-0 flex items-center gap-1.5 pr-3 mr-2 border-r border-white/15">
-                    <span class="relative flex h-1.5 w-1.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                    </span>
-                    <span class="text-[9px] font-bold uppercase tracking-[.14em] text-white/45 whitespace-nowrap">Updates</span>
-                </span>
-                <div class="flex gap-1.5">
-                    @foreach($panelItems as $item)
-                    <a href="{{ $item['type']==='event' ? route('events') : route('notices') }}"
-                       class="shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
-                       style="{{ $item['type']==='event' ? 'background:rgba(196,151,58,.22)' : 'background:rgba(107,45,57,.35)' }}">
-                        @if($item['date'])<span class="text-white/35 text-[9px] mr-0.5">{{ $item['date'] }}</span>@endif
-                        {{ \Illuminate\Support\Str::limit($item['title'], 32) }}
-                    </a>
-                    @endforeach
-                </div>
-            </div>
-            @else
-            <span class="flex-1 min-w-0 truncate text-[11px] font-semibold text-white/70">Admissions are open — apply now</span>
-            @endif
+            <span class="flex-1 min-w-0 truncate text-[11px] font-semibold text-white/75">Admissions are open — apply now</span>
             <a href="{{ route('admissions') }}"
                class="shrink-0 rounded-full px-4 py-2 text-[11px] font-bold text-white transition hover:opacity-90"
                style="background:var(--site-brand)">
@@ -140,40 +126,33 @@
             <div class="h-px w-full mt-3" style="background:rgba(255,255,255,.07)"></div>
         </div>
 
-        {{-- Items list --}}
-        <div class="flex-1 overflow-y-auto px-3 space-y-1 pb-3"
-             style="scrollbar-width:thin;scrollbar-color:#333 transparent;">
-            @forelse($panelItems as $item)
-            <a href="{{ $item['type']==='event'?route('events'):route('notices') }}"
-               class="group flex gap-3 rounded-lg px-3 py-3 transition hover:bg-white/[.06] items-start">
-                {{-- Icon --}}
-                <div class="shrink-0 mt-0.5 h-7 w-7 rounded-md flex items-center justify-center"
-                     style="{{ $item['type']==='event'?'background:rgba(196,151,58,.15)':'background:rgba(107,45,57,.25)' }}">
-                    @if($item['type']==='event')
-                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--site-gold)">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    @else
-                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--site-brand)">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                    </svg>
-                    @endif
-                </div>
-                {{-- Text --}}
-                <div class="min-w-0 flex-1">
-                    <p class="text-[12px] font-medium leading-snug text-white/65 line-clamp-2 group-hover:text-white/90 transition">
-                        {{ $item['title'] }}
-                    </p>
-                    @if($item['date'])
-                    <span class="mt-1 block text-[10px] text-white/28">{{ $item['date'] }}</span>
-                    @endif
-                </div>
-            </a>
-            @empty
+        {{-- Items list — auto-scrolling vertical ticker (pauses on hover) --}}
+        <div class="jdca-mq flex-1 overflow-hidden px-3 pb-3">
+            @if($panelItems->isNotEmpty())
+            <div class="jdca-vtrack space-y-1" style="--vdur: {{ max(14, $panelItems->count() * 4) }}s;">
+                @foreach($panelItems->concat($panelItems) as $item)
+                <a href="{{ $item['type']==='event'?route('events'):route('notices') }}"
+                   class="group flex gap-3 rounded-lg px-3 py-3 transition hover:bg-white/[.06] items-start">
+                    <div class="shrink-0 mt-0.5 h-7 w-7 rounded-md flex items-center justify-center"
+                         style="{{ $item['type']==='event'?'background:rgba(196,151,58,.15)':'background:rgba(255,255,255,.08)' }}">
+                        @if($item['type']==='event')
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--site-gold)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        @else
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#fff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        @endif
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[12px] font-medium leading-snug text-white/65 line-clamp-2 group-hover:text-white/90 transition">{{ $item['title'] }}</p>
+                        @if($item['date'])<span class="mt-1 block text-[10px] text-white/28">{{ $item['date'] }}</span>@endif
+                    </div>
+                </a>
+                @endforeach
+            </div>
+            @else
             <div class="flex flex-col items-center justify-center py-12 text-center">
                 <p class="text-xs text-white/20">No updates yet</p>
             </div>
-            @endforelse
+            @endif
         </div>
 
         {{-- Apply button --}}
@@ -186,6 +165,29 @@
         </div>
     </aside>
 </div>
+
+{{-- ══ HORIZONTAL UPDATES TICKER — below the slider, all screens (pauses on hover) ══ --}}
+@if($panelItems->isNotEmpty())
+<div class="w-full overflow-hidden" style="background:var(--site-brand-dark);border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)">
+    <div class="flex items-stretch">
+        <span class="shrink-0 z-10 flex items-center gap-1.5 px-4 text-[11px] font-bold uppercase tracking-wider text-white" style="background:var(--site-brand)">
+            <span class="relative flex h-1.5 w-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-white"></span></span>
+            Updates
+        </span>
+        <div class="jdca-mq flex-1 overflow-hidden">
+            <div class="jdca-htrack flex items-center gap-10 whitespace-nowrap py-2.5 pl-8" style="--hdur: {{ max(24, $panelItems->count() * 7) }}s;">
+                @foreach($panelItems->concat($panelItems) as $item)
+                <a href="{{ $item['type']==='event'?route('events'):route('notices') }}" class="flex items-center gap-2 text-[12.5px] text-white/85 hover:text-white transition-colors">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full" style="background:{{ $item['type']==='event'?'var(--site-gold)':'#fff' }}"></span>
+                    @if($item['date'])<span class="text-white/45">{{ $item['date'] }}</span>@endif
+                    {{ $item['title'] }}
+                </a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 <script>
 document.addEventListener('alpine:init',()=>{

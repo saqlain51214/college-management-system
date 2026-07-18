@@ -217,6 +217,7 @@
                         <li><a href="{{ route('about.director') }}"  class="dropdown-link">Message from Director</a></li>
                         <li><a href="{{ route('about.principal') }}" class="dropdown-link">Message from Principal</a></li>
                         <li><a href="{{ route('campus-facilities') }}" class="dropdown-link">Campus Facilities</a></li>
+                        <li><a href="{{ route('gallery') }}" class="dropdown-link">Campus Gallery</a></li>
                     </ul>
                 </li>
 
@@ -306,6 +307,7 @@
                         <li><a href="{{ route('about.director') }}"  class="mob-link pl-7">Message from Director</a></li>
                         <li><a href="{{ route('about.principal') }}" class="mob-link pl-7">Message from Principal</a></li>
                         <li><a href="{{ route('campus-facilities') }}" class="mob-link pl-7">Campus Facilities</a></li>
+                        <li><a href="{{ route('gallery') }}" class="mob-link pl-7">Campus Gallery</a></li>
 
                         <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">Academics</li>
                         <li><a href="{{ route('departments') }}" class="mob-link pl-7">Departments</a></li>
