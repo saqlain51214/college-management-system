@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Disable the framework's auto /storage/{path} route so our own route
+            // (routes/web.php) serves uploaded files from the PUBLIC disk instead.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
