@@ -214,6 +214,13 @@ class AdmissionInquiryResource extends Resource
                     ->options(AcademicProgram::active()->pluck('name','id')),
             ])
             ->actions([
+                Tables\Actions\Action::make('convertToStudent')
+                    ->label('Enroll as Student')
+                    ->icon('heroicon-o-user-plus')
+                    ->color('success')
+                    ->tooltip('Create a student record pre-filled from this application')
+                    ->visible(fn ($record) => $record->status !== 'enrolled')
+                    ->url(fn ($record) => \App\Filament\Resources\StudentResource::getUrl('create', ['from_inquiry' => $record->id])),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
