@@ -8,6 +8,18 @@ use App\Http\Controllers\TeacherAuthController;
 use App\Http\Controllers\TeacherPortalController;
 use Illuminate\Support\Facades\Route;
 
+// Serve uploaded files from the public disk directly — a reliable fallback for
+// hosts where the `public/storage` symlink isn't served (e.g. php artisan serve
+// on Railway). Static files that DO resolve are served by the web server first;
+// only unresolved /storage/* requests reach this route.
+Route::get('/storage/{path}', function (string $path) {
+    abort_if(str_contains($path, '..'), 404);
+    $file = storage_path('app/public/' . $path);
+    abort_unless(is_file($file), 404);
+
+    return response()->file($file);
+})->where('path', '.*')->name('storage.public');
+
 // ── Public website ──────────────────────────────────────────────────────
 Route::get('/',              [PublicController::class, 'home'])->name('home');
 
