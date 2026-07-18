@@ -121,6 +121,7 @@
                 @php $logoCustom = $college->logo_url ?? null; @endphp
                 @if($logoCustom)
                     <img src="{{ $logoCustom }}" alt="{{ $college->short_name ?? 'JDCA' }}"
+                         onerror="this.onerror=null;this.src='{{ asset('assets/images/jdca-logo.svg') }}'"
                          class="h-full w-auto max-w-[80px] sm:max-w-[96px] shrink-0 object-contain">
                 @else
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none"

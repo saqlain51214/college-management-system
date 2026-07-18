@@ -1,5 +1,18 @@
 @php
     $heroSlides = $pageContent['hero']['slides'] ?? [];
+    // Fallback: if no slides are configured, show a bundled default slide so the
+    // hero is never empty (also survives Railway's ephemeral uploads).
+    if (empty($heroSlides)) {
+        $heroSlides = [[
+            'image'              => 'assets/images/default/slider-default.jpg',
+            'title'              => $college->college_name ?? 'Jinnah Degree College Astore',
+            'description'        => 'Empowering students in Astore, Gilgit-Baltistan.',
+            'primary_btn_text'   => 'Apply for Admission',
+            'primary_btn_link'   => 'admissions',
+            'secondary_btn_text' => 'Explore Programs',
+            'secondary_btn_link' => 'programs',
+        ]];
+    }
     $panelItems = collect();
     foreach(($notices ?? []) as $n) {
         $panelItems->push(['type'=>'notice','title'=>$n->title,'date'=>$n->publish_date?\Carbon\Carbon::parse($n->publish_date)->format('d M'):'']);
@@ -38,7 +51,8 @@
                  class="absolute inset-0 h-full w-full object-cover transition-opacity duration-1000"
                  style="object-position:center center"
                  :class="activeSlide===i?'opacity-100':'opacity-0'"
-                 :fetchpriority="i===0?'high':'auto'">
+                 :fetchpriority="i===0?'high':'auto'"
+                 onerror="this.onerror=null;this.src='{{ asset('assets/images/default/slider-default.jpg') }}'">
         </template>
 
         {{-- Gradient — left text readable, right image visible --}}

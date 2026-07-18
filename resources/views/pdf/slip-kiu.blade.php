@@ -227,7 +227,7 @@ $bcW = round($bx + 3, 2);
     <tr>
       {{-- LEFT: Bank logo ─────────────────────────────── --}}
       <td style="width:22%;vertical-align:middle;">
-        @if(!empty($template->bank_logo_path))
+        @if(!empty($template->bank_logo_path) && is_file(public_path('storage/' . $template->bank_logo_path)))
           <img src="{{ public_path('storage/' . $template->bank_logo_path) }}" style="max-width:52pt;max-height:32pt;display:block;"/>
         @else
           <div style="background:{{ $primaryColor }};color:#fff;display:inline-block;padding:1pt 5pt 2pt;line-height:1;">
@@ -252,7 +252,7 @@ $bcW = round($bx + 3, 2);
 
       {{-- RIGHT: College logo or SVG crest ───────────── --}}
       <td style="width:24%;vertical-align:middle;text-align:right;">
-        @if(!empty($template->logo_path))
+        @if(!empty($template->logo_path) && is_file(public_path('storage/' . $template->logo_path)))
           <img src="{{ public_path('storage/' . $template->logo_path) }}" style="max-width:44pt;max-height:40pt;display:inline-block;"/>
         @else
           <svg width="40" height="40" viewBox="0 0 40 40" style="opacity:0.55;">
