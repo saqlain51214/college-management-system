@@ -86,6 +86,29 @@ class DownloadImportTemplateAction extends Action
                     ['Kaveeta Begum', 'Khush Khan', '2024-KIU-ADP-3107'],
                 ],
             ],
+            [
+                // Department of Education → B.Ed 2.5 Year (Fall 2024)
+                'program'  => 'B.Ed 2.5 Year',
+                'session'  => '2024',
+                'semester' => '1',
+                'students' => [
+                    ['Sania', 'Sham ul Haq', '2024-KIU-2978'],
+                    ['Araz Hafeez', 'Abdul Hafeez', '2024-KIU-2979'],
+                    ['Noseen Jamal', 'Jamal Khan', '2024-KIU-2980'],
+                    ['Amjeeda', 'Azam Khan', '2024-KIU-2981'],
+                    ['Anjuman Shaheen', 'Abdul Zahir', '2024-KIU-2982'],
+                    ['Fozia Batool', 'Sulaman', '2024-KIU-2983'],
+                    ['Younan Aara', 'Sham ul Haq', '2024-KIU-2984'],
+                    ['Wasila', 'Dilbar Khan', '2024-KIU-2985'],
+                    ['Noor Ul Aim', 'Ashfaq Ahmed', '2024-KIU-2986'],
+                    ['Batool', 'Muhammad Shafa', '2024-KIU-2987'],
+                    ['Azeema Shaheen', 'Sadiq Ali', '2024-KIU-2988'],
+                    ['Nina Batool', 'Baktawar Shah', '2024-KIU-2989'],
+                    ['Quraish Begum', 'Ghulam Hussain', '2024-KIU-2990'],
+                    ['Nadir Ali', 'Sag Ali', '2024-KIU-2991'],
+                    ['Muhammad Usama', 'Azmat Khan', '2024-KIU-2992'],
+                ],
+            ],
         ];
     }
 
