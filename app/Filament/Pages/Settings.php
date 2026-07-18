@@ -240,9 +240,7 @@ class Settings extends Page implements HasForms
                                 }
                                 $p = $presets[$state];
                                 $set('website_theme_brand', $p['brand']);
-                                $set('website_theme_brand_dark', $p['dark']);
                                 $set('website_theme_gold', $p['accent']);
-                                $set('website_theme_footer_bg', $p['footer']);
                             })
                             ->columnSpanFull(),
                         Select::make('website_theme_brand')
@@ -251,34 +249,16 @@ class Settings extends Page implements HasForms
                             ->allowHtml()
                             ->searchable()
                             ->native(false)
-                            ->helperText('Preset list includes the current live value so it is not lost.'),
-                        Select::make('website_theme_brand_dark')
-                            ->label('Brand Dark Color')
-                            ->options($this->colorSwatches($this->withCurrentOption($this->themeColorOptions(), CollegeSetting::get('website_theme_brand_dark', '#5A2430'))))
-                            ->allowHtml()
-                            ->searchable()
-                            ->native(false),
+                            ->helperText('The main theme colour — drives the navbar AND footer. The darker shade is set automatically.'),
                         Select::make('website_theme_gold')
                             ->label('Accent Color')
                             ->options($this->colorSwatches($this->withCurrentOption($this->accentColorOptions(), CollegeSetting::get('website_theme_gold', '#C4973A'))))
                             ->allowHtml()
                             ->searchable()
                             ->native(false),
-                        Select::make('website_theme_footer_bg')
-                            ->label('Footer Background')
-                            ->options($this->colorSwatches($this->withCurrentOption($this->footerColorOptions(), CollegeSetting::get('website_theme_footer_bg', '#1A1A1A'))))
-                            ->allowHtml()
-                            ->searchable()
-                            ->native(false),
                         Select::make('website_theme_body_bg')
                             ->label('Global Body Background')
                             ->options($this->colorSwatches($this->withCurrentOption($this->backgroundColorOptions(), CollegeSetting::get('website_theme_body_bg', '#F8FAFC'))))
-                            ->allowHtml()
-                            ->searchable()
-                            ->native(false),
-                        Select::make('website_theme_surface')
-                            ->label('Global Surface Background')
-                            ->options($this->colorSwatches($this->withCurrentOption($this->surfaceColorOptions(), CollegeSetting::get('website_theme_surface', '#F1F5F9'))))
                             ->allowHtml()
                             ->searchable()
                             ->native(false),
@@ -393,6 +373,13 @@ class Settings extends Page implements HasForms
             }
         }
 
+        // Footer matches the navbar, and the dark shade is derived automatically —
+        // so the whole site follows a single Brand Colour.
+        if (! blank($data['website_theme_brand'] ?? null)) {
+            $data['website_theme_footer_bg']  = $data['website_theme_brand'];
+            $data['website_theme_brand_dark'] = $this->darkenHex($data['website_theme_brand']);
+        }
+
         $groups = [
             'college_name'               => 'college',
             'college_name_urdu'          => 'college',
@@ -499,6 +486,22 @@ class Settings extends Page implements HasForms
     }
 
     /**
+     * Darken a hex colour (default ~18%) to derive the brand's dark shade.
+     */
+    protected function darkenHex(string $hex, float $factor = 0.82): string
+    {
+        $hex = ltrim(trim($hex), '#');
+        if (strlen($hex) !== 6) {
+            return '#' . $hex;
+        }
+        $r = (int) round(hexdec(substr($hex, 0, 2)) * $factor);
+        $g = (int) round(hexdec(substr($hex, 2, 2)) * $factor);
+        $b = (int) round(hexdec(substr($hex, 4, 2)) * $factor);
+
+        return sprintf('#%02X%02X%02X', min(255, $r), min(255, $g), min(255, $b));
+    }
+
+    /**
      * Wrap [hex => label] options with an inline colour swatch (needs ->allowHtml()).
      */
     protected function colorSwatches(array $options): array
@@ -516,46 +519,24 @@ class Settings extends Page implements HasForms
     protected function themeColorOptions(): array
     {
         return [
-            '#1A3A5F' => 'KIU Navy',
-            '#122A45' => 'Navy (Dark)',
-            '#14213D' => 'Oxford Blue',
-            '#0B1526' => 'Oxford (Dark)',
+            '#1A3A5F' => 'Navy',
+            '#0F766E' => 'Emerald',
             '#1E40AF' => 'Royal Blue',
-            '#1E3A8A' => 'Royal Blue (Dark)',
-            '#1D4ED8' => 'Bright Blue',
-            '#0C4A6E' => 'Steel Blue',
-            '#0F766E' => 'Emerald Teal',
-            '#115E59' => 'Emerald (Dark)',
-            '#0D9488' => 'Teal',
-            '#166534' => 'Academic Green',
-            '#14532D' => 'Forest (Dark)',
+            '#166534' => 'Forest Green',
             '#4338CA' => 'Indigo',
-            '#3730A3' => 'Indigo (Dark)',
-            '#7C3AED' => 'Deep Violet',
-            '#6B2D39' => 'JDCA Maroon',
-            '#5A2430' => 'Maroon (Dark)',
+            '#14213D' => 'Oxford Blue',
+            '#6B2D39' => 'Maroon',
             '#7B1E3B' => 'Wine',
-            '#5A162B' => 'Wine (Dark)',
-            '#B91C1C' => 'Crimson',
-            '#334155' => 'Graphite',
-            '#1E293B' => 'Graphite (Dark)',
         ];
     }
 
     protected function accentColorOptions(): array
     {
         return [
-            '#C4973A' => 'Classic Gold',
-            '#EAB308' => 'Bright Gold',
-            '#CA8A04' => 'Deep Gold',
-            '#D4A15E' => 'Rose Gold',
+            '#C4973A' => 'Gold',
             '#F59E0B' => 'Amber',
-            '#D97706' => 'Warm Amber',
-            '#F97316' => 'Coral Orange',
+            '#F97316' => 'Coral',
             '#0EA5E9' => 'Sky Blue',
-            '#0F766E' => 'Teal Accent',
-            '#14B8A6' => 'Turquoise',
-            '#BE185D' => 'Rose',
             '#E11D48' => 'Ruby',
         ];
     }
