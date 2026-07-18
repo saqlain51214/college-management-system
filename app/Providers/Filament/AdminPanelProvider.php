@@ -44,6 +44,10 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->renderHook(
+                'panels::head.end',
+                fn (): string => '<style>.jdca-review-row, .jdca-review-row td { background-color: rgba(251, 191, 36, 0.14) !important; }</style>',
+            )
             ->plugins([
                 FilamentShieldPlugin::make()
                     ->localizePermissionLabels()

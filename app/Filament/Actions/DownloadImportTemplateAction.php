@@ -330,6 +330,51 @@ class DownloadImportTemplateAction extends Action
                     ['Faisal Mashroof', 'Muhammad Mashroof', '2025-KIU-5224'],
                 ],
             ],
+            [
+                // ADE Fall 2025 — DUPLICATE rows from the second attendance tab.
+                // Imported with a BLANK registration number + a note so the admin can
+                // reconcile them (verify / merge / delete) one by one from the dashboard.
+                'program'  => 'Associate Degree in Education',
+                'session'  => '2025',
+                'semester' => '1',
+                'students' => [
+                    ['Waseem', 'Ghulam Sarwar', '', 'Duplicate of 2025-ADP-4250 — verify'],
+                    ['Shima Begum', 'Abdul Aziz', '', 'Duplicate of 2025-ADP-4251 — verify'],
+                    ['Anila Jahan', 'Shah Jahan', '', 'Duplicate of 2025-ADP-4252 — verify'],
+                    ['Erum Jahan', 'Shah Jahan', '', 'Duplicate of 2025-ADP-4253 — verify'],
+                    ['Abdullah', 'Muhammad Wali', '', 'Duplicate of 2025-ADP-4254 — verify'],
+                    ['Maria Raza', 'Muhammad Raza', '', 'Duplicate of 2025-ADP-4255 — verify'],
+                    ['Zeeshan Ullah', 'Raheem Ullah', '', 'Duplicate of 2025-ADP-4256 — verify'],
+                    ['Ali Abbas', 'Raiz Ahmed', '', 'Duplicate of 2025-ADP-4257 — verify'],
+                    ['Nosheeda Kiran', 'Abdul Rasheed', '', 'Duplicate of 2025-ADP-4258 — verify'],
+                    ['Bibi Sania', 'Behram Khan', '', 'Duplicate of 2025-ADP-4259 — verify'],
+                    ['Qazafi', 'Shukoor Muhammad', '', 'Duplicate of 2025-ADP-4260 — verify'],
+                    ['Shehzadi', 'Muzfar Khan', '', 'Duplicate of 2025-ADP-4261 — verify'],
+                    ['Nosheen', 'Mirza Khan', '', 'Duplicate of 2025-ADP-4262 — verify'],
+                    ['Iqrar-ul-Hassan', 'Muhammad Hussain', '', 'Duplicate of 2025-ADP-4263 — verify'],
+                    ['Mehreen', 'Muhammad Hanif', '', 'Duplicate of 2025-ADP-4264 — verify'],
+                    ['Huma', 'Ijaz Ali', '', 'Duplicate of 2025-ADP-4265 — verify'],
+                    ['Waseem', 'Muhammad Sharif', '', 'Duplicate of 2025-ADP-4266 — verify'],
+                    ['Arifia', 'Amir Ali', '', 'Duplicate of 2025-ADP-4267 — verify'],
+                    ['Iqra', 'Ghulam Nabi', '', 'Duplicate of 2025-ADP-4268 — verify'],
+                    ['Saba Nisar', 'Nisar Ali', '', 'Duplicate of 2025-ADP-4269 — verify'],
+                    ['Alveena Alam', 'Naik Alam', '', 'Duplicate of 2025-ADP-4270 — verify'],
+                    ['Afsheen Zaman', 'Muhammad Alam', '', 'Duplicate of 2025-ADP-4271 — verify'],
+                    ['Naheed Akhtar', 'Abdul Latif', '', 'Duplicate of 2025-ADP-4272 — verify'],
+                    ['Roman Begum', 'Jamal Khan', '', 'Duplicate of 2025-ADP-4273 — verify'],
+                    ['Nusrat Batool', 'Shah Raies', '', 'Duplicate of 2025-ADP-4274 — verify'],
+                    ['Fatima', 'Abdul Jamil', '', 'Duplicate of 2025-ADP-4275 — verify'],
+                    ['Adnan Essa', 'Muhammad Essa', '', 'Duplicate of 2025-ADP-4276 — verify'],
+                    ['Adeeba Issa', 'Muhammad Issa', '', 'Duplicate of 2025-ADP-4277 — verify'],
+                    ['Hasbiullah', 'Abdul Jabbar', '', 'Duplicate of 2025-ADP-4278 — verify'],
+                    ['Usman Malik', 'Muhammad Yousuf', '', 'Duplicate of 2025-ADP-4279 — verify'],
+                    ['Iqra Batool', 'Amanullah', '', 'Duplicate of 2025-ADP-4280 — verify'],
+                    ['Anjum Shareif', 'Muhammad Sharif', '', 'Duplicate of 2025-ADP-4281 — verify'],
+                    ['Nadia Mushqat', 'Mushqat', '', 'Duplicate of 2025-ADP-4282 — verify'],
+                    ['Muhammad Abid', 'Rozi Khan', '', 'Duplicate of 2025-ADP-4283 — verify'],
+                    ['Zaidullah Khan', 'Jamal Khan', '', 'Duplicate of 2025-ADP-5209 — verify'],
+                ],
+            ],
         ];
     }
 
@@ -350,7 +395,8 @@ class DownloadImportTemplateAction extends Action
                 fputcsv($output, $headers);
 
                 foreach (static::studentGroups() as $group) {
-                    foreach ($group['students'] as [$studentName, $fatherName, $registration]) {
+                    foreach ($group['students'] as $student) {
+                        [$studentName, $fatherName, $registration] = $student;
                         fputcsv($output, [
                             $studentName,          // NAME
                             $fatherName,           // FATHER NAME
@@ -364,7 +410,7 @@ class DownloadImportTemplateAction extends Action
                             '',                    // CITY
                             '',                    // ADDRESS
                             $group['semester'],    // SEMESTER
-                            '',                    // REMARKS
+                            $student[3] ?? '',     // REMARKS (per-student note, e.g. duplicate flag)
                         ]);
                     }
                 }

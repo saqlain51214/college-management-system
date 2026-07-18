@@ -482,6 +482,22 @@ class StudentResource extends Resource
                     ->badge()
                     ->color(fn($state) => $state instanceof StudentStatusEnum ? $state->color() : 'gray'),
 
+                Tables\Columns\TextColumn::make('review_flag')
+                    ->label('Review')
+                    ->badge()
+                    ->color('warning')
+                    ->state(function (Student $r): ?string {
+                        if (str_contains((string) $r->remarks, 'Duplicate')) {
+                            return 'Duplicate';
+                        }
+                        if (blank($r->registration_number)) {
+                            return 'No Reg #';
+                        }
+                        return null;
+                    })
+                    ->tooltip(fn (Student $r) => $r->remarks ?: null)
+                    ->placeholder('—'),
+
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Phone')
                     ->searchable()
@@ -528,10 +544,27 @@ class StudentResource extends Resource
                             ->all()
                     ),
 
+                Tables\Filters\SelectFilter::make('review')
+                    ->label('Needs Review')
+                    ->options([
+                        'duplicate'    => 'Duplicates (flagged)',
+                        'missing_reg'  => 'Missing Registration No',
+                        'missing_roll' => 'Missing Roll No',
+                    ])
+                    ->query(function ($query, array $data) {
+                        return match ($data['value'] ?? null) {
+                            'duplicate'    => $query->where('remarks', 'like', '%Duplicate%'),
+                            'missing_reg'  => $query->where(fn ($q) => $q->whereNull('registration_number')->orWhere('registration_number', '')),
+                            'missing_roll' => $query->where(fn ($q) => $q->whereNull('roll_number')->orWhere('roll_number', '')),
+                            default        => $query,
+                        };
+                    }),
+
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
                 Tables\Filters\TernaryFilter::make('is_hosteler')->label('Hosteler'),
                 Tables\Filters\TrashedFilter::make(),
             ])
+            ->recordClasses(fn (Student $r) => (blank($r->registration_number) || str_contains((string) $r->remarks, 'Duplicate')) ? 'jdca-review-row' : null)
             ->actions([
                 Tables\Actions\EditAction::make(),
 
