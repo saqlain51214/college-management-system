@@ -31,8 +31,8 @@
             'lora' => '"Lora", Georgia, ui-serif, serif',
             'source-serif-4' => '"Source Serif 4", Georgia, ui-serif, serif',
         ];
-        $siteBrand = \App\Models\CollegeSetting::get('website_theme_brand', '#6B2D39');
-        $siteBrandDark = \App\Models\CollegeSetting::get('website_theme_brand_dark', '#5a2430');
+        $siteBrand = \App\Models\CollegeSetting::get('website_theme_brand', '#0F766E');
+        $siteBrandDark = \App\Models\CollegeSetting::get('website_theme_brand_dark', '#115E59');
         $siteGold = \App\Models\CollegeSetting::get('website_theme_gold', '#c4973a');
         $siteFooterBg = \App\Models\CollegeSetting::get('website_theme_footer_bg', '#1A1A1A');
         $siteBodyBg = \App\Models\CollegeSetting::get('website_theme_body_bg', '#F8FAFC');
@@ -194,7 +194,9 @@
     </div>
 
     {{-- ── ROW 2: Nav bar — centered menu items ─────────────────────────── --}}
-    @php $deptList = \App\Models\Department::visible()->ordered()->get(); @endphp
+    @php $deptList = \App\Models\Department::visible()->ordered()
+        ->with(['academicPrograms' => fn ($q) => $q->where('is_active', true)->where('show_on_website', true)->orderBy('sort_order')->orderBy('name')])
+        ->get(); @endphp
     <div class="relative border-t border-white/10" style="background:rgba(0,0,0,0.52); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
         <div class="mx-auto max-w-6xl px-4">
 
@@ -230,7 +232,21 @@
                             </a>
                             <ul class="invisible absolute left-full top-0 z-50 w-72 list-none rounded-xl bg-white py-2 text-stone-800 shadow-xl pointer-events-none opacity-0 transition-all duration-200 group-hover/depts:pointer-events-auto group-hover/depts:visible group-hover/depts:opacity-100">
                                 @foreach($deptList as $dept)
-                                <li><a href="{{ route('departments.show', $dept->slug) }}" class="dropdown-link">{{ $dept->name }}</a></li>
+                                <li class="group/dept relative">
+                                    <a href="{{ route('departments.show', $dept->slug) }}" class="dropdown-link flex items-center justify-between">
+                                        {{ $dept->name }}
+                                        @if($dept->academicPrograms->isNotEmpty())
+                                        <svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                        @endif
+                                    </a>
+                                    @if($dept->academicPrograms->isNotEmpty())
+                                    <ul class="invisible absolute left-full top-0 z-50 w-72 list-none rounded-xl bg-white py-2 text-stone-800 shadow-xl pointer-events-none opacity-0 transition-all duration-200 group-hover/dept:pointer-events-auto group-hover/dept:visible group-hover/dept:opacity-100">
+                                        @foreach($dept->academicPrograms as $prog)
+                                        <li><a href="{{ route('departments.show', $dept->slug) }}" class="dropdown-link">{{ $prog->name }}</a></li>
+                                        @endforeach
+                                    </ul>
+                                    @endif
+                                </li>
                                 @endforeach
                                 @if($deptList->isEmpty())<li class="px-4 py-2 text-xs text-stone-400">No departments yet</li>@endif
                             </ul>

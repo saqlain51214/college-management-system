@@ -57,8 +57,8 @@ class CollegeSettingSeeder extends Seeder
             // Website Appearance
             ['key' => 'website_footer_about',      'value' => 'Intermediate and college programmes in Astore, Gilgit-Baltistan, aligned with national standards, student welfare, and pathways to universities across Pakistan.', 'group' => 'website'],
             ['key' => 'website_footer_copyright',  'value' => 'Jinnah School & Degree College Astore. All rights reserved.', 'group' => 'website'],
-            ['key' => 'website_theme_brand',       'value' => '#6B2D39',    'group' => 'website'],
-            ['key' => 'website_theme_brand_dark',  'value' => '#5A2430',    'group' => 'website'],
+            ['key' => 'website_theme_brand',       'value' => '#0F766E',    'group' => 'website'],
+            ['key' => 'website_theme_brand_dark',  'value' => '#115E59',    'group' => 'website'],
             ['key' => 'website_theme_gold',        'value' => '#C4973A',    'group' => 'website'],
             ['key' => 'website_theme_footer_bg',   'value' => '#1A1A1A',    'group' => 'website'],
             ['key' => 'website_theme_body_bg',     'value' => '#F8FAFC',    'group' => 'website'],
