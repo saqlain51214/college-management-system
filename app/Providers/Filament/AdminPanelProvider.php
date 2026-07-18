@@ -14,6 +14,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -44,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->maxContentWidth(MaxWidth::Full)
             ->renderHook(
                 'panels::head.end',
                 fn (): string => '<style>.jdca-review-row, .jdca-review-row td { background-color: rgba(251, 191, 36, 0.14) !important; }</style>',

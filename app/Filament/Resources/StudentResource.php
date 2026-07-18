@@ -445,6 +445,13 @@ class StudentResource extends Resource
                     ->badge()
                     ->color('primary'),
 
+                Tables\Columns\TextColumn::make('registration_number')
+                    ->label('Registration No.')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
+                    ->placeholder('—'),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Student Name')
                     ->searchable()
