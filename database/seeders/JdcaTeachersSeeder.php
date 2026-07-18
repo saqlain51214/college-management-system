@@ -45,12 +45,13 @@ class JdcaTeachersSeeder extends Seeder
     public static function upsertAll(): void
     {
         foreach (self::teachers() as [$emp, $name, $gender, $email, $phone, $qual, $subject, $year, $exp, $deptSlug]) {
-            $departmentId = $deptSlug ? Department::where('slug', $deptSlug)->value('id') : null;
-
+            // Department is intentionally left blank — the college assigns each
+            // teacher to a department later from the dashboard. The subject stays
+            // in `specialization` for reference.
             Teacher::updateOrCreate(
                 ['employee_id' => $emp],
                 [
-                    'department_id'         => $departmentId,
+                    'department_id'         => null,
                     'name'                  => $name,
                     'gender'                => $gender,
                     'email'                 => $email,
