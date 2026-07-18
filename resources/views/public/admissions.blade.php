@@ -107,39 +107,18 @@
                                     class="mt-1.5 w-full rounded-md border border-stone-300 bg-white px-3 py-2.5 text-sm outline-none ring-brand/20 focus:border-brand focus:ring-2 @error('program_name') border-red-400 @enderror">
                                 <option value="">— Select department &amp; programme —</option>
 
-                                <optgroup label="Department of Education">
-                                    <option value="Associate Degree in Education"
-                                        @selected(old('program_name') === 'Associate Degree in Education')>Associate Degree in Education</option>
-                                    <option value="B.Ed 1.5 Year"
-                                        @selected(old('program_name') === 'B.Ed 1.5 Year')>B.Ed 1.5 Year</option>
-                                    <option value="B.Ed 2.5 Year"
-                                        @selected(old('program_name') === 'B.Ed 2.5 Year')>B.Ed 2.5 Year</option>
-                                </optgroup>
-
-                                <optgroup label="Department of Physical Education">
-                                    <option value="Associate Degree in Health &amp; Physical Education"
-                                        @selected(old('program_name') === 'Associate Degree in Health & Physical Education')>Associate Degree in Health &amp; Physical Education</option>
-                                </optgroup>
-
-                                <optgroup label="Department of Sociology">
-                                    <option value="Associate Degree in Sociology"
-                                        @selected(old('program_name') === 'Associate Degree in Sociology')>Associate Degree in Sociology</option>
-                                </optgroup>
-
-                                <optgroup label="Department of Computer Science">
-                                    <option value="Associate Degree in Computer Science"
-                                        @selected(old('program_name') === 'Associate Degree in Computer Science')>Associate Degree in Computer Science</option>
-                                </optgroup>
-
-                                <optgroup label="Department of English">
-                                    <option value="Associate Degree in English"
-                                        @selected(old('program_name') === 'Associate Degree in English')>Associate Degree in English</option>
-                                </optgroup>
-
-                                <optgroup label="Department of Continuous Education">
-                                    <option value="Associate Degree in Continuous Education"
-                                        @selected(old('program_name') === 'Associate Degree in Continuous Education')>Associate Degree in Continuous Education</option>
-                                </optgroup>
+                                {{-- Departments & programmes come from the database (same source as the navbar) --}}
+                                @forelse(($departments ?? collect()) as $dept)
+                                    @if($dept->academicPrograms->isNotEmpty())
+                                    <optgroup label="{{ $dept->name }}">
+                                        @foreach($dept->academicPrograms as $prog)
+                                        <option value="{{ $prog->name }}" @selected(old('program_name') === $prog->name)>{{ $prog->name }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                    @endif
+                                @empty
+                                    <option value="" disabled>No programmes available — please contact the office</option>
+                                @endforelse
 
                             </select>
                         </label>

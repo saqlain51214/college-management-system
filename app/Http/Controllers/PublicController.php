@@ -185,13 +185,19 @@ class PublicController extends Controller
         $college     = $this->college();
         $cmsPage     = $this->cmsPage('admissions');
         $pageContent = $cmsPage->content;
-        $allPrograms = collect(); // programmes are now static in the view
+        $allPrograms = collect();
+
+        // Same DB source as the navbar so the form and menu never drift apart.
+        $departments = Department::visible()->ordered()
+            ->with(['academicPrograms' => fn ($q) => $q->where('is_active', true)->where('show_on_website', true)->orderBy('sort_order')->orderBy('name')])
+            ->get();
 
         return view('public.admissions', compact(
             'college',
             'cmsPage',
             'pageContent',
-            'allPrograms'
+            'allPrograms',
+            'departments'
         ));
     }
 
