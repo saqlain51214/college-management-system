@@ -226,6 +226,25 @@ class Settings extends Page implements HasForms
                         TextInput::make('website_footer_copyright')
                             ->label('Footer Copyright Text')
                             ->columnSpanFull(),
+                        Select::make('theme_preset')
+                            ->label('🎨 Quick Theme Preset')
+                            ->helperText('Pick a ready-made, high-contrast palette — it fills the Brand / Dark / Accent / Footer colours below. Then click Save.')
+                            ->options(collect($this->themePresets())->map(fn ($p) => $p['label'])->all())
+                            ->native(false)
+                            ->dehydrated(false)
+                            ->live()
+                            ->afterStateUpdated(function ($state, \Filament\Forms\Set $set): void {
+                                $presets = $this->themePresets();
+                                if (! $state || ! isset($presets[$state])) {
+                                    return;
+                                }
+                                $p = $presets[$state];
+                                $set('website_theme_brand', $p['brand']);
+                                $set('website_theme_brand_dark', $p['dark']);
+                                $set('website_theme_gold', $p['accent']);
+                                $set('website_theme_footer_bg', $p['footer']);
+                            })
+                            ->columnSpanFull(),
                         Select::make('website_theme_brand')
                             ->label('Brand Color')
                             ->options($this->withCurrentOption($this->themeColorOptions(), CollegeSetting::get('website_theme_brand', '#6B2D39')))
@@ -453,13 +472,52 @@ class Settings extends Page implements HasForms
             : $value;
     }
 
+    /**
+     * One-click, high-contrast palettes tailored for a college website.
+     * Each fills Brand / Dark / Accent / Footer at once.
+     */
+    protected function themePresets(): array
+    {
+        return [
+            'kiu-navy'   => ['label' => 'KIU Navy & Gold',        'brand' => '#1A3A5F', 'dark' => '#122A45', 'accent' => '#C4973A', 'footer' => '#122A45'],
+            'emerald'    => ['label' => 'Emerald & Gold',         'brand' => '#0F766E', 'dark' => '#115E59', 'accent' => '#EAB308', 'footer' => '#134E4A'],
+            'royal'      => ['label' => 'Royal Blue & Amber',     'brand' => '#1E40AF', 'dark' => '#1E3A8A', 'accent' => '#F59E0B', 'footer' => '#1E1B4B'],
+            'maroon'     => ['label' => 'Classic Maroon & Gold',  'brand' => '#6B2D39', 'dark' => '#5A2430', 'accent' => '#C4973A', 'footer' => '#3F1D2E'],
+            'forest'     => ['label' => 'Forest Green & Gold',    'brand' => '#166534', 'dark' => '#14532D', 'accent' => '#CA8A04', 'footer' => '#14532D'],
+            'indigo'     => ['label' => 'Indigo & Sky',           'brand' => '#4338CA', 'dark' => '#3730A3', 'accent' => '#0EA5E9', 'footer' => '#1E1B4B'],
+            'teal-coral' => ['label' => 'Teal & Coral',           'brand' => '#0D9488', 'dark' => '#0F766E', 'accent' => '#F97316', 'footer' => '#134E4A'],
+            'oxford'     => ['label' => 'Oxford Blue & Gold',     'brand' => '#14213D', 'dark' => '#0B1526', 'accent' => '#C4973A', 'footer' => '#0B1526'],
+            'wine'       => ['label' => 'Wine & Rose Gold',       'brand' => '#7B1E3B', 'dark' => '#5A162B', 'accent' => '#D4A15E', 'footer' => '#3F1D2E'],
+            'graphite'   => ['label' => 'Graphite & Amber',       'brand' => '#334155', 'dark' => '#1E293B', 'accent' => '#F59E0B', 'footer' => '#0F172A'],
+        ];
+    }
+
     protected function themeColorOptions(): array
     {
         return [
-            '#6B2D39' => 'JDCA Maroon',
-            '#1D4ED8' => 'Royal Blue',
+            '#1A3A5F' => 'KIU Navy',
+            '#122A45' => 'Navy (Dark)',
+            '#14213D' => 'Oxford Blue',
+            '#0B1526' => 'Oxford (Dark)',
+            '#1E40AF' => 'Royal Blue',
+            '#1E3A8A' => 'Royal Blue (Dark)',
+            '#1D4ED8' => 'Bright Blue',
+            '#0C4A6E' => 'Steel Blue',
+            '#0F766E' => 'Emerald Teal',
+            '#115E59' => 'Emerald (Dark)',
+            '#0D9488' => 'Teal',
             '#166534' => 'Academic Green',
+            '#14532D' => 'Forest (Dark)',
+            '#4338CA' => 'Indigo',
+            '#3730A3' => 'Indigo (Dark)',
             '#7C3AED' => 'Deep Violet',
+            '#6B2D39' => 'JDCA Maroon',
+            '#5A2430' => 'Maroon (Dark)',
+            '#7B1E3B' => 'Wine',
+            '#5A162B' => 'Wine (Dark)',
+            '#B91C1C' => 'Crimson',
+            '#334155' => 'Graphite',
+            '#1E293B' => 'Graphite (Dark)',
         ];
     }
 
@@ -467,9 +525,17 @@ class Settings extends Page implements HasForms
     {
         return [
             '#C4973A' => 'Classic Gold',
+            '#EAB308' => 'Bright Gold',
+            '#CA8A04' => 'Deep Gold',
+            '#D4A15E' => 'Rose Gold',
+            '#F59E0B' => 'Amber',
             '#D97706' => 'Warm Amber',
+            '#F97316' => 'Coral Orange',
+            '#0EA5E9' => 'Sky Blue',
             '#0F766E' => 'Teal Accent',
-            '#BE185D' => 'Rose Accent',
+            '#14B8A6' => 'Turquoise',
+            '#BE185D' => 'Rose',
+            '#E11D48' => 'Ruby',
         ];
     }
 
@@ -477,9 +543,15 @@ class Settings extends Page implements HasForms
     {
         return [
             '#1A1A1A' => 'Charcoal',
+            '#0F172A' => 'Midnight Slate',
             '#111827' => 'Slate Black',
-            '#172554' => 'Navy',
+            '#122A45' => 'Deep Navy',
+            '#0B1526' => 'Oxford Night',
+            '#1E1B4B' => 'Indigo Night',
+            '#134E4A' => 'Dark Teal',
+            '#14532D' => 'Deep Forest',
             '#3F1D2E' => 'Deep Plum',
+            '#172554' => 'Navy',
         ];
     }
 
@@ -487,9 +559,13 @@ class Settings extends Page implements HasForms
     {
         return [
             '#F8FAFC' => 'Soft Slate',
+            '#FFFFFF' => 'Pure White',
             '#F5F5F4' => 'Warm Stone',
             '#FAF7F2' => 'Light Beige',
+            '#FEF9F3' => 'Cream',
             '#F4F7FB' => 'Cool Blue Tint',
+            '#F0FDF4' => 'Mint Tint',
+            '#F5F3FF' => 'Lavender Tint',
         ];
     }
 
@@ -500,6 +576,8 @@ class Settings extends Page implements HasForms
             '#FFFFFF' => 'White Surface',
             '#F8F5F0' => 'Warm Surface',
             '#EEF6FF' => 'Cool Surface',
+            '#ECFDF5' => 'Mint Surface',
+            '#FAF5FF' => 'Lavender Surface',
         ];
     }
 
