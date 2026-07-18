@@ -11,7 +11,7 @@
 @endphp
 
 <div class="flex w-full overflow-hidden
-            h-[70dvh] min-h-[460px] max-h-[640px]
+            h-[58dvh] min-h-[400px] max-h-[540px]
             lg:h-[calc(100dvh_-_var(--site-header-offset,6rem))] lg:min-h-[520px] lg:max-h-[880px]"
      x-data="heroSlider()"
      x-init="startAutoPlay()"
