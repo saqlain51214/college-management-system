@@ -7,6 +7,13 @@
     <title>@yield('title', 'Jinnah School & Degree College Astore') — JDCA</title>
     <meta name="description" content="@yield('meta_description', 'Jinnah School & Degree College Astore (JDCA) — Quality education in Gilgit-Baltistan, Pakistan.')">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- Favicon: uploaded college logo when set, otherwise the bundled JDCA mark --}}
+    @php $siteFavicon = !empty($college->logo_url ?? null) ? $college->logo_url : asset('assets/images/jdca-logo.svg'); @endphp
+    <link rel="icon" href="{{ $siteFavicon }}" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/images/jdca-logo.svg') }}">
+    <link rel="apple-touch-icon" href="{{ $siteFavicon }}">
+
     @php
         $pageVisibility = \App\Models\WebsitePage::query()->pluck('is_published', 'slug')->all();
         $pageVisible = fn (string $slug): bool => ! array_key_exists($slug, $pageVisibility) || (bool) $pageVisibility[$slug];
@@ -141,7 +148,7 @@
                 @endif
                 <div class="min-w-0">
                     <div class="font-display font-bold leading-tight text-sm sm:text-base">{{ $college->college_name ?? 'Jinnah School & Degree College Astore' }}</div>
-                    <div class="hidden sm:block text-[10px] text-white/65 mt-0.5">Astore, Gilgit-Baltistan &nbsp;·&nbsp; Affiliated: KIU</div>
+                    <div class="hidden sm:block text-[10px] text-white/65 mt-0.5">Astore, Gilgit-Baltistan</div>
                 </div>
             </a>
 
