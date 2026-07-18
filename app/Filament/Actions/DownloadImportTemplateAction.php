@@ -163,6 +163,28 @@ class DownloadImportTemplateAction extends Action
                     ['Musrat Begum', 'Abdul Karim', '2025-KIU-ADP-3389'],
                 ],
             ],
+            [
+                // Department of Education → B.Ed 2.5 Year (Spring 2025)
+                'program'  => 'B.Ed 2.5 Year',
+                'session'  => '2025',
+                'semester' => '1',
+                'students' => [
+                    ['Nazakat', 'Raja Wajid Ali Shah', '2025-KIU-3510'],
+                    ['Shafiqa Malik', 'Abdul Hakeem Malik', '2025-KIU-3511'],
+                    ['Abdul Baqi', 'Abdul Raouf', '2025-KIU-3512'],
+                    ['Maqsood Ali', 'Muhammad Ali', '2025-KIU-3513'],
+                    ['Chinarah Gul', 'Gul Muhammad', '2025-KIU-3514'],
+                    ['Safia Sher', 'Qari Muhammad Farooz', '2025-KIU-3515'],
+                    ['Nabila', 'Muhammad Akbar', '2025-KIU-3516'],
+                    ['Shamim', 'Abdul Manaf', '2025-KIU-3517'],
+                    ['Shamim Ara', 'Muhammad Yousaf', '2025-KIU-3518'],
+                    ['Marina', 'Akbar Khan', '2025-KIU-3519'],
+                    ['Chaman Ara', 'Mohd Abdullah', '2025-KIU-3520'],
+                    ['Nelofer', 'Bakhtawar', '2025-KIU-3521'],
+                    ['Noor ul Haq', 'Muhammad Sher', '2025-KIU-3522'],
+                    ['Shumaila Raziq', 'Abdul Raziq', '2025-KIU-3525'],
+                ],
+            ],
         ];
     }
 
