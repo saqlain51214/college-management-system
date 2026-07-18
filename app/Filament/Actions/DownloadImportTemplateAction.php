@@ -289,6 +289,47 @@ class DownloadImportTemplateAction extends Action
                     ['Nousheen Salma', 'Noushad Ali', '2025-ADP-4249'],
                 ],
             ],
+            [
+                // Department of Education → B.Ed 2.5 Year (Fall 2025)
+                'program'  => 'B.Ed 2.5 Year',
+                'session'  => '2025',
+                'semester' => '1',
+                'students' => [
+                    ['Iftikhar Hussain', 'Ghulam Baqir', '2025-KIU-5225'],
+                    ['Sultana', 'Muhammad Hamid', '2025-KIU-5226'],
+                    ['Laila', 'Khan', '2025-KIU-5227'],
+                    ['Qudarat Ullah Khan', 'Ameer Ullah Khan', '2025-KIU-5228'],
+                    ['Shafqat Ara', 'Abdul Gafoor', '2025-KIU-5229'],
+                    ['Aklima', 'Amir Ali', '2025-KIU-5230'],
+                    ['Syed Irum Zehra', 'Syed Ashiq Hussain', '2025-KIU-5231'],
+                    ['Shahida', 'Muhammad Ibrahim', '2025-KIU-5232'],
+                    ['Aqeel Hussain', 'Muhammad Mussa', '2025-KIU-5233'],
+                    ['Hina Batool', 'Ghulam Nabi', '2025-KIU-5234'],
+                ],
+            ],
+            [
+                // Department of Education → B.Ed 1.5 Year (Fall 2025)
+                'program'  => 'B.Ed 1.5 Year',
+                'session'  => '2025',
+                'semester' => '1',
+                'students' => [
+                    ['Azeema Shaheen', 'Sadat Khan', '2025-KIU-5210'],
+                    ['Maria Abdul Gaffar', 'Abdul Gaffar', '2025-KIU-5211'],
+                    ['Abdul Basit', 'Abdul Muheet', '2025-KIU-5212'],
+                    ['Fozia Saleem', 'Muhammad Saleem', '2025-KIU-5213'],
+                    ['Kishwar Iqbal', 'Muhammad Iqbal', '2025-KIU-5214'],
+                    ['Shama Akhter', 'Fazal Shah', '2025-KIU-5215'],
+                    ['Niza-ul-Haq', 'Sabad Ali Shah', '2025-KIU-5216'],
+                    ['Abdullah Jan', 'Abdul Aziz', '2025-KIU-5217'],
+                    ['Muhammad Faisal Nazir', 'Muhammad Nazir', '2025-KIU-5218'],
+                    ['Tariq Maqsood', 'Shazada Khan', '2025-KIU-5219'],
+                    ['Bismillah', 'Saiden Shah', '2025-KIU-5220'],
+                    ['Sumia Aziz', 'Abdul Aziz', '2025-KIU-5221'],
+                    ['Asma Banu', 'Samad Khan', '2025-KIU-5222'],
+                    ['Afreen Zehra', 'Muhammad Ibrahim', '2025-KIU-5223'],
+                    ['Faisal Mashroof', 'Muhammad Mashroof', '2025-KIU-5224'],
+                ],
+            ],
         ];
     }
 
