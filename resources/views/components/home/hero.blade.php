@@ -166,9 +166,9 @@
     </aside>
 </div>
 
-{{-- ══ HORIZONTAL UPDATES TICKER — below the slider, all screens (pauses on hover) ══ --}}
+{{-- ══ HORIZONTAL UPDATES TICKER — below the slider, mobile/tablet only (desktop uses the side panel) ══ --}}
 @if($panelItems->isNotEmpty())
-<div class="w-full overflow-hidden" style="background:var(--site-brand-dark);border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)">
+<div class="w-full overflow-hidden lg:hidden" style="background:var(--site-brand-dark);border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)">
     <div class="flex items-stretch">
         <span class="shrink-0 z-10 flex items-center gap-1.5 px-4 text-[11px] font-bold uppercase tracking-wider text-white" style="background:var(--site-brand)">
             <span class="relative flex h-1.5 w-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-white"></span></span>
