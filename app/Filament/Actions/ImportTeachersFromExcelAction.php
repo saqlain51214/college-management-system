@@ -165,12 +165,15 @@ class ImportTeachersFromExcelAction extends Action
     private static function readRows(string $path): array
     {
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        $readerType = in_array($ext, ['xlsx', 'xls'])
-            ? \Maatwebsite\Excel\Excel::XLSX
-            : \Maatwebsite\Excel\Excel::CSV;
 
-        $allSheets = Excel::toArray(new class {}, $path, null, $readerType);
-        $sheetRows = $allSheets[0] ?? [];
+        if (in_array($ext, ['xlsx', 'xls'], true)) {
+            $allSheets = Excel::toArray(new class {}, $path, null, \Maatwebsite\Excel\Excel::XLSX);
+            $sheetRows = $allSheets[0] ?? [];
+        } else {
+            // Robust CSV read: strip BOM and auto-detect the delimiter (comma,
+            // semicolon or tab) so files saved by Excel in any locale still parse.
+            $sheetRows = static::readCsvRows($path);
+        }
 
         // Auto-detect header row: first row with a recognised column name
         $knownTerms = [
@@ -190,6 +193,38 @@ class ImportTeachersFromExcelAction extends Action
         }
 
         return array_slice($sheetRows, $headerIdx);
+    }
+
+    /**
+     * Read a CSV/TXT file into rows, tolerating a UTF-8 BOM and comma,
+     * semicolon or tab delimiters (Excel exports vary by locale).
+     *
+     * @return array<int,array<int,string>>
+     */
+    private static function readCsvRows(string $path): array
+    {
+        $content = (string) file_get_contents($path);
+        $content = preg_replace('/^\xEF\xBB\xBF/', '', $content); // strip BOM
+
+        $lines = preg_split('/\r\n|\r|\n/', $content) ?: [];
+        $lines = array_values(array_filter($lines, fn ($l) => trim($l) !== ''));
+        if ($lines === []) {
+            return [];
+        }
+
+        $header = $lines[0];
+        $counts = [
+            ','  => substr_count($header, ','),
+            ';'  => substr_count($header, ';'),
+            "\t" => substr_count($header, "\t"),
+        ];
+        arsort($counts);
+        $delimiter = array_key_first($counts) ?: ',';
+        if ($counts[$delimiter] === 0) {
+            $delimiter = ',';
+        }
+
+        return array_map(fn ($line) => str_getcsv($line, $delimiter), $lines);
     }
 
     private static function buildPreviewHtml(string $path, array $parsed = []): string
