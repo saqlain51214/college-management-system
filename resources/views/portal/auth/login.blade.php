@@ -37,11 +37,11 @@
       @csrf
 
       <div>
-        <label class="block text-sm font-medium text-slate-300 mb-1.5">Roll Number</label>
-        <input type="text" name="roll_number" value="{{ old('roll_number') }}" required
-          placeholder="e.g. CS-2024-001"
-          class="portal-auth-input w-full px-4 py-3 rounded-xl text-sm focus:outline-none @error('roll_number') border-red-400 @enderror">
-        @error('roll_number')
+        <label class="block text-sm font-medium text-slate-300 mb-1.5">Registration Number</label>
+        <input type="text" name="login" value="{{ old('login') }}" required
+          placeholder="e.g. 2024-KIU-ADP-3048"
+          class="portal-auth-input w-full px-4 py-3 rounded-xl text-sm focus:outline-none @error('login') border-red-400 @enderror">
+        @error('login')
         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
         @enderror
       </div>
@@ -67,7 +67,7 @@
     </form>
 
     <div class="mt-6 pt-5 text-center text-xs text-slate-500" style="border-top: 1px solid rgba(255,255,255,0.08)">
-      <p>Default password: your roll number</p>
+      <p>Default password: <strong>123456</strong></p>
       <p class="mt-1">Contact admin to reset your password</p>
     </div>
   </div>

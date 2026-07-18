@@ -20,28 +20,32 @@ class StudentAuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'roll_number' => 'required|string',
-            'password'    => 'required|string',
+            'login'    => 'required|string',
+            'password' => 'required|string',
         ]);
 
-        $student = Student::where('roll_number', trim($request->roll_number))
-            ->where('is_active', true)
+        $identifier = trim($request->input('login'));
+
+        // Log in with Registration Number (or Roll Number as a fallback).
+        $student = Student::where('is_active', true)
+            ->where(fn ($q) => $q->where('registration_number', $identifier)->orWhere('roll_number', $identifier))
             ->first();
 
         if (! $student) {
             return back()->withErrors([
-                'roll_number' => 'No active student found with this roll number.',
+                'login' => 'No active student found with this registration/roll number.',
             ])->withInput();
         }
 
-        // If portal_password is set, verify it; otherwise accept roll_number as password
+        // If a portal password is set, verify it; otherwise accept the default (123456)
+        // or the student's own registration/roll number.
         $valid = $student->portal_password
             ? Hash::check($request->password, $student->portal_password)
-            : ($request->password === $student->roll_number);
+            : in_array($request->password, ['123456', $student->registration_number, $student->roll_number], true);
 
         if (! $valid) {
             return back()->withErrors([
-                'password' => 'Incorrect password. Your default password is your roll number.',
+                'password' => 'Incorrect password. The default password is 123456.',
             ])->withInput();
         }
 

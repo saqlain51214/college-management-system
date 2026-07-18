@@ -390,7 +390,7 @@ class ImportStudentsFromExcelAction extends Action
                             if ($exists) unset($cleanAttrs[$unique]);
                         }
                     }
-                    Student::create(array_merge(['is_active' => true], $cleanAttrs));
+                    Student::create(array_merge(['is_active' => true, 'portal_password' => '123456'], $cleanAttrs));
                     $created++;
                 }
 

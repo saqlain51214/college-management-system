@@ -133,7 +133,7 @@ class StudentPortalController extends Controller
 
         $valid = $student->portal_password
             ? Hash::check($request->current_password, $student->portal_password)
-            : ($request->current_password === $student->roll_number);
+            : in_array($request->current_password, ['123456', $student->registration_number, $student->roll_number], true);
 
         if (!$valid) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
