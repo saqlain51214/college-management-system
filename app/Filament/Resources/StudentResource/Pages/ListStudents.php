@@ -24,33 +24,36 @@ class ListStudents extends ListRecords
      */
     public function getTabs(): array
     {
-        $missingReg  = fn (Builder $q) => $q->whereNull('registration_number')->orWhere('registration_number', '');
-        $missingRoll = fn (Builder $q) => $q->whereNull('roll_number')->orWhere('roll_number', '');
-        $isDuplicate = fn (Builder $q) => $q->where('remarks', 'like', '%Duplicate%');
+        // NOTE: modifyQueryUsing closures MUST name the param $query so Filament
+        // injects the real table query by name (a $q param makes Filament resolve
+        // a model-less builder → getModel() null → TypeError).
+        $missingReg   = fn (Builder $q) => $q->whereNull('registration_number')->orWhere('registration_number', '');
+        $missingRoll  = fn (Builder $q) => $q->whereNull('roll_number')->orWhere('roll_number', '');
+        $notDuplicate = fn (Builder $q) => $q->whereNull('remarks')->orWhere('remarks', 'not like', '%Duplicate%');
 
         return [
             'all' => Tab::make('All')
                 ->badge(Student::count()),
 
             'unique' => Tab::make('Unique')
-                ->modifyQueryUsing(fn (Builder $q) => $q
+                ->modifyQueryUsing(fn (Builder $query) => $query
                     ->whereNotNull('registration_number')->where('registration_number', '!=', '')
-                    ->where(fn (Builder $x) => $x->whereNull('remarks')->orWhere('remarks', 'not like', '%Duplicate%')))
+                    ->where($notDuplicate))
                 ->badge(Student::whereNotNull('registration_number')->where('registration_number', '!=', '')
-                    ->where(fn (Builder $x) => $x->whereNull('remarks')->orWhere('remarks', 'not like', '%Duplicate%'))->count()),
+                    ->where($notDuplicate)->count()),
 
             'duplicates' => Tab::make('Duplicates')
-                ->modifyQueryUsing($isDuplicate)
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('remarks', 'like', '%Duplicate%'))
                 ->badge(Student::where('remarks', 'like', '%Duplicate%')->count())
                 ->badgeColor('warning'),
 
             'no_registration' => Tab::make('No Registration #')
-                ->modifyQueryUsing(fn (Builder $q) => $q->where($missingReg))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where($missingReg))
                 ->badge(Student::where($missingReg)->count())
                 ->badgeColor('danger'),
 
             'no_roll' => Tab::make('No Roll #')
-                ->modifyQueryUsing(fn (Builder $q) => $q->where($missingRoll))
+                ->modifyQueryUsing(fn (Builder $query) => $query->where($missingRoll))
                 ->badge(Student::where($missingRoll)->count())
                 ->badgeColor('danger'),
         ];
