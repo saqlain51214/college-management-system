@@ -506,6 +506,13 @@ class StudentResource extends Resource
                     ->tooltip(fn (Student $r) => $r->remarks ?: null)
                     ->placeholder('—'),
 
+                Tables\Columns\TextColumn::make('email')
+                    ->label('Email')
+                    ->searchable()
+                    ->copyable()
+                    ->placeholder('—')
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Phone')
                     ->searchable()
@@ -525,6 +532,7 @@ class StudentResource extends Resource
                     ->falseColor('danger')
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->recordUrl(null)
             ->filters([
                 Tables\Filters\SelectFilter::make('department_id')
                     ->label('Department')

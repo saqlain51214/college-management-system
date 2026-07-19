@@ -377,6 +377,13 @@ class TeacherResource extends Resource
                     ->alignCenter()
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                Tables\Columns\TextColumn::make('email')
+                    ->label('Email')
+                    ->searchable()
+                    ->copyable()
+                    ->placeholder('—')
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Phone')
                     ->searchable()
@@ -400,6 +407,7 @@ class TeacherResource extends Resource
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->recordUrl(null)
             ->filters([
                 Tables\Filters\SelectFilter::make('department_id')
                     ->label('Department')
