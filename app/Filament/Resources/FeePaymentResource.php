@@ -125,7 +125,17 @@ class FeePaymentResource extends Resource
                     ->defaultImageUrl(null)
                     ->toggleable()
                     ->tooltip('Payment proof uploaded by student'),
-                Tables\Columns\TextColumn::make('student.roll_number')->label('Roll No.')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('student.registration_number')
+                    ->label('Reg No.')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable(),
+                Tables\Columns\TextColumn::make('student.roll_number')
+                    ->label('Roll No.')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('student.name')->label('Student')->searchable()->wrap(),
                 Tables\Columns\TextColumn::make('fee_type')
                     ->badge()
