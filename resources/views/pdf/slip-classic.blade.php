@@ -168,6 +168,7 @@ $inWords = (empty($wp)?'Zero':implode(' ',$wp)).' Only';
 
 // Code 128 barcode (optional)
 $barcodeSrc = $showBarcode ? \App\Support\Barcode::code128Png($sn) : null;
+$paymentQrSrc = \App\Support\PaymentQr::forSlip($college, $net, $sn, $bankAcct);
 @endphp
 
 <table class="outer"><tbody><tr>
@@ -371,14 +372,25 @@ $barcodeSrc = $showBarcode ? \App\Support\Barcode::code128Png($sn) : null;
 </tr>
 @endif
 
-{{-- ── Instructions ── --}}
+{{-- ── Instructions (+ Scan-to-Pay QR) ── --}}
 <tr>
   <td class="ins">
-    <div class="ins-v">
-      @foreach(array_filter(array_map('trim', explode("\n", $instructions))) as $line)
-        &bull; {{ $line }}<br>
-      @endforeach
-    </div>
+    <table style="width:100%;border-collapse:collapse;"><tr>
+      <td style="vertical-align:top;">
+        <div class="ins-v">
+          @foreach(array_filter(array_map('trim', explode("\n", $instructions))) as $line)
+            &bull; {{ $line }}<br>
+          @endforeach
+        </div>
+      </td>
+      @if($paymentQrSrc)
+      <td style="width:60pt;vertical-align:top;text-align:center;padding-left:4pt;">
+        <img src="{{ $paymentQrSrc }}" alt="Scan to Pay" style="width:54pt;height:54pt;display:block;margin:0 auto;"/>
+        <div style="font-size:5pt;font-weight:bold;color:#111;margin-top:1pt;">SCAN TO PAY</div>
+        <div style="font-size:4.5pt;color:#666;">Rs. {{ number_format($net) }}</div>
+      </td>
+      @endif
+    </tr></table>
   </td>
 </tr>
 

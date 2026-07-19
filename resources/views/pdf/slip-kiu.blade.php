@@ -165,16 +165,8 @@ $inWords = (empty($wp)?'Zero':implode(' ',$wp)).' Only';
 // -- Code 128 barcode --
 $barcodeSrc = \App\Support\Barcode::code128Png($sn);
 
-// Payment QR (EMVCo / Raast bill format). Uses the configured bank account as
-// the merchant id for now — swap in a registered Raast merchant id for live pay.
-$showQr       = $template->show_qr ?? true;
-$paymentQrSrc = $showQr ? \App\Support\PaymentQr::png([
-    'merchant_name' => $college,
-    'merchant_city' => 'Astore',
-    'merchant_id'   => $bankAcct,
-    'amount'        => $net,
-    'bill_ref'      => $sn,
-], 220) : null;
+// Payment QR (EMVCo / Raast bill format) — merchant id/GUID come from Settings.
+$paymentQrSrc = \App\Support\PaymentQr::forSlip($college, $net, $sn, $bankAcct);
 @endphp
 
 <table class="outer"><tbody><tr>

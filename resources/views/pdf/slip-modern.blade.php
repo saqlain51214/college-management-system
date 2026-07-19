@@ -145,6 +145,7 @@ $dateLabel = $paidDate ?: '____________________';
 
 // Code 128 barcode
 $barcodeSrc = \App\Support\Barcode::code128Png($sn, $primaryColor);
+$paymentQrSrc = \App\Support\PaymentQr::forSlip($college, $net, $sn, $bankAcct);
 @endphp
 
 @foreach($copies as $copyLabel)
@@ -271,7 +272,16 @@ $barcodeSrc = \App\Support\Barcode::code128Png($sn, $primaryColor);
 @endif
 
 <tr><td class="ins">
-  <div class="ins-v">{{ $instructions }}</div>
+  <table style="width:100%;border-collapse:collapse;"><tr>
+    <td style="vertical-align:top;"><div class="ins-v">{{ $instructions }}</div></td>
+    @if($paymentQrSrc)
+    <td style="width:64pt;vertical-align:top;text-align:center;padding-left:4pt;">
+      <img src="{{ $paymentQrSrc }}" alt="Scan to Pay" style="width:58pt;height:58pt;display:block;margin:0 auto;"/>
+      <div style="font-size:5pt;font-weight:bold;color:{{ $primaryColor }};margin-top:1pt;">SCAN TO PAY</div>
+      <div style="font-size:4.5pt;color:#666;">Rs. {{ number_format($net) }}</div>
+    </td>
+    @endif
+  </tr></table>
 </td></tr>
 
 <tr><td class="fp">

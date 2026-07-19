@@ -8,6 +8,7 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
@@ -194,6 +195,29 @@ class Settings extends Page implements HasForms
                             ->label('Reference Number Prefix')
                             ->placeholder('e.g. JDCA-2024')
                             ->helperText('Prepended to the challan number on printed vouchers.')
+                            ->columnSpan(1),
+
+                        Toggle::make('fee_qr_enabled')
+                            ->label('Show "Scan to Pay" QR on fee slips')
+                            ->helperText('EMVCo/Raast bill QR with the amount & challan reference.')
+                            ->default(true)
+                            ->columnSpan(2),
+
+                        TextInput::make('fee_qr_merchant_id')
+                            ->label('Raast / Merchant ID')
+                            ->placeholder('Provided by your bank (leave blank to use bank account no.)')
+                            ->helperText('The registered merchant ID from your bank. Required for real scan-and-pay in banking apps.')
+                            ->columnSpan(1),
+
+                        TextInput::make('fee_qr_guid')
+                            ->label('QR Scheme ID (GUID)')
+                            ->placeholder('e.g. PK.COM.RAAST — provided by your bank')
+                            ->helperText('Advanced: the scheme identifier your bank gives with the merchant ID. Leave as-is for testing.')
+                            ->columnSpan(1),
+
+                        TextInput::make('fee_qr_merchant_city')
+                            ->label('Merchant City (for QR)')
+                            ->placeholder('Astore')
                             ->columnSpan(1),
                     ]),
 
@@ -405,6 +429,10 @@ class Settings extends Page implements HasForms
             'fee_bank_name'              => 'fee',
             'fee_bank_account'           => 'fee',
             'fee_bank_branch'            => 'fee',
+            'fee_qr_enabled'             => 'fee',
+            'fee_qr_merchant_id'         => 'fee',
+            'fee_qr_guid'                => 'fee',
+            'fee_qr_merchant_city'       => 'fee',
             'website_footer_about'       => 'website',
             'website_footer_copyright'   => 'website',
             'website_theme_brand'        => 'website',

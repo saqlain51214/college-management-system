@@ -64,6 +64,27 @@ class PaymentQr
     }
 
     /**
+     * Build the fee-slip "Scan to Pay" QR from the saved fee settings.
+     * Returns null when the QR is disabled in Settings or unavailable.
+     */
+    public static function forSlip(string $merchantName, float $amount, string $billRef, ?string $fallbackAccount = null, int $size = 220): ?string
+    {
+        $enabled = filter_var(\App\Models\CollegeSetting::get('fee_qr_enabled', true), FILTER_VALIDATE_BOOLEAN);
+        if (! $enabled) {
+            return null;
+        }
+
+        return self::png([
+            'merchant_name' => $merchantName,
+            'merchant_city' => \App\Models\CollegeSetting::get('fee_qr_merchant_city') ?: 'Astore',
+            'merchant_id'   => \App\Models\CollegeSetting::get('fee_qr_merchant_id') ?: ($fallbackAccount ?? ''),
+            'guid'          => \App\Models\CollegeSetting::get('fee_qr_guid') ?: 'PK.COM.TEST',
+            'amount'        => $amount,
+            'bill_ref'      => $billRef,
+        ], $size);
+    }
+
+    /**
      * Render the payment QR as a base64 PNG data URI, or null if unavailable.
      *
      * @param array<string,mixed> $d
