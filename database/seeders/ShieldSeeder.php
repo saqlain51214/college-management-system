@@ -54,7 +54,7 @@ class ShieldSeeder extends Seeder
                 'course', 'department', 'fee_payment', 'fee_structure', 'scholarship',
                 'scholarship_award', 'list_item', 'news_article', 'announcement', 'student',
                 'teacher', 'website_event', 'website_page', 'home_section', 'download',
-                'fee::slip::template', 'notification::template',
+                'fee::slip::template',
             ],
             prefixes: ['view', 'view_any', 'create', 'update', 'delete', 'replicate', 'reorder'],
             exactPermissions: $widgetPermissions->all(),
