@@ -164,6 +164,17 @@ $inWords = (empty($wp)?'Zero':implode(' ',$wp)).' Only';
 
 // -- Code 128 barcode --
 $barcodeSrc = \App\Support\Barcode::code128Png($sn);
+
+// Payment QR (EMVCo / Raast bill format). Uses the configured bank account as
+// the merchant id for now — swap in a registered Raast merchant id for live pay.
+$showQr       = $template->show_qr ?? true;
+$paymentQrSrc = $showQr ? \App\Support\PaymentQr::png([
+    'merchant_name' => $college,
+    'merchant_city' => 'Astore',
+    'merchant_id'   => $bankAcct,
+    'amount'        => $net,
+    'bill_ref'      => $sn,
+], 220) : null;
 @endphp
 
 <table class="outer"><tbody><tr>
@@ -377,17 +388,28 @@ $barcodeSrc = \App\Support\Barcode::code128Png($sn);
 </tr>
 @endif
 
-{{-- ── Instructions ── --}}
+{{-- ── Instructions (+ Scan-to-Pay QR) ── --}}
 <tr>
   <td class="ins">
-    <div class="ins-v">
-      @foreach(array_filter(array_map('trim', explode("\n", $instructions))) as $line)
-        {{ $line }}<br>
-      @endforeach
-      @if($showConsumer && $billNo)
-        For Payment using 1-Bill, use the consumer number <b>{{ $consumerNo }}</b>
+    <table style="width:100%;border-collapse:collapse;"><tr>
+      <td style="vertical-align:top;">
+        <div class="ins-v">
+          @foreach(array_filter(array_map('trim', explode("\n", $instructions))) as $line)
+            {{ $line }}<br>
+          @endforeach
+          @if($showConsumer && $billNo)
+            For Payment using 1-Bill, use the consumer number <b>{{ $consumerNo }}</b>
+          @endif
+        </div>
+      </td>
+      @if($paymentQrSrc)
+      <td style="width:64pt;vertical-align:top;text-align:center;padding-left:4pt;">
+        <img src="{{ $paymentQrSrc }}" alt="Scan to Pay" style="width:58pt;height:58pt;display:block;margin:0 auto;"/>
+        <div style="font-size:5pt;font-weight:bold;color:#111;margin-top:1pt;">SCAN TO PAY</div>
+        <div style="font-size:4.5pt;color:#666;">Rs. {{ number_format($net) }}</div>
+      </td>
       @endif
-    </div>
+    </tr></table>
   </td>
 </tr>
 
