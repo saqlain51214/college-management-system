@@ -59,7 +59,7 @@ class ListFeePayments extends ListRecords
                         ->label('Due Date')->required()->native(false)->displayFormat('d M Y'),
                     Forms\Components\Select::make('academic_year_id')
                         ->label('Academic Year')
-                        ->options(fn () => AcademicYear::orderByDesc('name')->pluck('name', 'id'))->searchable(),
+                        ->options(fn () => AcademicYear::selectOptions())->searchable(),
                     Forms\Components\TextInput::make('remarks')
                         ->label('Remarks (optional)')->placeholder('e.g. Fall 2025 Semester Fee'),
                 ])

@@ -64,7 +64,7 @@ class FeePaymentResource extends Resource
 
                     Forms\Components\Select::make('academic_year_id')
                         ->label('Academic Year')
-                        ->options(fn() => AcademicYear::active()->orderByDesc('start_date')->pluck('name', 'id'))
+                        ->options(fn() => AcademicYear::selectOptions())
                         ->searchable(),
 
                     Forms\Components\Select::make('fee_structure_id')

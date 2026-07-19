@@ -261,7 +261,7 @@ class StudentResource extends Resource
 
                                     Forms\Components\Select::make('academic_year_id')
                                         ->label('Admission Academic Year')
-                                        ->options(fn() => AcademicYear::active()->orderByDesc('start_date')->pluck('name', 'id'))
+                                        ->options(fn() => AcademicYear::selectOptions())
                                         ->searchable()
                                         ->preload()
                                         ->placeholder('Select Year'),
