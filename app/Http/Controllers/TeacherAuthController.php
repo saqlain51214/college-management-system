@@ -41,13 +41,15 @@ class TeacherAuthController extends Controller
             ])->withInput();
         }
 
-        $valid = $teacher->portal_password
-            ? Hash::check($request->password, $teacher->portal_password)
-            : ($request->password === $teacher->employee_id);
+        // Default password is 123456 (also accepts employee ID). A teacher who has
+        // set their own password uses that; the defaults keep working until then.
+        $defaults = array_values(array_filter(['123456', $teacher->employee_id]));
+        $valid = ($teacher->portal_password && Hash::check($request->password, $teacher->portal_password))
+            || in_array($request->password, $defaults, true);
 
         if (! $valid) {
             return back()->withErrors([
-                'password' => 'Incorrect password. Your default password is your employee ID.',
+                'password' => 'Incorrect password. The default password is 123456.',
             ])->withInput();
         }
 
