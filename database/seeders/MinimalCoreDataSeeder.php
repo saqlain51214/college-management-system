@@ -287,66 +287,6 @@ class MinimalCoreDataSeeder extends Seeder
             ]
         );
 
-        $attendanceSession = AttendanceSession::updateOrCreate(
-            ['course_id' => $course->id, 'session_date' => '2026-09-02'],
-            [
-                'course_id' => $course->id,
-                'teacher_id' => $teacher->id,
-                'academic_program_id' => $undergraduateProgram->id,
-                'semester_number' => 1,
-                'session_date' => '2026-09-02',
-                'start_time' => '09:00',
-                'end_time' => '10:30',
-                'topic_covered' => 'Introduction to programming and development environments',
-                'is_locked' => true,
-            ]
-        );
-
-        AttendanceRecord::updateOrCreate(
-            ['attendance_session_id' => $attendanceSession->id, 'student_id' => $student->id],
-            [
-                'attendance_session_id' => $attendanceSession->id,
-                'student_id' => $student->id,
-                'status' => AttendanceStatusEnum::Present->value,
-            ]
-        );
-
-        $exam = Exam::updateOrCreate(
-            ['title' => 'Programming Fundamentals Midterm - Fall 2026'],
-            [
-                'course_id' => $course->id,
-                'academic_program_id' => $undergraduateProgram->id,
-                'academic_year_id' => $academicYear->id,
-                'semester_id' => $fallSemester->id,
-                'title' => 'Programming Fundamentals Midterm - Fall 2026',
-                'exam_type' => ExamTypeEnum::Midterm->value,
-                'semester_number' => 1,
-                'exam_date' => '2026-11-12',
-                'start_time' => '10:00',
-                'duration_minutes' => 90,
-                'total_marks' => 50,
-                'passing_marks' => 20,
-                'weightage_percent' => 30,
-                'venue' => 'Main Hall',
-                'is_published' => true,
-                'results_published' => true,
-                'instructions' => 'Bring college ID card and blue pen.',
-            ]
-        );
-
-        ExamResult::updateOrCreate(
-            ['exam_id' => $exam->id, 'student_id' => $student->id],
-            [
-                'exam_id' => $exam->id,
-                'student_id' => $student->id,
-                'marks_obtained' => 42,
-                'grade' => 'A-',
-                'grade_points' => 3.7,
-                'is_absent' => false,
-                'is_exempted' => false,
-            ]
-        );
-
         $scholarship = Scholarship::updateOrCreate(
             ['name' => 'JDCA Merit Support Scholarship'],
             [
@@ -382,76 +322,6 @@ class MinimalCoreDataSeeder extends Seeder
                 'disbursement_date' => null,
                 'reason' => 'Strong previous academic record and entry merit.',
                 'remarks' => 'Award kept as minimal test scholarship.',
-            ]
-        );
-
-        $book = Book::updateOrCreate(
-            ['accession_number' => 'LIB-2026-001'],
-            [
-                'accession_number' => 'LIB-2026-001',
-                'title' => 'Programming Fundamentals with C++',
-                'author' => 'D. S. Malik',
-                'publisher' => 'Cengage',
-                'isbn' => '978-1-305-26284-0',
-                'publication_year' => 2020,
-                'edition' => '8th',
-                'language' => 'English',
-                'category' => 'Computer Science',
-                'department_id' => $department->id,
-                'total_copies' => 2,
-                'available_copies' => 1,
-                'price' => 4800,
-                'status' => BookStatusEnum::Available->value,
-                'is_reference_only' => false,
-                'is_active' => true,
-            ]
-        );
-
-        BookIssue::updateOrCreate(
-            ['book_id' => $book->id, 'student_id' => $student->id, 'issue_date' => '2026-09-12'],
-            [
-                'book_id' => $book->id,
-                'student_id' => $student->id,
-                'teacher_id' => null,
-                'issue_date' => '2026-09-12',
-                'due_date' => '2026-09-26',
-                'return_date' => null,
-                'fine_amount' => 0,
-                'fine_paid' => false,
-                'condition_on_issue' => 'good',
-                'condition_on_return' => null,
-                'issued_by' => 'Library Desk',
-                'remarks' => 'Issued to default seeded student.',
-            ]
-        );
-
-        LmsMaterial::updateOrCreate(
-            ['course_id' => $course->id, 'title' => 'Programming Fundamentals Week 1 Notes'],
-            [
-                'course_id' => $course->id,
-                'teacher_id' => $teacher->id,
-                'title' => 'Programming Fundamentals Week 1 Notes',
-                'material_type' => 'document',
-                'external_url' => null,
-                'week_number' => 1,
-                'is_published' => true,
-                'download_count' => 0,
-            ]
-        );
-
-        LmsAssignment::updateOrCreate(
-            ['course_id' => $course->id, 'title' => 'Programming Fundamentals Assignment 1'],
-            [
-                'course_id' => $course->id,
-                'teacher_id' => $teacher->id,
-                'title' => 'Programming Fundamentals Assignment 1',
-                'description' => 'Write three small programs using variables, conditions, and loops.',
-                'instructions' => 'Submit a ZIP file with source code and screenshots.',
-                'total_marks' => 20,
-                'due_datetime' => '2026-09-25 23:59:00',
-                'submission_type' => 'file',
-                'allow_late_submission' => true,
-                'is_published' => true,
             ]
         );
 
@@ -497,29 +367,5 @@ class MinimalCoreDataSeeder extends Seeder
             ]
         );
 
-        Timetable::updateOrCreate(
-            [
-                'academic_program_id' => $undergraduateProgram->id,
-                'course_id' => $course->id,
-                'teacher_id' => $teacher->id,
-                'academic_year_id' => $academicYear->id,
-                'day_of_week' => 'monday',
-                'start_time' => '09:00',
-            ],
-            [
-                'academic_program_id' => $undergraduateProgram->id,
-                'course_id' => $course->id,
-                'teacher_id' => $teacher->id,
-                'academic_year_id' => $academicYear->id,
-                'semester' => 1,
-                'semester_number' => 1,
-                'day_of_week' => 'monday',
-                'start_time' => '09:00',
-                'end_time' => '10:30',
-                'room' => 'CS Lab 1',
-                'section' => 'A',
-                'is_active' => true,
-            ]
-        );
     }
 }

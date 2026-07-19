@@ -107,9 +107,6 @@ Route::prefix('teacher')->name('teacher.')->group(function () {
 Route::middleware(['auth'])->prefix('pdf')->name('pdf.')->group(function () {
     Route::get('/challan/{payment}',         [PdfController::class, 'feeChallan'])->name('challan');
     Route::get('/challan/{payment}/preview', [PdfController::class, 'feeChallanPreview'])->name('challan.preview');
-    Route::get('/transcript/{student}',      [PdfController::class, 'studentTranscript'])->name('transcript');
-    Route::get('/attendance/{student}',      [PdfController::class, 'studentAttendance'])->name('attendance');
-    Route::get('/exam/{exam}',               [PdfController::class, 'examResultSheet'])->name('exam');
 });
 
 // ── Admin: Fee Slip Template Preview ────────────────────────────────────

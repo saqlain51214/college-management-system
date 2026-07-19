@@ -11,7 +11,6 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
@@ -90,31 +89,6 @@ class Teacher extends Model implements AuthenticatableContract
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
-    }
-
-    public function timetables(): HasMany
-    {
-        return $this->hasMany(Timetable::class);
-    }
-
-    public function attendanceSessions(): HasMany
-    {
-        return $this->hasMany(AttendanceSession::class);
-    }
-
-    public function lmsMaterials(): HasMany
-    {
-        return $this->hasMany(LmsMaterial::class);
-    }
-
-    public function lmsAssignments(): HasMany
-    {
-        return $this->hasMany(LmsAssignment::class);
-    }
-
-    public function bookIssues(): HasMany
-    {
-        return $this->hasMany(BookIssue::class);
     }
 
     protected function portalPassword(): Attribute

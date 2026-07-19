@@ -2,29 +2,18 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\AttendanceChart;
-use App\Filament\Widgets\ExamPerformanceChart;
 use App\Filament\Widgets\FeeSlipTemplateGallery;
-use App\Filament\Widgets\LibraryStatsWidget;
-use App\Filament\Widgets\TimetableTodayWidget;
-use App\Filament\Widgets\TopPerformersWidget;
 use Filament\Facades\Filament;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
     /**
-     * Hide dashboard widgets whose management modules are not present in the
-     * panel (attendance, exams, library, timetable) so the dashboard never
-     * shows data that staff cannot manage. Also hides the fee-slip gallery.
+     * Hide the fee-slip template gallery from the dashboard (managed under
+     * Finance instead).
      */
     protected const HIDDEN_WIDGETS = [
         FeeSlipTemplateGallery::class,
-        AttendanceChart::class,
-        ExamPerformanceChart::class,
-        LibraryStatsWidget::class,
-        TimetableTodayWidget::class,
-        TopPerformersWidget::class,
     ];
 
     public function getWidgets(): array
