@@ -32,7 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->darkMode(true, true)
+            ->darkMode(true)
             ->brandName(fn() => \App\Models\CollegeSetting::get('college_name', 'JDCA'))
             ->brandLogo(function () {
                 $logo = \App\Models\CollegeSetting::get('college_logo');
@@ -43,7 +43,8 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotificationsPolling('60s')
             ->profile(EditProfile::class, isSimple: false)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex('#6B2D39'), // JDCA brand maroon
+                'gray'    => Color::Slate,
             ])
             ->maxContentWidth(MaxWidth::Full)
             ->renderHook(
