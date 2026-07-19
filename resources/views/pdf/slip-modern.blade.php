@@ -181,13 +181,21 @@ foreach (str_split(substr($bcTxt, 0, 20)) as $ch) {
     $cksum += $pos++ * $cv;
 }
 $mods = array_merge($mods, $c128[$cksum % 103], $bcStop);
-$sc = 1.2; $bx = 4; $bars = [];
-foreach ($mods as $mi => $mw) {
-    $sw = round($mw * $sc, 2);
-    if ($mi % 2 === 0) $bars[] = ['x' => round($bx,2), 'w' => $sw];
-    $bx += $sw;
+
+// Render bars to a PNG (dompdf renders <img> reliably; inline SVG it does not).
+$barcodeSrc = null;
+if (function_exists('imagecreatetruecolor')) {
+    $hex = ltrim($primaryColor ?? '#0d0d0d', '#');
+    if (strlen($hex) === 3) { $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2]; }
+    $cr = hexdec(substr($hex, 0, 2)); $cg = hexdec(substr($hex, 2, 2)); $cb = hexdec(substr($hex, 4, 2));
+    $mwPx = 2; $bcH = 46; $quiet = 20; $bx = $quiet; $rects = [];
+    foreach ($mods as $mi => $m) { $w = $m * $mwPx; if ($mi % 2 === 0) { $rects[] = [$bx, $w]; } $bx += $w; }
+    $imgW = (int) ($bx + $quiet); $img = imagecreatetruecolor($imgW, $bcH);
+    $white = imagecolorallocate($img, 255, 255, 255); $bar = imagecolorallocate($img, $cr, $cg, $cb);
+    imagefilledrectangle($img, 0, 0, $imgW, $bcH, $white);
+    foreach ($rects as [$x, $w]) { imagefilledrectangle($img, (int) $x, 0, (int) ($x + $w - 1), $bcH - 1, $bar); }
+    ob_start(); imagepng($img); $barcodeSrc = 'data:image/png;base64,' . base64_encode(ob_get_clean()); imagedestroy($img);
 }
-$bcW = round($bx + 4, 2);
 @endphp
 
 @foreach($copies as $copyLabel)
@@ -222,14 +230,10 @@ $bcW = round($bx + 4, 2);
   </div>
 </td></tr>
 
-@if($showBarcode)
-<tr><td class="bc">
-  <svg width="68%" height="28" viewBox="0 0 {{ $bcW }} 28" preserveAspectRatio="none">
-    @foreach($bars as $b)
-      <rect x="{{ $b['x'] }}" y="0" width="{{ $b['w'] }}" height="22" fill="{{ $primaryColor }}"/>
-    @endforeach
-    <text x="{{ round($bcW/2,2) }}" y="27" text-anchor="middle" font-size="5.5" fill="#333" font-family="DejaVu Sans">{{ $sn }}</text>
-  </svg>
+@if($showBarcode && $barcodeSrc)
+<tr><td class="bc" style="text-align:center;">
+  <img src="{{ $barcodeSrc }}" alt="{{ $sn }}" style="width:70%;height:26px;display:block;margin:0 auto;"/>
+  <div style="font-size:5.5pt;color:#333;font-family:'DejaVu Sans',sans-serif;letter-spacing:1.5px;">{{ $sn }}</div>
 </td></tr>
 @endif
 

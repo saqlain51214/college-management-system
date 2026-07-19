@@ -167,7 +167,7 @@ if ($tmp>=20){$wp[]=$tn[intdiv($tmp,10)].($tmp%10?' '.$o[$tmp%10]:'');}elseif($t
 $inWords = (empty($wp)?'Zero':implode(' ',$wp)).' Only';
 
 // ── Code 128 B Barcode (optional) ────────────────────────────────────
-$bars = []; $bcW = 100;
+$bars = []; $bcW = 100; $barcodeSrc = null;
 if ($showBarcode) {
     $c128 = [
         [2,1,2,2,2,2],[2,2,2,1,2,2],[2,2,2,2,2,1],[1,2,1,2,2,3],[1,2,1,3,2,2],[1,3,1,2,2,2],[1,2,2,2,1,3],[1,2,2,3,1,2],
@@ -191,13 +191,15 @@ if ($showBarcode) {
         $cksum += $pos++ * $cv;
     }
     $mods = array_merge($mods, $c128[$cksum % 103], [2,3,3,1,1,1,2]);
-    $sc = 1.1; $bx = 3;
-    foreach ($mods as $mi => $mw) {
-        $sw = round($mw * $sc, 2);
-        if ($mi % 2 === 0) $bars[] = ['x' => round($bx,2), 'w' => $sw];
-        $bx += $sw;
+    if (function_exists('imagecreatetruecolor')) {
+        $mwPx = 2; $bcH = 44; $quiet = 20; $bx = $quiet; $rects = [];
+        foreach ($mods as $mi => $m) { $w = $m * $mwPx; if ($mi % 2 === 0) { $rects[] = [$bx, $w]; } $bx += $w; }
+        $imgW = (int) ($bx + $quiet); $img = imagecreatetruecolor($imgW, $bcH);
+        $white = imagecolorallocate($img, 255, 255, 255); $black = imagecolorallocate($img, 0, 0, 0);
+        imagefilledrectangle($img, 0, 0, $imgW, $bcH, $white);
+        foreach ($rects as [$x, $w]) { imagefilledrectangle($img, (int) $x, 0, (int) ($x + $w - 1), $bcH - 1, $black); }
+        ob_start(); imagepng($img); $barcodeSrc = 'data:image/png;base64,' . base64_encode(ob_get_clean()); imagedestroy($img);
     }
-    $bcW = round($bx + 3, 2);
 }
 @endphp
 
@@ -264,16 +266,12 @@ if ($showBarcode) {
   </td>
 </tr>
 
-@if($showBarcode)
+@if($showBarcode && $barcodeSrc)
 {{-- ── Barcode ── --}}
 <tr>
-  <td style="padding:1.5pt 5pt 0;">
-    <svg width="72%" height="26" viewBox="0 0 {{ $bcW }} 26" preserveAspectRatio="none" style="display:block;">
-      @foreach($bars as $b)
-        <rect x="{{ $b['x'] }}" y="0" width="{{ $b['w'] }}" height="21" fill="#0d0d0d"/>
-      @endforeach
-      <text x="{{ round($bcW/2,2) }}" y="25.5" text-anchor="middle" font-size="5" fill="#444" font-family="DejaVu Sans">{{ $sn }}</text>
-    </svg>
+  <td style="padding:1.5pt 5pt 0;text-align:center;">
+    <img src="{{ $barcodeSrc }}" alt="{{ $sn }}" style="width:72%;height:24px;display:block;margin:0 auto;"/>
+    <div style="font-size:5pt;color:#444;font-family:'DejaVu Sans',sans-serif;letter-spacing:1.5px;">{{ $sn }}</div>
   </td>
 </tr>
 @endif

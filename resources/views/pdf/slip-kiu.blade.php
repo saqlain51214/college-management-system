@@ -198,13 +198,33 @@ foreach (str_split(substr(preg_replace('/[^\x20-\x7E]/', ' ', $sn), 0, 18)) as $
     $cksum += $pos++ * $cv;
 }
 $mods = array_merge($mods, $c128[$cksum % 103], [2,3,3,1,1,1,2]);
-$sc = 1.1; $bx = 3; $bars = [];
-foreach ($mods as $mi => $mw) {
-    $sw = round($mw * $sc, 2);
-    if ($mi % 2 === 0) $bars[] = ['x' => round($bx,2), 'w' => $sw];
-    $bx += $sw;
+
+// Render the bars to a crisp PNG (dompdf renders <img> reliably; inline SVG it does not).
+$barcodeSrc = null;
+if (function_exists('imagecreatetruecolor')) {
+    $mw    = 2;   // px per module unit — preserves exact Code 128 ratios so it scans
+    $bcH   = 46;  // bar height (px)
+    $quiet = 20;  // quiet zone each side (px)
+    $bx    = $quiet;
+    $rects = [];
+    foreach ($mods as $mi => $m) {
+        $w = $m * $mw;
+        if ($mi % 2 === 0) { $rects[] = [$bx, $w]; } // even index = black bar
+        $bx += $w;
+    }
+    $imgW  = (int) ($bx + $quiet);
+    $img   = imagecreatetruecolor($imgW, $bcH);
+    $white = imagecolorallocate($img, 255, 255, 255);
+    $black = imagecolorallocate($img, 0, 0, 0);
+    imagefilledrectangle($img, 0, 0, $imgW, $bcH, $white);
+    foreach ($rects as [$x, $w]) {
+        imagefilledrectangle($img, (int) $x, 0, (int) ($x + $w - 1), $bcH - 1, $black);
+    }
+    ob_start();
+    imagepng($img);
+    $barcodeSrc = 'data:image/png;base64,' . base64_encode(ob_get_clean());
+    imagedestroy($img);
 }
-$bcW = round($bx + 3, 2);
 @endphp
 
 <table class="outer"><tbody><tr>
@@ -274,16 +294,12 @@ $bcW = round($bx + 3, 2);
   </td>
 </tr>
 
-@if($showBarcode)
+@if($showBarcode && $barcodeSrc)
 {{-- ── Code 128 B Barcode ── --}}
 <tr>
-  <td class="bc">
-    <svg width="72%" height="28" viewBox="0 0 {{ $bcW }} 28" preserveAspectRatio="none" style="display:block;">
-      @foreach($bars as $b)
-        <rect x="{{ $b['x'] }}" y="0" width="{{ $b['w'] }}" height="22" fill="#0d0d0d"/>
-      @endforeach
-      <text x="{{ round($bcW/2,2) }}" y="27.5" text-anchor="middle" font-size="5" fill="#444" font-family="DejaVu Sans">{{ $sn }}</text>
-    </svg>
+  <td class="bc" style="text-align:center;padding-top:2px;">
+    <img src="{{ $barcodeSrc }}" alt="{{ $sn }}" style="width:74%;height:26px;display:block;margin:0 auto;"/>
+    <div style="font-size:5.5pt;color:#444;font-family:'DejaVu Sans',sans-serif;letter-spacing:1.5px;margin-top:1px;">{{ $sn }}</div>
   </td>
 </tr>
 @endif
