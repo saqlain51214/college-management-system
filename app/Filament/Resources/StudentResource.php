@@ -584,14 +584,6 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
 
-                Tables\Actions\Action::make('attendanceReport')
-                    ->label('Attendance Report')
-                    ->icon('heroicon-o-chart-bar')
-                    ->color('success')
-                    ->iconButton()
-                    ->url(fn(\App\Models\Student $r) => route('pdf.attendance', $r))
-                    ->openUrlInNewTab(),
-
                 Tables\Actions\Action::make('changeStatus')
                     ->label('Change Status')
                     ->icon('heroicon-o-arrow-path')
