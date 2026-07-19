@@ -142,15 +142,26 @@ _Ye guide college ke admin/staff ke liye hai. Har module ka **maqsad**, uski **b
 
 ## 🎓 Portals (login logic)
 
-### Student Portal — `/portal/login`
-- **Login ID:** Registration Number (roll number bhi chalta hai).
-- **Default password:** `123456` (sab students ke liye shuru mein).
-- Student apni fees, challan (PDF + barcode + QR), aur profile dekhta hai. Password khud badal sakta hai.
+### Student Portal
+- **Link:** `https://<aapki-website>/portal/login`
+- **Login ID:** apna **Registration Number** (jaise `4267`). _(Roll number bhi chal jaata hai.)_
+- **Initial password:** `123456` — ye sirf pehli baar ke liye hai. **Login page par ye kahin likha nahi hota** (security); admin students ko batata hai.
+- Student apni fees, challan (PDF + barcode + QR), aur profile dekhta hai.
 
-### Teacher Portal — `/teacher/login`
+### Teacher Portal
+- **Link:** `https://<aapki-website>/teacher/login`
 - **Login ID:** **Employee ID** (jaise `JDCA-T-001`) **ya email**.
-- **Default password:** `123456` (sab teachers ke liye).
-- Password khud badal sakte hain (default 123456 daal kar naya set karein).
+- **Initial password:** `123456` — sirf pehli baar ke liye. Login page par show nahi hota.
+
+### Password bhool jayein? (Forgot Password — Email OTP)
+Dono portals par **"Forgot password?"** link hai:
+1. Student/Teacher apna reg number/employee ID **ya email** daalta hai.
+2. Uske **email par ek 6-digit code (OTP)** aata hai (15 minute tak valid).
+3. Code + naya password daal kar apna password khud badal leta hai.
+
+> **Zaroori:** OTP email tab hi jayega jab (a) us student/teacher ka **email record par ho**, aur (b) college ka **email (SMTP) set** ho (Settings/hosting mein). Email na ho to woh "college office se rabta karein" ka message dekhega.
+>
+> Yaad rahe: **123456 sirf initial hai** — jaise hi koi apna password badal le, phir sirf naya password chalega (123456 dobara kaam nahi karega).
 
 ---
 
@@ -177,8 +188,9 @@ System khud kuch events par notifications bhejta hai (email + in-app bell, jab e
 | News/Notice | News / Notices → New → Publish |
 | Naye staff ko access | Roles → user + role |
 | Logs saaf | Activity Logs → Clear All Logs |
-| Teacher login | /teacher/login · Employee ID/email · password 123456 |
-| Student login | /portal/login · Reg number · password 123456 |
+| Teacher login | /teacher/login · Employee ID or email · initial password 123456 |
+| Student login | /portal/login · Registration number · initial password 123456 |
+| Password bhool gaye | Login page → "Forgot password?" → email OTP |
 
 ---
 

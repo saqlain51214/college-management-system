@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Password — Teacher Portal — JDCA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="portal-auth-page min-h-screen flex items-center justify-center p-4">
+<div class="w-full max-w-md">
+  <div class="text-center mb-8">
+    <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4" style="background:#1e3a5f">
+      <span class="text-white font-bold text-lg">JDCA</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-50">Reset Password</h1>
+    <p class="text-slate-400 text-sm mt-1">Teacher Portal</p>
+  </div>
+
+  <div class="portal-auth-card rounded-3xl p-8">
+    @if(session('success'))
+    <div class="rounded-xl p-4 mb-5 text-sm text-emerald-200" style="background: rgba(22,163,74,0.14); border: 1px solid rgba(34,197,94,0.24)">{{ session('success') }}</div>
+    @endif
+
+    <form action="{{ route('teacher.password.update') }}" method="POST" class="space-y-5">
+      @csrf
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1.5">6-Digit Code (from email)</label>
+        <input type="text" name="otp" inputmode="numeric" maxlength="6" required autofocus
+          class="portal-auth-input w-full px-4 py-3 rounded-xl text-sm tracking-widest focus:outline-none @error('otp') border-red-400 @enderror">
+        @error('otp')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1.5">New Password</label>
+        <input type="password" name="password" required minlength="6"
+          placeholder="At least 6 characters"
+          class="portal-auth-input w-full px-4 py-3 rounded-xl text-sm focus:outline-none @error('password') border-red-400 @enderror">
+        @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-1.5">Confirm New Password</label>
+        <input type="password" name="password_confirmation" required minlength="6"
+          class="portal-auth-input w-full px-4 py-3 rounded-xl text-sm focus:outline-none">
+      </div>
+      <button type="submit" class="portal-btn-primary w-full py-3.5 font-semibold rounded-xl transition">Update Password</button>
+    </form>
+
+    <div class="mt-6 pt-5 text-center text-xs" style="border-top: 1px solid rgba(255,255,255,0.08)">
+      <a href="{{ route('teacher.password.request') }}" class="text-slate-300 hover:text-white">Didn't get a code? Try again</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

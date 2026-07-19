@@ -85,6 +85,16 @@ class Student extends Model implements AuthenticatableContract
         );
     }
 
+    /** Give every new student the initial portal password "123456" if none is set. */
+    protected static function booted(): void
+    {
+        static::creating(function (Student $student) {
+            if (empty($student->getAttributes()['portal_password'] ?? null)) {
+                $student->portal_password = '123456';
+            }
+        });
+    }
+
     // ─── Scopes ───────────────────────────────────────────────────────────
     public function scopeActive($query)
     {

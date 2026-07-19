@@ -57,9 +57,8 @@ class TeacherPortalController extends Controller
             'password'         => 'required|string|min:6|confirmed',
         ]);
 
-        $defaults = array_values(array_filter(['123456', $teacher->employee_id]));
-        $valid = ($teacher->portal_password && Hash::check($request->current_password, $teacher->portal_password))
-            || in_array($request->current_password, $defaults, true);
+        $valid = $teacher->portal_password
+            && Hash::check($request->current_password, $teacher->portal_password);
 
         if (! $valid) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();

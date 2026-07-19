@@ -77,6 +77,11 @@ Route::prefix('portal')->name('portal.')->group(function () {
     Route::post('/login',  [StudentAuthController::class, 'login'])->middleware('throttle:student-login')->name('login.post');
     Route::post('/logout', [StudentAuthController::class, 'logout'])->name('logout');
 
+    Route::get('/forgot-password',  [StudentAuthController::class, 'showForgot'])->name('password.request');
+    Route::post('/forgot-password', [StudentAuthController::class, 'sendOtp'])->middleware('throttle:student-login')->name('password.email');
+    Route::get('/reset-password',   [StudentAuthController::class, 'showReset'])->name('password.reset');
+    Route::post('/reset-password',  [StudentAuthController::class, 'resetPassword'])->middleware('throttle:student-login')->name('password.update');
+
     Route::middleware('auth.student')->group(function () {
         Route::get('/',                       [StudentPortalController::class, 'dashboard'])->name('dashboard');
         Route::get('/fees',                   [StudentPortalController::class, 'fees'])->name('fees');
@@ -94,6 +99,11 @@ Route::prefix('teacher')->name('teacher.')->group(function () {
     Route::get('/login',   [TeacherAuthController::class, 'showLogin'])->name('login');
     Route::post('/login',  [TeacherAuthController::class, 'login'])->middleware('throttle:teacher-login')->name('login.post');
     Route::post('/logout', [TeacherAuthController::class, 'logout'])->name('logout');
+
+    Route::get('/forgot-password',  [TeacherAuthController::class, 'showForgot'])->name('password.request');
+    Route::post('/forgot-password', [TeacherAuthController::class, 'sendOtp'])->middleware('throttle:teacher-login')->name('password.email');
+    Route::get('/reset-password',   [TeacherAuthController::class, 'showReset'])->name('password.reset');
+    Route::post('/reset-password',  [TeacherAuthController::class, 'resetPassword'])->middleware('throttle:teacher-login')->name('password.update');
 
     Route::middleware('auth.teacher')->group(function () {
         Route::get('/',                   [TeacherPortalController::class, 'dashboard'])->name('dashboard');

@@ -98,6 +98,16 @@ class Teacher extends Model implements AuthenticatableContract
         );
     }
 
+    /** Give every new teacher the initial portal password "123456" if none is set. */
+    protected static function booted(): void
+    {
+        static::creating(function (Teacher $teacher) {
+            if (empty($teacher->getAttributes()['portal_password'] ?? null)) {
+                $teacher->portal_password = '123456';
+            }
+        });
+    }
+
     public function getPhotoUrlAttribute(): ?string
     {
         return $this->photo ? asset('storage/' . $this->photo) : null;

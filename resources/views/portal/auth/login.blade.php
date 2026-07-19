@@ -49,27 +49,24 @@
       <div>
         <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
         <input type="password" name="password" required
-          placeholder="Your password"
+          placeholder="Enter your password"
           class="portal-auth-input w-full px-4 py-3 rounded-xl text-sm focus:outline-none @error('password') border-red-400 @enderror">
         @error('password')
         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
         @enderror
       </div>
 
-      <div class="flex items-center gap-2">
-        <input type="checkbox" name="remember" id="remember" class="rounded">
-        <label for="remember" class="text-sm text-slate-400">Remember me</label>
+      <div class="flex items-center justify-between gap-2">
+        <label class="flex items-center gap-2 text-sm text-slate-400">
+          <input type="checkbox" name="remember" id="remember" class="rounded"> Remember me
+        </label>
+        <a href="{{ route('portal.password.request') }}" class="text-sm text-sky-300 hover:text-white">Forgot password?</a>
       </div>
 
       <button type="submit" class="portal-btn-primary w-full py-3.5 font-semibold rounded-xl transition">
         Sign In
       </button>
     </form>
-
-    <div class="mt-6 pt-5 text-center text-xs text-slate-500" style="border-top: 1px solid rgba(255,255,255,0.08)">
-      <p>Default password: <strong>123456</strong></p>
-      <p class="mt-1">Contact admin to reset your password</p>
-    </div>
   </div>
 
   <div class="text-center mt-6">
