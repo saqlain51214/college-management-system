@@ -41,9 +41,10 @@ class WebsitePageResource extends Resource
                         ->required()
                         ->maxLength(200)
                         ->disabled(),
-                    Forms\Components\TextInput::make('sort_order')->numeric()->label('Menu Order')->disabled(),
-                    Forms\Components\Toggle::make('in_menu')->label('Show in Navigation Menu')->onColor('info'),
-                    Forms\Components\Toggle::make('is_published')->label('Published')->default(true)->onColor('success'),
+                    Forms\Components\Toggle::make('is_published')
+                        ->label('Published (show on website)')
+                        ->helperText('ON: page is live on the website and its menu link appears. OFF: page shows a 404 and its menu is hidden (you can still Preview it).')
+                        ->default(true)->onColor('success'),
                     Forms\Components\TextInput::make('meta_title')->label('SEO Title')->maxLength(200)->columnSpanFull(),
                     Forms\Components\Textarea::make('meta_description')->label('SEO Description')->rows(2)->maxLength(300)->columnSpanFull(),
                     Placeholder::make('page_preview_link')
@@ -260,8 +261,7 @@ class WebsitePageResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('#')->sortable()->alignCenter(),
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable()->wrap(),
                 Tables\Columns\TextColumn::make('slug')->searchable(),
-                Tables\Columns\IconColumn::make('in_menu')->label('In Menu')->boolean(),
-                Tables\Columns\ToggleColumn::make('is_published')->label('Status')->onColor('success')->offColor('gray'),
+                Tables\Columns\ToggleColumn::make('is_published')->label('Published')->onColor('success')->offColor('gray'),
                 Tables\Columns\TextColumn::make('updated_at')->label('Last Updated')->dateTime('d M Y')->sortable(),
             ])
             ->filters([Tables\Filters\TernaryFilter::make('is_published'), Tables\Filters\TrashedFilter::make()])
