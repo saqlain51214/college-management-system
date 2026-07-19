@@ -162,69 +162,8 @@ if ($v=intdiv($tmp,100)){$wp[]=$o[$v].' Hundred';$tmp%=100;}
 if ($tmp>=20){$wp[]=$tn[intdiv($tmp,10)].($tmp%10?' '.$o[$tmp%10]:'');}elseif($tmp>0){$wp[]=$o[$tmp];}
 $inWords = (empty($wp)?'Zero':implode(' ',$wp)).' Only';
 
-// ── Code 128 B Barcode ────────────────────────────────────────────────
-$c128 = [
-    [2,1,2,2,2,2],[2,2,2,1,2,2],[2,2,2,2,2,1],[1,2,1,2,2,3],
-    [1,2,1,3,2,2],[1,3,1,2,2,2],[1,2,2,2,1,3],[1,2,2,3,1,2],
-    [1,3,2,2,1,2],[2,2,1,2,1,3],[2,2,1,3,1,2],[2,3,1,2,1,2],
-    [1,1,2,2,3,2],[1,2,2,1,3,2],[1,2,2,2,3,1],[1,1,3,2,2,2],
-    [1,2,3,1,2,2],[1,2,3,2,2,1],[2,2,3,2,1,1],[2,2,1,1,3,2],
-    [2,2,1,2,3,1],[2,1,3,2,1,2],[2,2,3,1,1,2],[3,1,2,1,3,1],
-    [3,1,1,2,2,2],[3,2,1,1,2,2],[3,2,1,2,2,1],[3,1,2,2,1,2],
-    [3,2,2,1,1,2],[3,2,2,2,1,1],[2,1,2,1,2,3],[2,1,2,3,2,1],
-    [2,3,2,1,2,1],[1,1,1,3,2,3],[1,3,1,1,2,3],[1,3,1,3,2,1],
-    [1,1,2,3,1,3],[1,3,2,3,1,1],[2,1,3,3,1,1],[1,1,3,1,2,3],
-    [1,1,3,3,2,1],[1,3,3,1,2,1],[3,1,3,1,2,1],[2,1,1,3,3,1],
-    [2,3,1,1,3,1],[1,1,2,1,3,3],[1,1,2,3,3,1],[2,1,3,1,1,3],
-    [2,1,3,3,1,1],[2,3,3,1,1,1],[1,1,3,1,3,2],[3,1,3,1,1,2],
-    [3,1,1,1,2,3],[3,3,1,1,2,1],[3,1,2,1,1,3],[3,1,2,3,1,1],
-    [3,3,2,1,1,1],[3,1,4,1,1,1],[2,2,1,4,1,1],[4,3,1,1,1,1],
-    [1,1,1,2,2,4],[1,1,1,4,2,2],[1,2,1,1,2,4],[1,2,1,4,2,1],
-    [1,4,1,1,2,2],[1,4,1,2,2,1],[1,1,2,2,1,4],[1,1,2,4,1,2],
-    [1,2,2,1,1,4],[1,2,2,4,1,1],[1,4,2,1,1,2],[1,4,2,2,1,1],
-    [2,4,1,2,1,1],[2,2,1,1,1,4],[4,1,3,1,1,1],[2,4,1,1,1,2],
-    [1,3,4,1,1,1],[1,1,1,2,4,2],[1,2,1,1,4,2],[1,2,1,2,4,1],
-    [1,1,4,2,1,2],[1,2,4,1,1,2],[1,2,4,2,1,1],[4,1,1,2,1,2],
-    [4,2,1,1,1,2],[4,2,1,2,1,1],[2,1,2,1,4,1],[2,1,4,1,2,1],
-    [4,1,2,1,2,1],[1,1,1,1,4,3],[1,1,1,3,4,1],[1,3,1,1,4,1],
-    [1,1,4,1,1,3],[1,1,4,3,1,1],[4,1,1,1,1,3],[4,1,1,3,1,1],
-    [1,1,3,1,4,1],[1,1,4,1,3,1],[3,1,1,1,4,1],[4,1,1,1,3,1],
-    [2,1,1,4,1,2],[2,1,1,2,1,4],[2,1,1,2,3,2],
-];
-$mods = [2,1,1,4,1,2]; $cksum = 104; $pos = 1;
-foreach (str_split(substr(preg_replace('/[^\x20-\x7E]/', ' ', $sn), 0, 18)) as $ch) {
-    $cv = max(0, min(95, ord($ch) - 32));
-    $mods = array_merge($mods, $c128[$cv]);
-    $cksum += $pos++ * $cv;
-}
-$mods = array_merge($mods, $c128[$cksum % 103], [2,3,3,1,1,1,2]);
-
-// Render the bars to a crisp PNG (dompdf renders <img> reliably; inline SVG it does not).
-$barcodeSrc = null;
-if (function_exists('imagecreatetruecolor')) {
-    $mw    = 2;   // px per module unit — preserves exact Code 128 ratios so it scans
-    $bcH   = 46;  // bar height (px)
-    $quiet = 20;  // quiet zone each side (px)
-    $bx    = $quiet;
-    $rects = [];
-    foreach ($mods as $mi => $m) {
-        $w = $m * $mw;
-        if ($mi % 2 === 0) { $rects[] = [$bx, $w]; } // even index = black bar
-        $bx += $w;
-    }
-    $imgW  = (int) ($bx + $quiet);
-    $img   = imagecreatetruecolor($imgW, $bcH);
-    $white = imagecolorallocate($img, 255, 255, 255);
-    $black = imagecolorallocate($img, 0, 0, 0);
-    imagefilledrectangle($img, 0, 0, $imgW, $bcH, $white);
-    foreach ($rects as [$x, $w]) {
-        imagefilledrectangle($img, (int) $x, 0, (int) ($x + $w - 1), $bcH - 1, $black);
-    }
-    ob_start();
-    imagepng($img);
-    $barcodeSrc = 'data:image/png;base64,' . base64_encode(ob_get_clean());
-    imagedestroy($img);
-}
+// -- Code 128 barcode --
+$barcodeSrc = \App\Support\Barcode::code128Png($sn);
 @endphp
 
 <table class="outer"><tbody><tr>
@@ -297,9 +236,11 @@ if (function_exists('imagecreatetruecolor')) {
 @if($showBarcode && $barcodeSrc)
 {{-- ── Code 128 B Barcode ── --}}
 <tr>
-  <td class="bc" style="text-align:center;padding-top:2px;">
-    <img src="{{ $barcodeSrc }}" alt="{{ $sn }}" style="width:74%;height:26px;display:block;margin:0 auto;"/>
-    <div style="font-size:5.5pt;color:#444;font-family:'DejaVu Sans',sans-serif;letter-spacing:1.5px;margin-top:1px;">{{ $sn }}</div>
+  <td class="bc" style="text-align:center;padding:3px 0;">
+    <div style="background:#fff;padding:4px 14px;display:inline-block;">
+      <img src="{{ $barcodeSrc }}" alt="{{ $sn }}" style="width:190px;height:42px;display:block;margin:0 auto;"/>
+      <div style="font-size:6pt;color:#222;font-family:'DejaVu Sans',sans-serif;letter-spacing:2px;margin-top:1px;">{{ $sn }}</div>
+    </div>
   </td>
 </tr>
 @endif
