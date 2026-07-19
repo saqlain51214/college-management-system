@@ -33,11 +33,17 @@ class StudentAuthController extends Controller
             ->where(fn ($q) => $q->where('registration_number', $identifier)->orWhere('roll_number', $identifier))
             ->first();
 
+        if (! $student) {
+            return back()->withErrors([
+                'login' => 'No active student found with this registration/roll number. Please check it in the college office.',
+            ])->withInput();
+        }
+
         // Password must match the stored password (initially 123456; changed via
         // "Forgot password"). No permanent default fallback.
-        if (! $student || ! $student->portal_password || ! Hash::check($request->password, $student->portal_password)) {
+        if (! $student->portal_password || ! Hash::check($request->password, $student->portal_password)) {
             return back()->withErrors([
-                'login' => 'Registration number or password is incorrect.',
+                'password' => 'The password is incorrect. If you forgot it, use "Forgot password?" to reset it.',
             ])->withInput();
         }
 

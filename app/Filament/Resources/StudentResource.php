@@ -626,10 +626,13 @@ class StudentResource extends Resource
                             ->label('New Portal Password')
                             ->required()
                             ->minLength(6)
-                            ->helperText('Default (if not set): student roll number is the password.'),
+                            ->default('123456')
+                            ->helperText('The student will use this to log in (initial password is 123456).'),
                     ])
                     ->action(function (Student $record, array $data) {
-                        $record->update(['portal_password' => bcrypt($data['password'])]);
+                        // The model mutator hashes it — do NOT bcrypt again (double-hash breaks login).
+                        $record->portal_password = $data['password'];
+                        $record->save();
                         \Filament\Notifications\Notification::make()->success()->title('Portal password updated.')->send();
                     }),
 

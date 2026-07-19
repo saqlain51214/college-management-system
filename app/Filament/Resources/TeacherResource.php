@@ -451,6 +451,27 @@ class TeacherResource extends Resource
                         ]);
                     }),
 
+                Tables\Actions\Action::make('setPortalPassword')
+                    ->label('Set Portal Password')
+                    ->icon('heroicon-o-key')
+                    ->color('warning')
+                    ->iconButton()
+                    ->tooltip('Set teacher portal password')
+                    ->form([
+                        Forms\Components\TextInput::make('password')
+                            ->label('New Portal Password')
+                            ->required()
+                            ->minLength(6)
+                            ->default('123456')
+                            ->helperText('The teacher will use this to log in (initial password is 123456).'),
+                    ])
+                    ->action(function (Teacher $record, array $data) {
+                        // The model mutator hashes it — do NOT bcrypt again.
+                        $record->portal_password = $data['password'];
+                        $record->save();
+                        \Filament\Notifications\Notification::make()->success()->title('Portal password updated.')->send();
+                    }),
+
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),

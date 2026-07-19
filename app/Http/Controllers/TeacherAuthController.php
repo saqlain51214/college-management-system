@@ -37,11 +37,17 @@ class TeacherAuthController extends Controller
             })
             ->first();
 
+        if (! $teacher) {
+            return back()->withErrors([
+                'login' => 'No active teacher found with this Employee ID or email. Please check it in the admin panel.',
+            ])->withInput();
+        }
+
         // Password must match the stored password (initially 123456; changed via
         // "Forgot password"). No permanent default fallback.
-        if (! $teacher || ! $teacher->portal_password || ! Hash::check($request->password, $teacher->portal_password)) {
+        if (! $teacher->portal_password || ! Hash::check($request->password, $teacher->portal_password)) {
             return back()->withErrors([
-                'login' => 'Employee ID / email or password is incorrect.',
+                'password' => 'The password is incorrect. If you forgot it, use "Forgot password?" to reset it.',
             ])->withInput();
         }
 
