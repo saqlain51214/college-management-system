@@ -414,19 +414,22 @@ class PublicController extends Controller
     public function aboutHistory()
     {
         $college = $this->college();
-        return view('public.about-history', compact('college'));
+        $cmsPage = $this->cmsPage('about-history');
+        return view('public.about-history', compact('college', 'cmsPage'));
     }
 
     public function aboutMission()
     {
         $college = $this->college();
-        return view('public.about-mission', compact('college'));
+        $cmsPage = $this->cmsPage('about-mission');
+        return view('public.about-mission', compact('college', 'cmsPage'));
     }
 
     public function aboutMessage()
     {
         $college = $this->college();
-        return view('public.about-message', compact('college'));
+        $cmsPage = $this->cmsPage('about-message');
+        return view('public.about-message', compact('college', 'cmsPage'));
     }
 
     public function aboutDirector()
@@ -462,7 +465,8 @@ class PublicController extends Controller
     public function campusFacilities()
     {
         $college = $this->college();
-        return view('public.campus-facilities', compact('college'));
+        $cmsPage = $this->cmsPage('campus-facilities');
+        return view('public.campus-facilities', compact('college', 'cmsPage'));
     }
 
     public function downloads()
@@ -520,25 +524,29 @@ class PublicController extends Controller
     public function admissionProcedure()
     {
         $college = $this->college();
-        return view('public.admission-procedure', compact('college'));
+        $cmsPage = $this->cmsPage('admission-procedure');
+        return view('public.admission-procedure', compact('college', 'cmsPage'));
     }
 
     public function feeStructurePublic()
     {
         $college = $this->college();
-        return view('public.fee-structure-public', compact('college'));
+        $cmsPage = $this->cmsPage('fee-structure');
+        return view('public.fee-structure-public', compact('college', 'cmsPage'));
     }
 
     public function semesterRules()
     {
         $college = $this->college();
-        return view('public.semester-rules', compact('college'));
+        $cmsPage = $this->cmsPage('semester-rules');
+        return view('public.semester-rules', compact('college', 'cmsPage'));
     }
 
     public function scholarships()
     {
         $college = $this->college();
-        return view('public.scholarships', compact('college'));
+        $cmsPage = $this->cmsPage('scholarships');
+        return view('public.scholarships', compact('college', 'cmsPage'));
     }
 
     public function scholarshipDetail(string $type)

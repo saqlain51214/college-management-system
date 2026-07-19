@@ -2,6 +2,18 @@
 @section('title', 'Campus Facilities')
 
 @section('content')
+@php $customBody = !empty($cmsPage) ? $cmsPage->customBodyHtml() : null; @endphp
+@if($customBody)
+<div class="pt-[var(--site-header-offset)]">
+    <div class="site-brand-gradient py-8 px-4 sm:px-6">
+        <div class="mx-auto max-w-6xl">
+            <p class="text-xs text-white/60 mb-1"><a href="{{ route('home') }}" class="hover:text-white">Home</a><span class="mx-1.5">›</span><span class="text-white/90">{{ $cmsPage->title }}</span></p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white">{{ $cmsPage->title }}</h1>
+        </div>
+    </div>
+</div>
+<div class="mx-auto max-w-4xl px-4 sm:px-6 py-12"><div class="prose-content max-w-none">{!! $customBody !!}</div></div>
+@else
 <div class="pt-[var(--site-header-offset)]">
     <div class="site-brand-gradient py-8 px-4 sm:px-6">
         <div class="mx-auto max-w-6xl">
@@ -50,4 +62,5 @@
         </a>
     </div>
 </div>
+@endif
 @endsection

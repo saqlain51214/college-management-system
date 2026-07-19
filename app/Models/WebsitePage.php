@@ -81,6 +81,28 @@ class WebsitePage extends Model
         return route($routeName, $preview ? ['preview' => 1] : []);
     }
 
+    /**
+     * Returns the admin-authored page body ONLY when it has actually been
+     * customised (i.e. it differs from the seeded placeholder default and is
+     * not empty). Lets a blade fall back to its built-in design until the
+     * administrator writes real content in the Website Pages editor.
+     */
+    public function customBodyHtml(): ?string
+    {
+        $body = $this->content['body_html'] ?? '';
+
+        if (trim(strip_tags($body)) === '') {
+            return null;
+        }
+
+        $default = self::defaultContentFor($this->slug)['body_html'] ?? '';
+        if (trim(strip_tags($body)) === trim(strip_tags($default))) {
+            return null; // still the untouched placeholder
+        }
+
+        return $body;
+    }
+
     public static function defaultContentFor(string $slug): array
     {
         $studentCount = class_exists(Student::class) ? Student::where('status', 'active')->count() : 2500;
