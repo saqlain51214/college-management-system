@@ -34,7 +34,13 @@ class DeployInit extends Command
                 '--force' => true,
             ], $this->output);
         } else {
-            $this->info('▸ Existing data found — skipping seed.');
+            $this->info('▸ Existing data found — refreshing permissions & roles...');
+            // Idempotent: keeps Shield permissions/roles in sync on existing installs
+            // (e.g. after new resources are added) without touching other data.
+            Artisan::call('db:seed', [
+                '--class' => \Database\Seeders\ShieldSeeder::class,
+                '--force' => true,
+            ], $this->output);
         }
 
         try {

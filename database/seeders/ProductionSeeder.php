@@ -38,6 +38,9 @@ class ProductionSeeder extends Seeder
             // Useful presets.
             FeeSlipTemplateSeeder::class,
             NotificationTemplateSeeder::class,
+
+            // Permissions + standard roles (super_admin / admin / panel_user).
+            ShieldSeeder::class,
         ]);
 
         // The only user in the system: full-access super administrator.

@@ -15,7 +15,7 @@ class RecentFeePaymentsWidget extends BaseWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->hasAnyRole(['super_admin', 'Developer', 'panel_user']) ?? false;
+        return auth()->user()?->hasAnyRole(['super_admin', 'admin', 'Developer', 'panel_user']) ?? false;
     }
 
     public function table(Table $table): Table

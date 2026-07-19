@@ -15,7 +15,7 @@ class FeeCollectionChart extends ChartWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->hasAnyRole(['super_admin', 'Developer', 'panel_user']) ?? false;
+        return auth()->user()?->hasAnyRole(['super_admin', 'admin', 'Developer', 'panel_user']) ?? false;
     }
 
     protected int | string | array $columnSpan = 2;

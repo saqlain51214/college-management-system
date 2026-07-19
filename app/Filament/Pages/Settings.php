@@ -35,6 +35,11 @@ class Settings extends Page implements HasForms
 
     public array $data = [];
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasAnyRole(['super_admin', 'Developer']) ?? false;
+    }
+
     public function mount(): void
     {
         $settings = CollegeSetting::all()->pluck('value', 'key')->toArray();
