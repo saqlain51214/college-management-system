@@ -20,7 +20,7 @@
           <h2 class="text-2xl font-bold text-slate-50">{{ $student->name }}</h2>
           <p class="text-sm text-slate-400 mt-1">{{ $student->academicProgram?->name ?? 'Program not assigned' }}</p>
           <div class="flex flex-wrap gap-2 mt-4">
-            <span class="portal-chip">{{ $student->roll_number }}</span>
+            <span class="portal-chip">{{ $student->registration_number ?: $student->roll_number }}</span>
             <span class="portal-chip" style="background: rgba(59,130,246,0.1); color: #bfdbfe; border-color: rgba(96,165,250,0.18)">
               Semester {{ $student->current_semester ?? '—' }}
             </span>
@@ -44,7 +44,7 @@
       {{-- Info grid --}}
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-5" style="border-top: 1px solid rgba(148,163,184,0.14)">
         @foreach([
-          ['label' => 'Roll Number',    'value' => $student->roll_number],
+          ['label' => 'Registration Number', 'value' => $student->registration_number ?: $student->roll_number],
           ['label' => 'Batch Year',     'value' => $student->batch_year ?? '—'],
           ['label' => 'Semester',       'value' => 'Semester ' . ($student->current_semester ?? '—')],
           ['label' => 'Section',        'value' => $student->section ?? '—'],

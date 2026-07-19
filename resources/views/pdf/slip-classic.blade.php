@@ -90,7 +90,7 @@ if ($payment !== null) {
     $s        = $payment->student;
     $sName    = $s?->name ?? '—';
     $sFather  = $s?->father_name ?? '—';
-    $sRoll    = $s?->roll_number ?? '—';
+    $sRoll    = $s?->registration_number ?: ($s?->roll_number ?? '—');
     $sProgram = $s?->academicProgram?->name ?? '—';
     $sSem     = $payment->semester_number ?? '—';
     $sSession = $payment->academicYear?->name ?? '—';

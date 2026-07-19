@@ -15,7 +15,7 @@
         <span class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium"
               style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75)">
           <span class="w-1.5 h-1.5 rounded-full" style="background:#c4973a"></span>
-          {{ $student->roll_number }}
+          {{ $student->registration_number ?: $student->roll_number }}
         </span>
         <span class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium"
               style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75)">

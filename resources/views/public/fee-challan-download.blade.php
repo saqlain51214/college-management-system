@@ -40,7 +40,7 @@
                         <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
                             <div>
                                 <p class="font-display text-lg font-bold text-stone-900">{{ $student->name }}</p>
-                                <p class="text-xs text-stone-500">Roll No: {{ $student->roll_number }} @if($student->registration_number)· Reg: {{ $student->registration_number }}@endif</p>
+                                <p class="text-xs text-stone-500">Reg No: {{ $student->registration_number ?: $student->roll_number }}</p>
                             </div>
                         </div>
 

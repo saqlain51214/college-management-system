@@ -68,7 +68,7 @@ if ($payment !== null) {
     $s        = $payment->student;
     $sName    = $s?->name ?? 'â€”';
     $sFather  = $s?->father_name ?? 'â€”';
-    $sRoll    = $s?->roll_number ?? 'â€”';
+    $sRoll    = $s?->registration_number ?: ($s?->roll_number ?? 'â€”');
     $sProgram = $s?->academicProgram?->name ?? 'â€”';
     $sSem     = $payment->semester_number ?? 'â€”';
     $sSession = $payment->academicYear?->name ?? 'â€”';

@@ -437,20 +437,21 @@ class StudentResource extends Resource
                     ->defaultImageUrl(asset('images/student-placeholder.png'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('roll_number')
-                    ->label('Roll No.')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold')
-                    ->badge()
-                    ->color('primary'),
-
                 Tables\Columns\TextColumn::make('registration_number')
                     ->label('Registration No.')
                     ->searchable()
                     ->sortable()
+                    ->weight('bold')
+                    ->badge()
+                    ->color('primary')
                     ->copyable()
                     ->placeholder('—'),
+
+                Tables\Columns\TextColumn::make('roll_number')
+                    ->label('Roll No.')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Student Name')
