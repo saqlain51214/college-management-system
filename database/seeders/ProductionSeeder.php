@@ -41,6 +41,9 @@ class ProductionSeeder extends Seeder
 
             // Permissions + standard roles (super_admin / admin / panel_user).
             ShieldSeeder::class,
+
+            // Sample course outlines + fee structures (only if those tables are empty).
+            DemoContentSeeder::class,
         ]);
 
         // The only user in the system: full-access super administrator.

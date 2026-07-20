@@ -55,6 +55,16 @@ class DeployInit extends Command
             }
         }
 
+        // Seed sample course outlines + fee structures (idempotent: only when empty).
+        try {
+            Artisan::call('db:seed', [
+                '--class' => \Database\Seeders\DemoContentSeeder::class,
+                '--force' => true,
+            ], $this->output);
+        } catch (\Throwable $e) {
+            $this->error('Demo content seed error (continuing): ' . $e->getMessage());
+        }
+
         try {
             Artisan::call('storage:link');
         } catch (\Throwable) {
