@@ -14,13 +14,13 @@
 @endphp
 
 @if($leaders->isNotEmpty())
-<section class="relative overflow-hidden py-16 sm:py-24" style="background:var(--site-body-bg)">
+<section class="relative overflow-hidden py-10 sm:py-14" style="background:var(--site-body-bg)">
     {{-- soft decorative accents --}}
     <div class="pointer-events-none absolute right-[-10%] top-[-10%] h-96 w-96 rounded-full opacity-[0.04]" style="background:var(--site-brand)"></div>
     <div class="pointer-events-none absolute left-[-10%] bottom-[-10%] h-96 w-96 rounded-full opacity-[0.05]" style="background:var(--site-gold)"></div>
 
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
-        <div class="mb-12 text-center">
+        <div class="mb-8 text-center" data-reveal>
             <span class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em]"
                   style="background:color-mix(in srgb, var(--site-gold) 15%, transparent); color:var(--site-gold)">Leadership</span>
             <h2 class="mt-4 font-display text-3xl font-bold text-stone-900 sm:text-4xl">Message Desk</h2>
@@ -30,7 +30,7 @@
         <div class="grid gap-6 sm:gap-7 md:grid-cols-2 lg:grid-cols-3">
             @foreach($leaders as $L)
                 @php $initials = collect(explode(' ', trim($L->name)))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode(''); @endphp
-                <a href="{{ route('leadership.message', $L) }}"
+                <a href="{{ route('leadership.message', $L) }}" data-reveal data-reveal-delay="{{ $loop->index % 3 + 1 }}"
                    class="group relative flex flex-col overflow-hidden rounded-[26px] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.15)] ring-1 ring-stone-100 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.28)]">
                     {{-- gradient banner + avatar --}}
                     <div class="relative h-24 site-brand-gradient">

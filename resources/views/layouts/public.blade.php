@@ -73,6 +73,14 @@
         .site-topbar { background-color: var(--site-brand); }
         .site-footer { background-color: var(--site-footer-bg); }
         .site-brand-gradient { background: linear-gradient(135deg, var(--site-brand), var(--site-brand-dark)); }
+
+        /* ── Subtle scroll-reveal animations (only when JS enables them) ── */
+        .has-reveal [data-reveal] { opacity: 0; transform: translateY(26px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); will-change: opacity, transform; }
+        .has-reveal [data-reveal].is-visible { opacity: 1; transform: none; }
+        .has-reveal [data-reveal][data-reveal-delay="1"] { transition-delay: .08s; }
+        .has-reveal [data-reveal][data-reveal-delay="2"] { transition-delay: .16s; }
+        .has-reveal [data-reveal][data-reveal-delay="3"] { transition-delay: .24s; }
+        @media (prefers-reduced-motion: reduce) { .has-reveal [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; } }
         .site-gold-gradient { background: linear-gradient(135deg, var(--site-gold), #a07830); }
         .site-brand-text { color: var(--site-brand); }
         /* ── Navigation dropdowns ───────────────────────────────────────── */
@@ -93,6 +101,7 @@
         .mob-link:hover { background: rgba(255,255,255,0.1); }
         .event-details-btn:hover { background: var(--site-brand); color: #fff; }
     </style>
+    <script>document.documentElement.classList.add('has-reveal');</script>
 </head>
 
 <body class="font-sans text-stone-800 antialiased overflow-x-hidden" style="background:var(--site-body-bg)">
@@ -418,5 +427,21 @@
     })();
 </script>
 @stack('scripts')
+<script>
+    (function () {
+        var els = document.querySelectorAll('[data-reveal]');
+        if (!els.length) return;
+        if (!('IntersectionObserver' in window)) {
+            els.forEach(function (el) { el.classList.add('is-visible'); });
+            return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        els.forEach(function (el) { io.observe(el); });
+    })();
+</script>
 </body>
 </html>

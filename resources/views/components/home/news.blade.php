@@ -1,10 +1,10 @@
 @php $newsSection = $pageContent['news'] ?? []; @endphp
 
-<section class="py-12 sm:py-16 lg:py-24" style="background:var(--site-body-bg)" aria-labelledby="news-heading">
+<section class="py-10 sm:py-12" style="background:var(--site-body-bg)" aria-labelledby="news-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6">
 
         {{-- Header --}}
-        <div class="mb-8 sm:mb-12 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div class="mb-7 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between" data-reveal>
             <div>
                 <p class="mb-2 text-xs font-bold uppercase tracking-[0.16em]" style="color:var(--site-gold)">College News</p>
                 <h2 id="news-heading" class="font-display text-2xl font-bold text-stone-900 sm:text-3xl lg:text-4xl">

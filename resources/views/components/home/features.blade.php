@@ -12,18 +12,18 @@
     ];
 @endphp
 
-<section class="relative overflow-hidden py-14 sm:py-20 site-brand-gradient">
+<section class="relative overflow-hidden py-10 sm:py-12 site-brand-gradient">
     {{-- decorative accents --}}
     <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full opacity-10" style="background:var(--site-gold)"></div>
     <div class="pointer-events-none absolute -left-20 bottom-0 h-72 w-72 rounded-full opacity-[0.07] bg-white"></div>
 
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
-        <div class="mb-10 text-center">
+        <div class="mb-8 text-center" data-reveal>
             <p class="mb-2 text-xs font-bold uppercase tracking-[0.22em]" style="color:var(--site-gold)">By the numbers</p>
             <h2 class="font-display text-2xl font-bold text-white sm:text-3xl">A Growing Community of Learners</h2>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+        <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4" data-reveal data-reveal-delay="1">
             @foreach ($items as [$v, $l, $path])
                 <div class="group rounded-2xl bg-white/[0.06] p-6 text-center ring-1 ring-white/10 backdrop-blur-sm transition duration-300 hover:bg-white/10 hover:-translate-y-1">
                     <span class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-lg transition group-hover:scale-110 site-gold-gradient">

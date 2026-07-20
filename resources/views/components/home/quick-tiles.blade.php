@@ -11,13 +11,13 @@
     ];
 @endphp
 
-<section class="py-12 sm:py-16" style="background:var(--site-body-bg)">
+<section class="py-8 sm:py-10" style="background:var(--site-body-bg)">
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
-        <div class="mb-8 sm:mb-10 text-center">
+        <div class="mb-8 sm:mb-10 text-center" data-reveal>
             <p class="mb-2 text-xs font-bold uppercase tracking-[0.2em]" style="color:var(--site-gold)">Explore</p>
             <h2 class="font-display text-2xl font-bold text-stone-900 sm:text-3xl">Quick Access</h2>
         </div>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5">
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5" data-reveal data-reveal-delay="1">
             @foreach ($tiles as $t)
                 <a href="{{ $t['url'] }}"
                    class="qt-card group relative flex flex-col gap-3 overflow-hidden rounded-2xl bg-white p-5 ring-1 ring-stone-100 shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-xl">
