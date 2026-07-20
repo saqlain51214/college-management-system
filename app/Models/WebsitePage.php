@@ -38,7 +38,6 @@ class WebsitePage extends Model
         'scholarships'        => ['title' => 'Scholarships',            'route_name' => 'scholarships',            'sort' => 16, 'in_menu' => true],
 
         // ── Other public pages ────────────────────────────────────────
-        'alumni'              => ['title' => 'Alumni',                  'route_name' => 'alumni',                  'sort' => 17, 'in_menu' => true],
         'news'                => ['title' => 'News',                    'route_name' => 'news',                    'sort' => 18, 'in_menu' => false],
         'events'              => ['title' => 'Events',                  'route_name' => 'events',                  'sort' => 19, 'in_menu' => false],
         'notices'             => ['title' => 'Notices',                 'route_name' => 'notices',                 'sort' => 20, 'in_menu' => false],
@@ -77,6 +76,11 @@ class WebsitePage extends Model
     public function previewUrl(bool $preview = false): string
     {
         $routeName = self::STATIC_PAGES[$this->slug]['route_name'] ?? 'home';
+
+        // Guard: if a page's route isn't defined, fall back to home instead of 500.
+        if (! \Illuminate\Support\Facades\Route::has($routeName)) {
+            $routeName = 'home';
+        }
 
         return route($routeName, $preview ? ['preview' => 1] : []);
     }
