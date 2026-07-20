@@ -37,6 +37,7 @@ Route::get('/faculty',             [PublicController::class, 'faculty'])->name('
 Route::get('/departments',         [PublicController::class, 'departments'])->name('departments');
 Route::get('/departments/{slug}',  [PublicController::class, 'departmentDetail'])->name('departments.show');
 Route::get('/course-outlines',     [PublicController::class, 'courseOutlines'])->name('course-outlines');
+Route::get('/message/{message}',   [PublicController::class, 'leadershipMessage'])->name('leadership.message');
 Route::get('/gallery',             [PublicController::class, 'gallery'])->name('gallery');
 Route::get('/campus-facilities',   [PublicController::class, 'campusFacilities'])->name('campus-facilities');
 Route::get('/downloads',           [PublicController::class, 'downloads'])->name('downloads');

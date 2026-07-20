@@ -481,6 +481,15 @@ class PublicController extends Controller
         return view('public.course-outlines', compact('college', 'departments'));
     }
 
+    public function leadershipMessage(\App\Models\LeadershipMessage $message)
+    {
+        abort_unless($message->is_active, 404);
+        $college = $this->college();
+        $others  = \App\Models\LeadershipMessage::where('is_active', true)
+            ->where('id', '!=', $message->id)->orderBy('sort_order')->get();
+        return view('public.leadership-message', compact('college', 'message', 'others'));
+    }
+
     public function campusFacilities()
     {
         $college = $this->college();
