@@ -88,7 +88,9 @@ class FeeSlipTemplateResource extends Resource
                                 ->directory('fee-slip-logos')
                                 ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'])
                                 ->image()
+                                ->maxSize(10240)
                                 ->imagePreviewHeight('80')
+                                ->helperText('PNG/JPG, up to 10 MB.')
                                 ->columnSpanFull(),
 
                             Forms\Components\ColorPicker::make('primary_color')
@@ -135,8 +137,9 @@ class FeeSlipTemplateResource extends Resource
                                 ->directory('fee-slip-bank-logos')
                                 ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'])
                                 ->image()
+                                ->maxSize(10240)
                                 ->imagePreviewHeight('60')
-                                ->helperText('Upload bank logo (PNG/JPG). Shown in the fee challan header.'),
+                                ->helperText('Upload bank logo (PNG/JPG, up to 10 MB). Shown in the fee challan header.'),
 
                             Forms\Components\TextInput::make('bank_account')
                                 ->label('Account Number')

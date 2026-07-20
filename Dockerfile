@@ -25,6 +25,14 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install -j"$(nproc)" intl gd zip bcmath pdo_mysql exif \
     && rm -rf /var/lib/apt/lists/*
 
+# Raise PHP upload limits so admins can upload logos / images (default is only 2MB)
+RUN { \
+      echo "upload_max_filesize=20M"; \
+      echo "post_max_size=25M"; \
+      echo "memory_limit=256M"; \
+      echo "max_execution_time=120"; \
+    } > /usr/local/etc/php/conf.d/zz-uploads.ini
+
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
