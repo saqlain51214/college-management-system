@@ -24,3 +24,8 @@ Homestead.yaml
 Thumbs.db
 /graphify-out
 /Dashboard-J.zip
+
+# Local env backups / secrets (never commit)
+.env.local.bak
+.env.*.bak
+*.bak
