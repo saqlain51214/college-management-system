@@ -38,6 +38,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // A stale CSRF token (419) should not show a scary "Page Expired" page —
+        // send the user back to the form with a friendly message so they retry.
+        $exceptions->render(function (TokenMismatchException $e, Request $request) {
+            return redirect()->back()
+                ->withInput($request->except('password', 'password_confirmation', '_token'))
+                ->with('error', 'Your session expired. Please try again.');
+        });
+
         $exceptions->report(function (\Throwable $exception): void {
             if (
                 $exception instanceof ValidationException
