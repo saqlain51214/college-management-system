@@ -172,6 +172,31 @@
             </section>
             @endif
 
+            {{-- Course Outlines (semester-wise) --}}
+            @if(isset($outlines) && $outlines->isNotEmpty())
+            <section>
+                <h2 class="text-xl font-bold text-stone-800 pb-2 mb-6 border-b-2" style="border-color: var(--site-brand)">Course Outlines</h2>
+                @foreach($outlines as $sem => $items)
+                    <p class="mb-2 mt-4 text-xs font-bold uppercase tracking-[0.14em]" style="color:var(--site-gold)">{{ $sem ? 'Semester ' . $sem : 'General' }}</p>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        @foreach($items as $o)
+                            <a href="{{ $o->url ?: '#' }}" @if($o->url) target="_blank" @endif
+                               class="group flex items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-4 py-3 transition hover:bg-white hover:shadow-sm">
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white" style="background:var(--site-brand)">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V4a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg>
+                                </span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block text-sm font-semibold text-stone-800 truncate">{{ $o->title }}</span>
+                                    @if($o->academicProgram)<span class="block text-xs text-stone-400 truncate">{{ $o->academicProgram->name }}</span>@endif
+                                </span>
+                                <span class="shrink-0 text-xs font-semibold" style="color:var(--site-gold)">{{ $o->file_path ? 'PDF ↓' : 'Open ↗' }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                @endforeach
+            </section>
+            @endif
+
             {{-- Empty state --}}
             @if(!$department->description && !$department->vision && !$department->mission && $teachers->isEmpty())
             <div class="rounded-2xl border border-dashed border-stone-300 p-12 text-center">

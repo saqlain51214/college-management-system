@@ -232,6 +232,7 @@
                         </li>
                         <li><a href="{{ route('faculty') }}"                   class="dropdown-link">Faculty Profile</a></li>
                         <li><a href="{{ route('admissions.semester-rules') }}" class="dropdown-link">Semester Rules</a></li>
+                        <li><a href="{{ route('course-outlines') }}" class="dropdown-link">Course Outlines</a></li>
                     </ul>
                 </li>
 
@@ -294,6 +295,7 @@
                         @endforeach
                         <li><a href="{{ route('faculty') }}"                   class="mob-link pl-7">Faculty Profile</a></li>
                         <li><a href="{{ route('admissions.semester-rules') }}" class="mob-link pl-7">Semester Rules</a></li>
+                        <li><a href="{{ route('course-outlines') }}" class="mob-link pl-7">Course Outlines</a></li>
 
                         <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">Admission</li>
                         <li><a href="{{ route('admissions.procedure') }}"     class="mob-link pl-7">Admission Procedure</a></li>

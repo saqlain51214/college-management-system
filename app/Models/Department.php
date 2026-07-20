@@ -111,4 +111,10 @@ class Department extends Model
     {
         return $this->hasMany(AcademicProgram::class)->where('is_active', true)->orderBy('name');
     }
+
+    public function courseOutlines(): HasMany
+    {
+        return $this->hasMany(CourseOutline::class)->where('is_active', true)
+            ->orderBy('semester_number')->orderBy('sort_order')->orderBy('title');
+    }
 }
