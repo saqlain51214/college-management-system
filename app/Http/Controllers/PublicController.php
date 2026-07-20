@@ -560,7 +560,17 @@ class PublicController extends Controller
     {
         $college = $this->college();
         $cmsPage = $this->cmsPage('fee-structure');
-        return view('public.fee-structure-public', compact('college', 'cmsPage'));
+
+        $feeGroups = collect();
+        if (\Illuminate\Support\Facades\Schema::hasTable('fee_structures')) {
+            $feeGroups = \App\Models\FeeStructure::where('is_active', true)
+                ->with('academicProgram')
+                ->orderBy('academic_program_id')->orderBy('fee_type')
+                ->get()
+                ->groupBy(fn ($f) => $f->academicProgram?->name ?? 'General Fees');
+        }
+
+        return view('public.fee-structure-public', compact('college', 'cmsPage', 'feeGroups'));
     }
 
     public function semesterRules()

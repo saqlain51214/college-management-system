@@ -32,24 +32,12 @@
 
 <div class="mx-auto max-w-4xl px-4 sm:px-6 py-12 space-y-10">
 
-    @foreach([
-        ['B.Ed 2.5 Year Program', [
-            ['Admission Fee','One-time','Rs. 2,000'],
-            ['Tuition Fee (per semester)','Per semester','Rs. 8,000'],
-            ['Examination Fee','Per semester','Rs. 1,500'],
-            ['Library Fee','Annual','Rs. 500'],
-            ['Sports Fee','Annual','Rs. 300'],
-            ['Student Welfare Fund','Annual','Rs. 200'],
-        ]],
-        ['B.Ed 1.5 Year Program', [
-            ['Admission Fee','One-time','Rs. 2,000'],
-            ['Tuition Fee (per semester)','Per semester','Rs. 9,000'],
-            ['Examination Fee','Per semester','Rs. 1,500'],
-            ['Library Fee','Annual','Rs. 500'],
-            ['Sports Fee','Annual','Rs. 300'],
-            ['Student Welfare Fund','Annual','Rs. 200'],
-        ]],
-    ] as [$programName, $feeRows])
+    @php
+        $fmtFreq = fn ($f) => $f ? ucwords(str_replace('_', ' ', $f)) : '—';
+        $fmtType = fn ($t) => ucwords(str_replace('_', ' ', $t instanceof \BackedEnum ? $t->value : (string) $t));
+    @endphp
+
+    @forelse(($feeGroups ?? collect()) as $programName => $items)
     <section>
         <h2 class="text-xl font-bold text-stone-800 pb-2 mb-4 border-b-2" style="border-color:var(--site-brand)">{{ $programName }}</h2>
         <div class="overflow-x-auto rounded-xl border border-stone-200 shadow-sm">
@@ -62,18 +50,22 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-100">
-                    @foreach($feeRows as $i => [$head, $freq, $amount])
+                    @foreach($items as $i => $fee)
                     <tr class="{{ $i % 2 === 0 ? 'bg-white' : 'bg-stone-50' }} hover:bg-blue-50 transition-colors">
-                        <td class="px-5 py-3 font-medium text-stone-800">{{ $head }}</td>
-                        <td class="px-5 py-3 text-stone-500">{{ $freq }}</td>
-                        <td class="px-5 py-3 text-right font-semibold text-stone-800">{{ $amount }}</td>
+                        <td class="px-5 py-3 font-medium text-stone-800">{{ $fee->title ?: $fmtType($fee->fee_type) }}{{ $fee->semester_number ? ' (Semester '.$fee->semester_number.')' : '' }}</td>
+                        <td class="px-5 py-3 text-stone-500">{{ $fmtFreq($fee->frequency) }}</td>
+                        <td class="px-5 py-3 text-right font-semibold text-stone-800">Rs. {{ number_format((float) $fee->amount) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
     </section>
-    @endforeach
+    @empty
+    <div class="rounded-2xl border border-dashed border-stone-200 bg-white px-6 py-16 text-center">
+        <p class="text-stone-500">Fee structure will be published here soon. Please contact the accounts office for details.</p>
+    </div>
+    @endforelse
 
     <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 flex items-start gap-4">
         <svg class="w-5 h-5 shrink-0 mt-0.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
