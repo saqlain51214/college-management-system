@@ -146,25 +146,6 @@ class WebsitePage extends Model
                         ],
                     ],
                 ],
-                'features' => [
-                    ['title' => 'Board & entry focus', 'description' => 'Structured preparation for BISE papers, practicals, and university entry tests (MDCAT, ECAT, and others) with regular assessments and counselling.'],
-                    ['title' => 'Qualified faculty', 'description' => 'Subject teachers with relevant degrees, remedial support before board exams, and parent-teacher meetings aligned with the college calendar.'],
-                    ['title' => 'Campus life', 'description' => 'Societies, sports, and student welfare within college rules-building confidence for universities across Pakistan and abroad.'],
-                ],
-                'about' => [
-                    'title' => 'Discover the Minds Shaping Future',
-                    'description' => 'For over three decades, MySchool has been committed to providing exceptional education that prepares students for success in an ever-changing world. Our holistic approach combines rigorous academics with character development.',
-                    'image' => 'assets/images/photo-1541339907198-e08756dedf3f.jpg',
-                    'badge_title' => 'Excellence',
-                    'badge_text' => 'A campus built for curiosity, collaboration, and growth.',
-                    'button_text' => 'Learn More',
-                    'button_link' => 'about',
-                    'stats' => [
-                        ['value' => number_format($studentCount) . '+', 'label' => 'Students'],
-                        ['value' => '98%', 'label' => 'Success'],
-                        ['value' => number_format($teacherCount) . '+', 'label' => 'Faculty'],
-                    ],
-                ],
                 'programs' => [
                     'section_title' => 'Featured Programs',
                     'section_text' => 'Discover our comprehensive range of academic programs designed to prepare you for success.',

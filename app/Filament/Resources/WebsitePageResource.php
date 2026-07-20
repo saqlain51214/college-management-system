@@ -53,17 +53,6 @@ class WebsitePageResource extends Resource
                             ? new HtmlString('<a href="' . e($record->previewUrl(true)) . '" target="_blank" class="text-sm font-semibold text-primary-600 underline">Open page preview (draft)</a>')
                             : new HtmlString('<span class="text-sm text-gray-500">Save page to preview it.</span>'))
                         ->columnSpanFull(),
-                    Forms\Components\FileUpload::make('featured_image')
-                        ->label('Page Banner Image')
-                        ->image()
-                        ->disk('public')
-                        ->directory('website/pages')
-                        ->maxSize(2048)
-                        ->columnSpanFull(),
-                    Placeholder::make('current_featured_image')
-                        ->label('Current Banner Preview')
-                        ->content(fn (?WebsitePage $record): HtmlString => static::imagePreviewHtml($record?->featured_image, 'Banner preview'))
-                        ->columnSpanFull(),
                 ]),
 
             Forms\Components\Section::make('Home Page Content')
@@ -73,23 +62,13 @@ class WebsitePageResource extends Resource
                         ->label('Home Page Sections Guide')
                         ->content(fn (?WebsitePage $record): HtmlString => new HtmlString(
                             '<div class="space-y-2 text-sm leading-6">'
-                            . '<div><strong>1. Announcement Bar</strong> - updates from <a class="text-primary-600 underline" href="' . e(AnnouncementResource::getUrl('index')) . '">Notices module</a></div>'
-                            . '<div><strong>2. Hero Slider</strong> - update below in <strong>Hero Slides</strong> (3 images)</div>'
-                            . '<div><strong>3. Feature Cards</strong> - update below in <strong>Feature Cards</strong></div>'
-                            . '<div><strong>4. Elevate Your Learning</strong> - update from <a class="text-primary-600 underline" href="' . e(HomeSectionResource::getUrl('index')) . '">Home Sections module</a></div>'
-                            . '<div><strong>5. Campus Life</strong> - update from <a class="text-primary-600 underline" href="' . e(HomeSectionResource::getUrl('index')) . '">Home Sections module</a></div>'
-                            . '<div><strong>6. Testimonials</strong> - update from <a class="text-primary-600 underline" href="' . e(HomeSectionResource::getUrl('index')) . '">Home Sections module</a></div>'
-                            . '<div><strong>7. Discover the Minds Shaping Future</strong> - update below in <strong>Home About Section</strong> (1 image)</div>'
-                            . '<div><strong>8. Featured Programs</strong> - headings from this page, program cards from Academic Programs module</div>'
-                            . '<div><strong>9. News</strong> - headings from this page, articles from <a class="text-primary-600 underline" href="' . e(NewsArticleResource::getUrl('index')) . '">News module</a></div>'
-                            . '<div><strong>10. Events</strong> - headings from this page, records from <a class="text-primary-600 underline" href="' . e(WebsiteEventResource::getUrl('index')) . '">Events module</a></div>'
+                            . '<div><strong>1. Hero Slider</strong> - update below in <strong>Hero Slides</strong></div>'
+                            . '<div><strong>2. Quick Access tiles</strong> - fixed links (Admissions, Fee Challan, etc.)</div>'
+                            . '<div><strong>3. Statistics band</strong> - numbers update automatically from live data</div>'
+                            . '<div><strong>4. Featured Programmes</strong> - headings below, cards from Academic Programs module</div>'
+                            . '<div><strong>5. Message Desk</strong> - update from the <strong>Message Desk</strong> module (leadership)</div>'
+                            . '<div><strong>6. Latest News</strong> - headings below, articles from <a class="text-primary-600 underline" href="' . e(NewsArticleResource::getUrl('index')) . '">News module</a></div>'
                             . '</div>'
-                        ))
-                        ->columnSpanFull(),
-                    Placeholder::make('home_sections_access')
-                        ->label('Quick Access')
-                        ->content(fn (): HtmlString => new HtmlString(
-                            '<a href="' . e(HomeSectionResource::getUrl('index')) . '" class="text-sm font-semibold text-primary-600 underline">Open Home Sections Module</a>'
                         ))
                         ->columnSpanFull(),
                     Placeholder::make('home_image_preview')
@@ -125,45 +104,6 @@ class WebsitePageResource extends Resource
                             Forms\Components\TextInput::make('primary_btn_link')->label('Primary Route Name'),
                             Forms\Components\TextInput::make('secondary_btn_text')->label('Secondary Button Text'),
                             Forms\Components\TextInput::make('secondary_btn_link')->label('Secondary Route Name'),
-                        ]),
-                    Forms\Components\Repeater::make('content.features')
-                        ->label('Feature Cards')
-                        ->minItems(3)
-                        ->maxItems(3)
-                        ->schema([
-                            Forms\Components\TextInput::make('title')->required(),
-                            Forms\Components\Textarea::make('description')->rows(3)->required(),
-                        ]),
-                    Forms\Components\Section::make('Discover the Minds Shaping Future Section')
-                        ->columns(2)
-                        ->schema([
-                            Forms\Components\TextInput::make('content.about.title')->required()->columnSpanFull(),
-                            Forms\Components\Textarea::make('content.about.description')->rows(4)->required()->columnSpanFull(),
-                            Forms\Components\FileUpload::make('content.about.image')
-                                ->image()
-                                ->disk('public')
-                                ->directory('website/pages')
-                                ->columnSpan(1),
-                            Placeholder::make('about_image_preview')
-                                ->label('Current About Image')
-                                ->content(fn (Get $get): HtmlString => static::imagePreviewHtml($get('content.about.image'), 'About image'))
-                                ->columnSpan(1),
-                            Forms\Components\Group::make([
-                                Forms\Components\TextInput::make('content.about.badge_title'),
-                                Forms\Components\TextInput::make('content.about.badge_text'),
-                                Forms\Components\TextInput::make('content.about.button_text'),
-                                Forms\Components\TextInput::make('content.about.button_link')->label('Button Route Name'),
-                            ])->columnSpan(1),
-                            Forms\Components\Repeater::make('content.about.stats')
-                                ->label('About Statistics')
-                                ->helperText('Example: 2,500+ / Active Students, 98% / Graduate Rate, 50+ / Programs Offered')
-                                ->minItems(3)
-                                ->maxItems(4)
-                                ->schema([
-                                    Forms\Components\TextInput::make('value')->required()->placeholder('e.g. 2,500+'),
-                                    Forms\Components\TextInput::make('label')->required()->placeholder('e.g. Active Students'),
-                                ])
-                                ->columnSpanFull(),
                         ]),
                     Forms\Components\Section::make('Featured Programs, News & Events Section')
                         ->columns(2)
