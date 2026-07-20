@@ -12,7 +12,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Child tables (with foreign keys) first, then parents.
+        // Disable FK checks so drops never fail on MySQL due to foreign-key
+        // constraints (SQLite ignores them, MySQL does not).
+        Schema::disableForeignKeyConstraints();
+
         foreach ([
             'exam_results',
             'attendance_records',
@@ -26,8 +29,14 @@ return new class extends Migration
             'books',
             'timetables',
         ] as $table) {
-            Schema::dropIfExists($table);
+            try {
+                Schema::dropIfExists($table);
+            } catch (\Throwable) {
+                // Ignore — a single stubborn table must not block the whole migration batch.
+            }
         }
+
+        Schema::enableForeignKeyConstraints();
     }
 
     public function down(): void
