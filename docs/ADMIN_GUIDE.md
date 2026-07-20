@@ -1,197 +1,191 @@
-# Jinnah Degree College Astore — Admin Panel Guide
+# Jinnah Degree College Astore — Complete System Guide
 
-_Ye guide college ke admin/staff ke liye hai. Har module ka **maqsad**, uski **business logic (andar se kaise kaam karta hai)**, aur **aap kya-kya kar sakte hain** — aasan zabaan mein._
-
-**Admin panel:** `https://<aapki-website>/admin` · **Super Admin:** `admin@admin.com`
-**Student portal:** `/portal/login` · **Teacher portal:** `/teacher/login`
-
-> Upar dayeen taraf 🌙/☀️ se theme, sidebar groups collapse/expand.
+_College ke admin/staff ke liye mukammal reference. Har module, har public page, content kahan se badalta hai, portals, links aur passwords — sab aasan zabaan mein. Future mein bhi kaam aayega._
 
 ---
 
-## 📊 Dashboard
-**Maqsad:** Login karte hi college ka poora haal ek nazar mein.
-**Business logic:** Ye numbers **live database** se aate hain — koi manual entry nahi. "Fee Collected (This Month)" sirf un challans ka jod hai jo is mahine **Paid** hue; "Overdue Challans" woh hain jinki due date guzar chuki aur paise nahi aaye; "New Admission Inquiries" is mahine website se aayi requests.
+## 🔑 Quick Access — Links & Logins
+
+| Kya | Link | Login | Password |
+|---|---|---|---|
+| **Admin Panel** | `/admin` | `admin@admin.com` | `admin123` (super admin) |
+| **Student Portal** | `/portal/login` | Registration Number | initial `123456` |
+| **Teacher Portal** | `/teacher/login` | Employee ID (JDCA-T-001) ya email | initial `123456` |
+| **Public Website** | `/` | — | — |
+
+> `<aapki-website>` = `https://college-management-system-production-7fa1.up.railway.app`
+> Passwords har account ke liye **initial** hain — user "Forgot password?" (email OTP) se ya admin 🔑 button se badal sakte hain.
 
 ---
+
+# PART 1 — Admin Panel Modules
+
+Sidebar 6 groups mein ba- ta hua hai. Har module ka **maqsad + kya kar sakte hain**.
 
 ## 🏛️ College Setup
-
-### Departments
-**Maqsad:** College ke shobe.
-**Business logic:** Har department ek **container** hai jisse programmes aur teachers jurte hain. `show_on_website` flag decide karta hai website par dikhega ya nahi; `sort_order` tarteeb. Department delete karne se pehle uske programmes/students ka khayal rakhein (woh us se linked hote hain).
-**Actions:** New/Edit/Delete, website par dikhana on/off, tarteeb.
-
-### Academic Programs
-**Maqsad:** Programmes (ADE, B.Ed 1.5, AD Health & PE, etc.).
-**Business logic:** Har programme **ek department** se belong karta hai (parent-child). Yehi programmes 3 jagah use hote hain — (1) student add/import karte waqt, (2) admission form ka dropdown, (3) website "Academics → Departments → Programmes" menu. `show_on_website` se public visibility control hoti hai.
-**Actions:** Add/Edit, department se link, website visibility.
-
----
+- **Departments** — shobe (jaise Department of Education). Add/edit; `show on website` se public visibility; sort order. Programmes aur teachers isi se jurte hain.
+- **Academic Programs** — programmes (ADE, B.Ed, etc.), har ek **ek department** se linked. Ye admission form + student add + website menu mein aate hain. `show on website` se dikhana control.
 
 ## 👨‍🎓 Students & Admissions
-
-### Students
-**Maqsad:** Poore college ke students ka markazi record — baaki har cheez (fees, portal) isi se judi hai.
-**Business logic (zaroori samajhna):**
-- **Registration Number = student ki pehchaan.** Yehi number fee challan, portal login, aur reports mein use hota hai. (Roll number system ne khud banaya tha, isliye chhupa hua hai.)
-- Student banate hi uska **portal account khud ban jaata hai** — username = registration number, password = **123456**. Alag se account banane ki zarurat nahi.
-- **Status lifecycle:** Active → On Leave → Inactive. Sirf **Active** students bulk fee challan, dashboard counts, aur "active students" mein aate hain.
-- Har student ek **programme + department** se linked hota hai — isi bina par dept-wise challan aur reports chalte hain.
-- **Duplicate/No-Reg handling:** Jin students ka reg number nahi tha (35 duplicates), unhe alag tab/filter se ek-ek kar ke theek kiya jaata hai — taake ghalat billing na ho.
-**Actions:** New · Import (Excel/CSV) · Download Template · Export · Filter tabs (All/Unique/Duplicates/No Reg/No Roll) · select → Generate Challans / Download Fee Challans (1 PDF).
-
-### Admission Inquiries
-**Maqsad:** Website ke online admission form ki requests ka inbox.
-**Business logic:** Jab koi website par admission form bharta hai (documents ke saath), ek **AdmissionInquiry** record ban jaata hai + ek **reference number (JDCA-YYYY-XXXX)** milta hai, aur college ko email jaata hai (jab email on ho). **Ye khud student nahi banata** — ye sirf ek lead/request hai. Admin review kar ke, agar admit karna ho, to us student ko **Students** module mein manually add karta hai. (Do-step process: inquiry → admin decision → student.)
-**Actions:** Inquiries dekho, documents kholo, status review.
-
----
+- **Students** — markazi student record. New / Import (Excel) / Download Template / Export. Naya student banate hi **portal login** ban jaata hai (username = reg number, password = 123456). Filter tabs (All/Unique/Duplicates/No Reg/No Roll). 🔑 **Set Portal Password** button. Select kar ke **Generate Challans** / **Download Fee Challans**.
+- **Admission Inquiries** — website ke online admission form ki requests (documents ke saath) ka inbox. Sirf review — admit karna ho to student ko **Students** mein add karte hain.
 
 ## 👩‍🏫 Faculty & Staff
+- **Teachers** — teacher/staff record. New / Import / Template / Export. Department assign. 🔑 **Set Portal Password** button. Teacher portal login banta hai.
 
-### Teachers
-**Maqsad:** Teachers/staff ka record + unka portal.
-**Business logic:** Har teacher ka **Employee ID** uski pehchaan hai (jaise JDCA-T-001). Teacher portal login = **Employee ID ya email** + default password **123456**. Teacher ko department assign kar sakte hain (shuru mein blank hota hai). Sirf **Active** teachers portal mein login kar sakte hain aur faculty count mein aate hain.
-**Actions:** New · Import/Template/Export · department assign · edit/deactivate.
+## 💰 Finance
+- **Fee Structure** — programme/semester ki fee rate list (reference).
+- **Fee Payments** — har challan + payment. **Generate Dept-wise Challans** (ek click, poore dept ke active students; duplicate skip). **Mark as Paid**. **Download Challans (1 PDF)**. Filters (dept/program/status). Paid challan lock. Har challan par barcode + QR.
+- **Scholarships / Scholarship Awards** — programs aur kis student ko mila (record; fee khud kam nahi hoti — discount alag).
+- **Fee Reports** — total billed / collected / outstanding / overdue.
+- **Student Account (Ledger)** — reg number search → us student ka poora fee hisaab + har challan PDF.
+- **Fee Slip Templates** — challan design (bank, logo, fields, barcode, QR). Ek active template.
 
----
-
-## 💰 Finance (sabse ahem hissa)
-
-### Fee Structure
-**Maqsad:** Programme/semester ke hisaab se fees ki tafseel.
-**Business logic:** Ye "rate list" hai — kaunse fee head (tuition, admission, etc.) ki kitni raqam. Ye khud challan nahi banata; ye reference hai jiske hisaab se aap challan ki amount rakhte hain.
-
-### Fee Payments (fee challans ka dil)
-**Maqsad:** Har student ke har challan ka record aur uski payment.
-**Business logic (poora samajhna):**
-- **Net Payable = Amount Due + Fine − Discount.** Yehi asal wasool karne wali raqam hai.
-- **Status lifecycle:** `Pending` (banaya, paisa nahi aaya) → `Paid` (poora aaya) / `Partial` (kuch aaya) / `Overdue` (due date guzar gayi, paisa nahi) / `Waived` (maaf).
-- **Overdue khud lagta hai:** ek rozana automatic system (raat 1 baje) un Pending challans ko **Overdue** kar deta hai jinki due date guzar chuki, aur student/admin ko reminder bhejta hai (jab notifications on hon).
-- **Bulk generation samajhdaar hai:** "Generate Dept-wise Challans" us department ke **sirf Active students** ke liye challan banata hai, aur jis student ke paas pehle se **usi fee type + semester ka unpaid challan** hai use **skip** kar deta hai — yani double billing nahi hoti.
-- **Paid = locked:** jab challan Paid ho jaaye, woh lock ho jaata hai (sirf super admin edit/delete kar sakta hai) — taake record se chhed-chhaad na ho.
-- Har challan par **barcode** (bank counter scan) + **"Scan to Pay" QR** hota hai; Paid mark karte hi student ko confirmation notification jaata hai (jab on ho).
-**Actions:** Generate Dept-wise Challans · Mark as Paid · select → Download Challans (1 PDF) · Department/Programme/Status filters · Export.
-
-### Scholarships & Scholarship Awards
-**Maqsad:** Scholarship programs aur kis student ko mila.
-**Business logic:** Do parts — **Scholarship** (program: naam, type, amount, seats) aur **Scholarship Award** (kis student ko, kis saal, kitna, kya status: approved/pending). Ye ek **record-keeping** hai — award dene se fee challan khud kam nahi hota; agar fee kam karni ho to us student ke challan par **discount** daalna hota hai.
-**Actions:** Programs banao, students ko awards do (amount/status/tareekh).
-
-### Fee Reports
-**Maqsad:** Fees ka bird's-eye view.
-**Business logic:** Live jod — **Total Billed** (sab net payable), **Collected** (sab amount paid), **Outstanding** (billed − collected), aur overdue count/amount. Neeche unpaid challans ki list (purane pehle).
-
-### Student Account (Fee Ledger)
-**Maqsad:** Ek student ka poora fee hisaab, reg number se.
-**Business logic:** Reg number (ya roll) search karte hi us **ek student** ke saare challan nikaal kar Total Billed / Paid / Outstanding jod deta hai, har challan ka status + PDF link. Ye "customer statement" jaisa hai.
-**Actions:** Reg number search → statement dekho, challan PDF kholo.
-
-### Fee Slip Templates
-**Maqsad:** Challan/slip ka design.
-**Business logic:** Ek waqt mein ek template **active** hota hai — wahi sab challans par lagta hai. Template mein bank logo, college logo, bank account/title, fields, aur barcode/QR on-off hote hain. **Logo/QR fallback:** agar aap logo upload na karein to default logo lagta hai; QR ke liye merchant ID Settings se aata hai.
-**Actions:** Template edit, active chuno, logos/bank set karo, barcode/QR on-off.
-
----
-
-## 🌐 Website Management (public website ka control)
-
-### Website Pages
-**Maqsad:** Har website page ka content.
-**Business logic (khaas):**
-- **Publish flag** decide karta hai page public ko dikhega ya 404. Publish se pehle **Preview** (aap khud dekh lein).
-- **Kuch pages ka apna default design hai** (History, Mission, Message, Campus Facilities, Admission Procedure, Fee Structure, Semester Rules, Scholarships). Rule: **jab tak aap us page ka body edit nahi karte, default design dikhta hai; jaise hi aap content likhte hain, aapka content default ko replace kar deta hai.** Isliye galti se page khaali nahi hota.
-- Home page ke **hero slides, gallery, feature cards** repeaters se add/reorder hote hain.
-**Actions:** Content edit (rich text), hero slides/gallery, Publish/Preview.
-
-### News · Notices (Announcements) · Events
-**Business logic:** In sab mein ek **publish flag** aur tareekh hoti hai — sirf published cheezein website par aati hain. Notices/Events ki **expiry/end date** guzar jaye to woh apne aap list se hat jaate hain. Announcement publish karte hi students ko in-app notification ja sakta hai.
-**Actions:** Add/Edit, Publish, featured, category, dates.
-
-### Home Sections
-**Business logic:** Home page ke beech ke blocks (Elevate Learning, Campus Life, Testimonials). Har block ka **is_active** toggle aur `sort_order` — off karo to woh section home se ghayab.
-
-### Downloads
-**Business logic:** File list category + sort se website ke Downloads page par group ho kar aati hai; `is_active` off = chhup jaati hai.
-
-### Contact Messages
-**Business logic:** Website contact form → seedha ye inbox + college ko email. Sirf padhne ke liye.
-
----
+## 🌐 Website Management
+- **Website Pages** — public site ke pages ka content (details Part 2 mein).
+- **News** / **Notices (Announcements)** / **Events** — add/edit + Publish + dates.
+- **Home Sections** — home page ke beech ke blocks (on/off + order).
+- **Downloads** — downloadable files (forms/prospectus).
+- **Contact Messages** — website contact form ka inbox.
 
 ## ⚙️ System
-
-### Settings (College Settings) — _sirf Super Admin_
-**Maqsad:** Poore system ki bunyadi settings.
-**Business logic:** Ye ek **key-value store** hai jo poori site ko drive karta hai — College Information (naam/logo/address/phone/email), Fee Settings (bank, late fine, QR merchant ID), aur **Website Appearance** (theme color, accent, background, fonts). **Theme color yahin se badalta hai — navbar aur footer dono ek saath.** Ek jagah badlo, poori site (public + slips + emails) par asar.
-**Color change:** Settings → Website Appearance → color chuno (preview ke saath) → Save.
-
-### Lookup Values
-**Business logic:** Choti dropdown lists jo forms mein aati hain. Yahan item add karte hi woh foran metadata dropdowns mein aa jaata hai — **dynamic**, developer ki zarurat nahi.
-
-### Roles (Permissions) — _sirf Super Admin_
-**Maqsad:** Kaun kya kar sakta hai.
-**Business logic:** 3 tayaar roles — **super_admin** (sab kuch, koi rok nahi), **admin** (rozmarra: students/fees/website — magar settings/roles/permanent-delete nahi), **panel_user** (sirf website/CMS + inquiries). Har resource/action ka ek permission hota hai; role ko checkbox se woh permission de/le sakte hain. Naya staff = naya user + role assign — **bina developer ke**.
-**Actions:** Roles edit (checkboxes), users banao, role assign.
-
-### Activity Logs — _sirf Super Admin_
-**Business logic:** System khud record karta hai ke kisne kya create/update/delete kiya (audit trail). Purane logs 60 din baad khud saaf hote hain; aap **Clear All Logs** se foran sab hata sakte hain.
+- **Settings** _(super admin)_ — college identity, theme/colors, fonts, fee/bank, QR. (Part 3.)
+- **Lookup Values** — chhoti dropdown lists (foran forms mein aati hain).
+- **Roles (Permissions)** _(super admin)_ — kaun kya kar sakta hai; checkbox se; naye staff ko role dena.
+- **Activity Logs** _(super admin)_ — kisne kya kiya; **Clear All Logs** button.
 
 ---
 
-## 🎓 Portals (login logic)
+# PART 2 — Public Website: har page + content kahan se
 
-### Student Portal
-- **Link:** `https://<aapki-website>/portal/login`
-- **Login ID:** apna **Registration Number** (jaise `4267`). _(Roll number bhi chal jaata hai.)_
-- **Initial password:** `123456` — ye sirf pehli baar ke liye hai. **Login page par ye kahin likha nahi hota** (security); admin students ko batata hai.
-- Student apni fees, challan (PDF + barcode + QR), aur profile dekhta hai.
+**Zaroori usool:** website ke **do hisse** hain —
+1. **Content jo aap badal sakte hain** — admin panel se (Website Pages, News, Settings, etc.).
+2. **Structure jo fixed hai** — top navigation menu ke items/naam/tarteeb design mein fixed hain (developer ke baghair nahi badalte). Aap pages ko **publish/unpublish** kar sakte hain (jisse unke menu link dikhte/chhupte hain).
 
-### Teacher Portal
-- **Link:** `https://<aapki-website>/teacher/login`
-- **Login ID:** **Employee ID** (jaise `JDCA-T-001`) **ya email**.
-- **Initial password:** `123456` — sirf pehli baar ke liye. Login page par show nahi hota.
+## Page-by-page content map
 
-### Password bhool jayein? (Forgot Password — Email OTP)
-Dono portals par **"Forgot password?"** link hai:
-1. Student/Teacher apna reg number/employee ID **ya email** daalta hai.
-2. Uske **email par ek 6-digit code (OTP)** aata hai (15 minute tak valid).
-3. Code + naya password daal kar apna password khud badal leta hai.
+| Public Page | Link | Kya dikhata hai | Content kahan se / kaise badlein |
+|---|---|---|---|
+| **Home** | `/` | Hero slider, feature cards, About block, stats, latest News/Events/Programmes | **Website Pages → Home** (hero slides, cards, about); stats **khud** live DB se; **Home Sections** (beech ke blocks); News/Events/Programmes apne modules se |
+| **About JDCA** | `/about` | College intro + stats | **Website Pages → About JDCA** (intro/body); stats live |
+| **History & Geography** | `/about/history` | College ki tareekh | **Website Pages → History & Geography** (body edit karein) * |
+| **Mission & Vision** | `/about/mission` | Mission/vision | **Website Pages → Mission & Vision** * |
+| **Message from Principal** | `/about/message` | Principal ka paigham | **Website Pages → Message from Principal** * |
+| **Message (VC/Director)** | `/about/director`, `/about/principal` | Paigham | **Abhi fixed (hardcoded)** — developer chahiye |
+| **Academic Programmes** | `/programs` | Programmes ki list | Intro: **Website Pages → Academic Programmes**; cards: **Academic Programs** module |
+| **Departments** | `/departments`, `/departments/{slug}` | Departments + detail | **Departments** module (`show on website`) |
+| **Faculty** | `/faculty` | Teachers ki list | Intro: **Website Pages → Faculty**; list: **Teachers** module |
+| **Campus Facilities** | `/campus-facilities` | Facilities | **Website Pages → Campus Facilities** (body) * |
+| **Gallery** | `/gallery` | Tasveerein | **Website Pages → Gallery** (gallery images repeater) |
+| **Downloads** | `/downloads` | Files | **Downloads** module |
+| **Online Admission Form** | `/admissions` | Admission form | Intro: **Website Pages → Online Admission Form**; form bharne par → **Admission Inquiries** inbox |
+| **Admission Procedure** | `/admissions/procedure` | Dakhle ka tareeqa | **Website Pages → Admission Procedure** (body) * |
+| **Fee Structure (public)** | `/admissions/fee-structure` | Fees ki tafseel | **Website Pages → Fee Structure** (body) * |
+| **Semester Rules** | `/admissions/semester-rules` | Rules | **Website Pages → Semester Rules** (body) * |
+| **Scholarships (public)** | `/scholarships` | Scholarship info | **Website Pages → Scholarships** (body) * |
+| **News** | `/news`, `/news/{slug}` | Khabrein | **News** module (Publish) |
+| **Events** | `/events` | Events | **Events** module (Publish) |
+| **Notices** | `/notices` | Notices | **Notices (Announcements)** module (Publish + expiry) |
+| **Contact** | `/contact` | Contact form + address/phone/email | Intro: **Website Pages → Contact**; address/phone/email: **Settings → College Information**; form → **Contact Messages** inbox |
+| **Fee Challan Download** | `/fee-challan` | Student reg number se apna challan | Automatic (Fee Payments data se) |
+| **Jobs / Careers** | `/jobs` | Naukriyaan | **Abhi fixed (hardcoded)** — applications email hoti hain |
+| **Search** | `/search` | Site search | Automatic |
 
-> **Zaroori:** OTP email tab hi jayega jab (a) us student/teacher ka **email record par ho**, aur (b) college ka **email (SMTP) set** ho (Settings/hosting mein). Email na ho to woh "college office se rabta karein" ka message dekhega.
->
-> Yaad rahe: **123456 sirf initial hai** — jaise hi koi apna password badal le, phir sirf naya password chalega (123456 dobara kaam nahi karega).
+\* **Ye pages "smart" hain:** jab tak aap us page ka **body edit nahi karte, ek default design** dikhta hai. Jaise hi aap **Website Pages** mein us page ka content likhte/save karte hain, aapka content default ki jagah live ho jaata hai. (Isse page kabhi khaali nahi hota.)
+
+## Publish / Preview (har page par)
+- **Website Pages** mein har page ka **Published** toggle:
+  - **ON** = page website par live + uska menu link dikhta hai.
+  - **OFF** = page 404 + menu se link chhup jaata hai (aap phir bhi **Preview** se dekh sakte hain).
+- News/Notices/Events mein bhi **Publish** toggle + tareekhein.
 
 ---
 
-## 🔔 Notifications (background logic)
-System khud kuch events par notifications bhejta hai (email + in-app bell, jab email on ho): **fee paid confirmation**, **fee overdue reminder**, **new announcement**. Iske templates code mein hain (manual editing wali screen hata di gayi). Email tab hi jaata hai jab Settings/hosting mein **SMTP (Gmail)** set ho.
+# PART 3 — Content Source Master Table (kaha se kya badlega)
+
+| Aap kya badalna chahte hain | Kahan jayein |
+|---|---|
+| College ka **naam / logo / favicon** | Settings → College Information |
+| **Address / phone / email** (footer + contact page) | Settings → College Information |
+| **Theme color** (navbar + footer + site) | Settings → Website Appearance → Save |
+| **Fonts / background** | Settings → Website Appearance |
+| **Footer text / copyright** | Settings → Website Appearance |
+| **Bank account / branch / fee QR (Raast) ID** | Settings → Fee Settings |
+| **Home page slider (hero images)** | Website Pages → Home → Hero slides |
+| **Home feature cards / About block** | Website Pages → Home |
+| **Home ke beech ke sections** | Home Sections |
+| **Home stats numbers** | Automatic (live DB — students/faculty/programmes count) |
+| **Kisi page ka text** (About/History/Facilities/Rules/Scholarships etc.) | Website Pages → woh page → body edit → Save |
+| **Gallery images** | Website Pages → Gallery |
+| **Departments / Programmes** | College Setup ke modules |
+| **Faculty list** | Teachers module |
+| **News / Notices / Events** | Website Management ke modules |
+| **Downloadable files** | Downloads module |
+| **Top navigation menu ke naam/tarteeb** | **Fixed (developer)** — sirf publish/unpublish se link dikhte/chhupte hain |
 
 ---
 
-## ⭐ Aam kaam — Quick Reference
+# PART 4 — Student & Teacher Portals (maqsad)
+
+## 🎓 Student Portal — `/portal/login`
+**Maqsad:** Student office aaye baghair apni cheezein khud dekhe/download kare.
+- **Fees & Challans** — status (jama/baqi) + **challan PDF** (barcode + QR) download → bank jama karne ke liye
+- **Payment proof upload** — jama karne ke baad receipt upload
+- **Notices** — announcements
+- **Profile** + **password change**
+- **Login:** Registration Number · **Initial password:** `123456` (login page par show nahi hota)
+
+## 👩‍🏫 Teacher Portal — `/teacher/login`
+**Maqsad (abhi):** Notices aur apni profile dekhna. _(Abhi halka hai — attendance/assignments/results wale modules hata diye gaye the.)_
+- Dashboard · Notices · Profile · Password change
+- **Login:** Employee ID (JDCA-T-001) ya email · **Initial password:** `123456`
+
+## Password bhool jayein — Forgot Password (Email OTP)
+Dono portals par **"Forgot password?"**:
+1. Reg number / Employee ID **ya email** daalein
+2. Email par **6-digit code** aata hai (15 min)
+3. Code + naya password → password badal jaata hai
+
+> OTP email tab jayega jab (a) user ka **email record par ho** aur (b) college ka **Gmail SMTP set** ho (Settings/hosting).
+> Agar login na ho: Admin → Students/Teachers → us row par **🔑 Set Portal Password** → `123456` set karein.
+
+---
+
+# PART 5 — Settings deep-dive (super admin)
+
+**Admin → Settings** (sirf super admin):
+- **College Information** — naam, logo, short name, address, phone, email. → poori site + slips + emails par asar.
+- **Academic Settings** — passing marks, etc.
+- **Fee Settings** — bank name/account/branch, late fine, reference prefix, **Scan-to-Pay QR** (enable + Raast/Merchant ID + city). Bank se Raast merchant ID mile to yahan daalein → QR se payment live.
+- **Website Appearance** — **theme color** (swatch preview), accent, background, **fonts**, footer text/copyright. (Navbar + footer color ek saath.)
+- **System / Library Settings.**
+
+---
+
+# PART 6 — Aam kaam (Quick Reference)
 
 | Kaam | Kahan |
 |---|---|
 | Naya student | Students → New |
-| Bahut se students | Students → Download Template → bharo → Import |
+| Bulk students | Students → Download Template → Import |
 | Dept-wise fee challan | Fee Payments → Generate Dept-wise Challans |
-| Fee slips print (1 PDF) | Fee Payments → filter → select all → Download Challans |
-| Student ka fee hisaab | Student Account → reg number search |
-| Payment received | Fee Payments → challan → Mark as Paid |
-| Theme/color badalna | Settings → Website Appearance → Save |
-| College naam/logo/phone | Settings → College Information |
-| Bank account / QR | Settings → Fee Settings |
-| Website page text | Website Pages → page → edit → Publish |
+| Fee slips print (1 PDF) | Fee Payments → filter → select → Download Challans |
+| Student ka fee hisaab | Student Account → reg number |
+| Payment received | Fee Payments → Mark as Paid |
+| Student/Teacher password reset | Students/Teachers → 🔑 Set Portal Password |
+| Theme/color | Settings → Website Appearance |
+| Logo / naam / phone | Settings → College Information |
+| Bank / QR | Settings → Fee Settings |
+| Kisi page ka text | Website Pages → page → edit → Publish |
 | Home slider images | Website Pages → Home → Hero slides |
-| News/Notice | News / Notices → New → Publish |
+| News / Notice / Event | woh module → New → Publish |
 | Naye staff ko access | Roles → user + role |
 | Logs saaf | Activity Logs → Clear All Logs |
-| Teacher login | /teacher/login · Employee ID or email · initial password 123456 |
-| Student login | /portal/login · Registration number · initial password 123456 |
-| Password bhool gaye | Login page → "Forgot password?" → email OTP |
 
 ---
 
-_Hata diye gaye modules (istemal nahi ho rahe the): Exams, Attendance, Library, Timetable, LMS. Naya feature (jaise WhatsApp notifications) chahiye to developer se rabta karein._
+## Notes
+- **Hata diye gaye modules** (istemal nahi the): Exams, Attendance, Library, Timetable, LMS.
+- **Navigation menu ka structure fixed hai** — naye top-level menu item/naam ke liye developer chahiye. (Dynamic banana ho to bataayein.)
+- **Email (OTP + notifications)** ke liye Settings/hosting mein **Gmail SMTP** set karna zaroori hai.
+- Naya feature (WhatsApp notifications, teacher portal expand, dynamic menu) chahiye → developer se rabta.
