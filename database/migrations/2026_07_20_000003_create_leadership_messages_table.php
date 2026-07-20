@@ -13,19 +13,25 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('leadership_messages', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('designation');
-            $table->string('organization')->nullable();
-            $table->text('message');
-            $table->string('photo')->nullable();
-            $table->unsignedInteger('sort_order')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('leadership_messages')) {
+            Schema::create('leadership_messages', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('designation');
+                $table->string('organization')->nullable();
+                $table->text('message');
+                $table->string('photo')->nullable();
+                $table->unsignedInteger('sort_order')->default(0);
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        }
 
-        // Seed the three default leaders so the Message Desk is populated out of the box.
+        // Seed the three default leaders once (only when the table is empty).
+        if (DB::table('leadership_messages')->count() > 0) {
+            return;
+        }
+
         $now = now();
         DB::table('leadership_messages')->insert([
             [

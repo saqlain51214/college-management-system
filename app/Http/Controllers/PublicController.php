@@ -459,13 +459,21 @@ class PublicController extends Controller
         $department = Department::visible()->where('slug', $slug)->firstOrFail();
         $teachers   = $department->teachers()->get();
         $programs   = $department->academicPrograms()->get();
-        $outlines   = $department->courseOutlines()->get()->groupBy('semester_number');
+        $outlines   = \Illuminate\Support\Facades\Schema::hasTable('course_outlines')
+            ? $department->courseOutlines()->get()->groupBy('semester_number')
+            : collect();
         return view('public.department-detail', compact('college', 'department', 'teachers', 'programs', 'outlines'));
     }
 
     public function courseOutlines()
     {
         $college = $this->college();
+
+        if (! \Illuminate\Support\Facades\Schema::hasTable('course_outlines')) {
+            $departments = collect();
+            return view('public.course-outlines', compact('college', 'departments'));
+        }
+
         $departments = Department::visible()->ordered()
             ->with(['courseOutlines' => fn ($q) => $q->orderBy('semester_number')->orderBy('sort_order')])
             ->get()
