@@ -3,17 +3,13 @@
 
 @section('content')
     <div style="padding-top: var(--site-header-offset, 6rem);">
+        {{-- Clean, KIU-style layout: hero → quick tiles → news → programmes → message desk → stats --}}
         @include('components.home.hero')
-        @include('components.home.features')
-        @include('components.home.message-desk')
-        @include('components.home.about')
-        @include('components.home.programs')
-        @include('components.home.elevate')
-        @include('components.home.student-life')
+        @include('components.home.quick-tiles')
         @include('components.home.news')
-        @include('components.home.events')
-        @include('components.home.testimonials')
-        @include('components.home.affiliations')
+        @include('components.home.programs')
+        @include('components.home.message-desk')
+        @include('components.home.features')
     </div>
 @endsection
 
