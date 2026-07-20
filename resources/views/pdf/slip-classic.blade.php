@@ -127,11 +127,11 @@ if ($payment !== null) {
 
 // ── Template settings ─────────────────────────────────────────────────
 $college      = $template->college_name       ?? \App\Models\CollegeSetting::get('college_name', 'Jinnah Degree College Astore');
-$collegeSub   = $template->college_subtitle   ?? \App\Models\CollegeSetting::get('college_subtitle', '(EIDGAH ASTORE)');
+$collegeSub   = $template->college_subtitle   ?? \App\Models\CollegeSetting::get('college_subtitle', '');
 $collegeShort = $template->college_short_name ?? \App\Models\CollegeSetting::get('college_short_name', 'JDCA');
 $bankName     = $template->bank_name          ?? \App\Models\CollegeSetting::get('fee_bank_name', 'KCBL');
 $bankAcct     = $template->bank_account       ?? \App\Models\CollegeSetting::get('fee_bank_account', '0368421');
-$bankBranch   = $template->bank_branch        ?? \App\Models\CollegeSetting::get('fee_bank_branch', 'Eidgah');
+$bankBranch   = $template->bank_branch        ?? \App\Models\CollegeSetting::get('fee_bank_branch', '');
 $bankTitle    = $template->bank_account_title ?? $college;
 $refPfx       = $template->ref_prefix         ?? 'JDCA';
 $billPfx      = $template->bill_prefix        ?? '';

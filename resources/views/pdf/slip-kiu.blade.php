@@ -198,9 +198,6 @@ $paymentQrSrc = \App\Support\PaymentQr::forSlip($college, $net, $sn, $bankAcct);
             <span style="font-size:16pt;font-weight:900;letter-spacing:-2.5pt;">{{ strtoupper(substr($bankName,0,3)) }}</span>
           </div>
         @endif
-        @if($bankBranch)
-        <div style="font-size:5pt;color:#666;margin-top:1pt;text-align:center;">{{ $bankBranch }}</div>
-        @endif
       </td>
 
       {{-- CENTER: University name ──────────────────────── --}}

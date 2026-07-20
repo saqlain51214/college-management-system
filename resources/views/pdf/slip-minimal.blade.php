@@ -116,7 +116,7 @@ if ($payment !== null) {
 }
 
 $college      = $template->college_name ?? \App\Models\CollegeSetting::get('college_name', 'Jinnah Degree College Astore');
-$collegeSub   = $template->college_subtitle ?? 'Eidgah, Astore, Gilgit-Baltistan';
+$collegeSub   = $template->college_subtitle ?? '';
 $bankName     = $template->bank_name ?? 'KCBL';
 $bankAcct     = $template->bank_account ?? '—';
 $bankTitle    = $template->bank_account_title ?? $college;
