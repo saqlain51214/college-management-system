@@ -72,6 +72,7 @@ if ($payment !== null) {
     $sProgram = $s?->academicProgram?->name ?? 'â€”';
     $sSem     = $payment->semester_number ?? 'â€”';
     $sSession = $payment->academicYear?->name ?? 'â€”';
+    $installmentLabel = $payment->installment_no ? "Installment #{$payment->installment_no}" : '';
     $due      = (float)($payment->amount_due ?? 0);
     $fine     = (float)($payment->fine_amount ?? 0);
     $disc     = (float)($payment->discount_amount ?? 0);
@@ -101,6 +102,7 @@ if ($payment !== null) {
     $dueDate  = $d['due_date'] ?? '30-06-2026';
     $sn       = $d['challan_number'] ?? 'JDCA-2026-0042';
     $feeLabel = $d['fee_label'] ?? 'Semester Fee';
+    $installmentLabel = $d['installment_label'] ?? '';
 }
 
 $college      = $template->college_name ?? \App\Models\CollegeSetting::get('college_name', 'Jinnah Degree College Astore');
@@ -206,7 +208,7 @@ $paymentQrSrc = \App\Support\PaymentQr::forSlip($college, $net, $sn, $bankAcct);
     <tr><td class="lbl">Program:</td><td>{{ $sProgram }}</td></tr>
     <tr><td class="lbl">Semester No:</td><td>{{ $sSem }}</td></tr>
     <tr><td class="lbl">Semester Name:</td><td>{{ $sSession }}</td></tr>
-    <tr><td class="lbl">Remarks:</td><td>&nbsp;</td></tr>
+    <tr><td class="lbl">Remarks:</td><td>{{ $installmentLabel ?: '' }}</td></tr>
   </table>
 </td></tr>
 

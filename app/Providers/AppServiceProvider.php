@@ -59,6 +59,11 @@ class AppServiceProvider extends ServiceProvider
                 ->by($request->ip() . '|' . mb_strtolower(trim((string) $request->input('login', 'guest'))));
         });
 
+        RateLimiter::for('public-fee-challan', function (Request $request): Limit {
+            return Limit::perMinute((int) config('platform.rate_limits.fee_challan_per_minute', 10))
+                ->by($request->ip() . '|' . mb_strtolower(trim((string) $request->input('identifier', 'guest'))));
+        });
+
         foreach ([
             AcademicProgram::class,
             Announcement::class,

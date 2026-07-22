@@ -72,6 +72,74 @@
             @endforeach
         </div>
 
+        {{-- Generate Fee Slip (custom, self-chosen amount) --}}
+        <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900">
+            <h3 class="mb-3 text-sm font-bold text-gray-800 dark:text-gray-100">Generate Fee Slip</h3>
+
+            @php $slip = $this->slipSummary(); @endphp
+
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div>
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Fee Type</label>
+                    <select wire:model.live="slipFeeType" class="w-full rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100">
+                        @foreach ($this->feeTypeOptions() as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Semester</label>
+                    <select wire:model.live="slipSemester" class="w-full rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100">
+                        <option value="">Not applicable</option>
+                        @foreach (range(1, 8) as $n)
+                            <option value="{{ $n }}">Semester {{ $n }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Academic Year</label>
+                    <select wire:model.live="slipAcademicYearId" class="w-full rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100">
+                        <option value="">Not applicable</option>
+                        @foreach ($this->academicYearOptions() as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Due Date</label>
+                    <input type="date" wire:model="slipDueDate" class="w-full rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"/>
+                </div>
+            </div>
+
+            @if ($slip)
+                <div class="mt-3 flex flex-wrap gap-4 rounded-lg bg-gray-50 px-3 py-2 text-xs dark:bg-white/5">
+                    <span class="text-gray-500">Total for period: <b class="text-gray-800 dark:text-gray-100">{{ $rs($slip['total']) }}</b></span>
+                    <span class="text-gray-500">Already invoiced: <b class="text-gray-800 dark:text-gray-100">{{ $rs($slip['already_invoiced']) }}</b></span>
+                    <span class="text-gray-500">Available to invoice: <b class="text-emerald-700 dark:text-emerald-400">{{ $rs($slip['available']) }}</b></span>
+                </div>
+            @endif
+
+            <form wire:submit.prevent="generateSlip" class="mt-3 flex flex-wrap items-end gap-3">
+                <div>
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Amount to Invoice (Rs.)</label>
+                    <input type="number" step="0.01" min="0" wire:model="slipAmount"
+                           placeholder="e.g. 10000"
+                           class="w-40 rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"/>
+                </div>
+                <button type="submit"
+                        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500">
+                    Generate Slip
+                </button>
+            </form>
+
+            @if ($slipSuccess)
+                <p class="mt-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">{{ $slipSuccess }}</p>
+            @endif
+            @if ($slipError)
+                <p class="mt-2 text-sm font-medium text-red-600">{{ $slipError }}</p>
+            @endif
+        </div>
+
         {{-- Challan ledger --}}
         <div class="rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900">
             <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-white/10">
@@ -84,7 +152,7 @@
                         <tr class="border-b border-gray-200 text-left text-xs uppercase tracking-wide text-gray-500 dark:border-white/10">
                             <th class="px-4 py-2">Challan</th>
                             <th class="px-4 py-2">Fee Type</th>
-                            <th class="px-4 py-2">Sem</th>
+                            <th class="px-4 py-2">Sem / Inst.</th>
                             <th class="px-4 py-2 text-right">Payable</th>
                             <th class="px-4 py-2 text-right">Paid</th>
                             <th class="px-4 py-2 text-right">Balance</th>
@@ -99,7 +167,7 @@
                             <tr class="border-b border-gray-100 dark:border-white/5">
                                 <td class="px-4 py-2 font-mono text-xs text-gray-600 dark:text-gray-300">{{ $row['challan'] }}</td>
                                 <td class="px-4 py-2 text-gray-700 dark:text-gray-200">{{ $row['fee_type'] }}</td>
-                                <td class="px-4 py-2 text-gray-500">{{ $row['semester'] ? 'S' . $row['semester'] : '—' }}</td>
+                                <td class="px-4 py-2 text-gray-500">{{ $row['semester'] ? 'S' . $row['semester'] : '—' }} · #{{ $row['installment'] }}</td>
                                 <td class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">{{ $rs($row['net']) }}</td>
                                 <td class="px-4 py-2 text-right text-green-700 dark:text-green-400">{{ $rs($row['paid']) }}</td>
                                 <td class="px-4 py-2 text-right font-semibold {{ $row['balance'] > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-gray-400' }}">{{ $rs($row['balance']) }}</td>

@@ -80,10 +80,11 @@ if ($payment !== null) {
     $s        = $payment->student;
     $sName    = $s?->name ?? '—';
     $sFather  = $s?->father_name ?? '—';
-    $sRoll    = $s?->roll_number ?? '—';
+    $sRoll    = $s?->registration_number ?: ($s?->roll_number ?? '—');
     $sProgram = $s?->academicProgram?->name ?? '—';
     $sSem     = $payment->semester_number ?? '—';
     $sSession = $payment->academicYear?->name ?? '—';
+    $installmentLabel = $payment->installment_no ? "Installment #{$payment->installment_no}" : '';
     $due      = (float)($payment->amount_due ?? 0);
     $fine     = (float)($payment->fine_amount ?? 0);
     $disc     = (float)($payment->discount_amount ?? 0);
@@ -113,6 +114,7 @@ if ($payment !== null) {
     $dueDate  = $d['due_date'] ?? '30-06-2026';
     $sn       = $d['challan_number'] ?? 'JDCA-2026-0042';
     $feeLabel = $d['fee_label'] ?? 'Semester Fee';
+    $installmentLabel = $d['installment_label'] ?? '';
 }
 
 $college      = $template->college_name ?? \App\Models\CollegeSetting::get('college_name', 'Jinnah Degree College Astore');
@@ -199,6 +201,12 @@ $inWords = (empty($wp)?'Zero':implode(' ',$wp)).' Only';
         <td class="info-lbl">Session</td>
         <td>{{ $sSession }}</td>
       </tr>
+      @if(!empty($installmentLabel))
+      <tr>
+        <td class="info-lbl">Remarks</td>
+        <td colspan="3">{{ $installmentLabel }}</td>
+      </tr>
+      @endif
     </table>
   </div>
 

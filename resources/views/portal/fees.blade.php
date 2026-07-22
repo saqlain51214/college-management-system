@@ -2,11 +2,17 @@
 @section('title', 'Fee Status')
 @section('content')
 
-{{-- Flash: proof uploaded --}}
+{{-- Flash: proof uploaded / slip generated --}}
 @if(session('proof_uploaded'))
 <div class="mb-4 flex items-start gap-3 rounded-xl px-4 py-3 text-sm font-medium" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;">
   <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
   {{ session('proof_uploaded') }}
+</div>
+@endif
+@if(session('success'))
+<div class="mb-4 flex items-start gap-3 rounded-xl px-4 py-3 text-sm font-medium" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;">
+  <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+  {{ session('success') }}
 </div>
 @endif
 
@@ -28,6 +34,55 @@
     <div class="text-2xl font-bold" style="color: {{ $fc['color'] }}">{{ $fc['value'] }}</div>
   </div>
   @endforeach
+</div>
+
+{{-- Generate a fee slip — pay the full semester at once, or in installments of your choice --}}
+<div class="bg-white rounded-2xl p-5 mb-6" style="border: 1px solid #e5e7eb">
+  <h3 class="font-semibold text-gray-800 mb-1">Generate a Fee Slip</h3>
+  <p class="text-xs text-gray-400 mb-3">Pay your whole semester fee at once, or generate a slip for whatever amount you want to pay right now — the rest can be paid later as another installment.</p>
+
+  @if($errors->has('amount'))
+    <div class="mb-3 rounded-lg px-3 py-2 text-xs font-medium" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca">
+      {{ $errors->first('amount') }}
+    </div>
+  @endif
+
+  <form action="{{ route('portal.fees') }}" method="GET" class="flex flex-wrap items-end gap-3 mb-3">
+    <div>
+      <label class="block text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Fee Type</label>
+      <select name="fee_type" onchange="this.form.submit()" class="rounded-lg border-gray-300 text-sm">
+        @foreach($feeTypeOptions as $value => $label)
+          <option value="{{ $value }}" @selected($slipFeeType === $value)>{{ $label }}</option>
+        @endforeach
+      </select>
+    </div>
+  </form>
+
+  <div class="flex flex-wrap gap-4 rounded-lg px-3 py-2 text-xs mb-3" style="background:#f9fafb">
+    <span class="text-gray-500">Total for this semester: <b class="text-gray-800">Rs. {{ number_format($invoice['total']) }}</b></span>
+    <span class="text-gray-500">Already invoiced: <b class="text-gray-800">Rs. {{ number_format($invoice['already_invoiced']) }}</b></span>
+    <span class="text-gray-500">Available to invoice: <b style="color:#15803d">Rs. {{ number_format($invoice['available']) }}</b></span>
+  </div>
+
+  @if($invoice['available'] > 0)
+    <form action="{{ route('portal.fees.generate-slip') }}" method="POST" class="flex flex-wrap items-end gap-3">
+      @csrf
+      <input type="hidden" name="fee_type" value="{{ $slipFeeType }}">
+      <div>
+        <label class="block text-xs font-medium uppercase tracking-wide text-gray-500 mb-1">Amount to Pay Now (Rs.)</label>
+        <input type="number" name="amount" step="0.01" min="1" max="{{ $invoice['available'] }}"
+               placeholder="e.g. 10000" required
+               class="w-40 rounded-lg border-gray-300 text-sm">
+      </div>
+      <button type="submit"
+              class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
+              style="background:#15803d">
+        Generate Slip
+      </button>
+    </form>
+  @else
+    <p class="text-xs text-gray-400">This semester's {{ strtolower($feeTypeOptions[$slipFeeType] ?? 'fee') }} has been fully invoiced. Check your challans below for outstanding balances.</p>
+  @endif
 </div>
 
 @if($payments->isEmpty())
@@ -74,6 +129,7 @@
           };
           $canUpload = in_array($status, ['pending','overdue','partial']);
           $hasProof  = !empty($p->payment_proof_path);
+          $awaitingVerification = $hasProof && $status !== 'paid';
         @endphp
 
         {{-- x-data on the <tr> so both the button and form share the same showUpload state --}}
@@ -142,11 +198,20 @@
 
                 {{-- State: proof already on file --}}
                 @if($hasProof)
-                  <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg"
-                        style="color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    Proof Uploaded
-                  </span>
+                  @if($awaitingVerification)
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg"
+                          style="color:#92400e;background:#fffbeb;border:1px solid #fde68a;"
+                          title="You claimed Rs. {{ number_format((float) $p->proof_claimed_amount) }} on {{ $p->proof_claimed_date?->format('d M Y') }} — awaiting admin confirmation">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      Verification Pending
+                    </span>
+                  @else
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg"
+                          style="color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                      Proof Uploaded
+                    </span>
+                  @endif
                   {{-- Allow replacing the proof --}}
                   <button @click="showUpload = !showUpload"
                           class="text-xs font-medium px-2 py-1 rounded-lg transition"
@@ -175,6 +240,14 @@
                     <p class="text-xs font-semibold mb-2" style="color:#7c3aed;">
                       Bank-Stamped Receipt
                     </p>
+                    <label class="block text-[10px] font-medium uppercase tracking-wide text-gray-500 mb-1">Amount Deposited (Rs.)</label>
+                    <input type="number" name="amount" step="0.01" min="1" required
+                           placeholder="e.g. {{ number_format($p->balance ?? $p->amount_due, 0, '.', '') }}"
+                           class="block w-full text-xs rounded-lg border-gray-300 mb-2">
+                    <label class="block text-[10px] font-medium uppercase tracking-wide text-gray-500 mb-1">Deposit Date</label>
+                    <input type="date" name="deposit_date" max="{{ now()->toDateString() }}" required
+                           class="block w-full text-xs rounded-lg border-gray-300 mb-2">
+                    <label class="block text-[10px] font-medium uppercase tracking-wide text-gray-500 mb-1">Receipt / Proof File</label>
                     <input type="file"
                            name="proof"
                            accept="image/*,application/pdf"

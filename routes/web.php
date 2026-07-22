@@ -45,8 +45,9 @@ Route::get('/search',              [PublicController::class, 'search'])->name('s
 
 // Public fee challan self-service download (student enters roll/registration number)
 Route::get('/fee-challan',              [PublicController::class, 'feeChallanDownload'])->name('fee-challan.download');
-Route::post('/fee-challan',             [PublicController::class, 'feeChallanLookup'])->name('fee-challan.lookup');
-Route::get('/fee-challan/{payment}/pdf', [PublicController::class, 'feeChallanPdf'])->name('fee-challan.pdf');
+Route::post('/fee-challan',             [PublicController::class, 'feeChallanLookup'])->middleware('throttle:public-fee-challan')->name('fee-challan.lookup');
+Route::post('/fee-challan/generate-slip', [PublicController::class, 'feeChallanGenerateSlip'])->middleware('throttle:public-fee-challan')->name('fee-challan.generate-slip');
+Route::get('/fee-challan/{payment}/pdf', [PublicController::class, 'feeChallanPdf'])->middleware('throttle:public-fee-challan')->name('fee-challan.pdf');
 
 // Admissions
 Route::get('/admissions',             [PublicController::class, 'admissions'])->name('admissions');
@@ -90,6 +91,7 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::get('/fees/{payment}/challan',         [StudentPortalController::class, 'feeChallan'])->name('fees.challan');
         Route::get('/fees/{payment}/challan/preview', [StudentPortalController::class, 'feeChallanPreview'])->name('fees.challan.preview');
         Route::post('/fees/{payment}/proof',          [StudentPortalController::class, 'uploadProof'])->name('fees.proof');
+        Route::post('/fees/generate-slip',            [StudentPortalController::class, 'generateSlip'])->name('fees.generate-slip');
         Route::get('/notices',                [StudentPortalController::class, 'notices'])->name('notices');
         Route::get('/profile',                [StudentPortalController::class, 'profile'])->name('profile');
         Route::post('/profile/password',      [StudentPortalController::class, 'updatePassword'])->name('profile.password');

@@ -94,6 +94,7 @@ if ($payment !== null) {
     $sProgram = $s?->academicProgram?->name ?? '—';
     $sSem     = $payment->semester_number ?? '—';
     $sSession = $payment->academicYear?->name ?? '—';
+    $installmentLabel = $payment->installment_no ? "Installment #{$payment->installment_no}" : '';
     $due      = (float)($payment->amount_due ?? 0);
     $fine     = (float)($payment->fine_amount ?? 0);
     $disc     = (float)($payment->discount_amount ?? 0);
@@ -123,6 +124,7 @@ if ($payment !== null) {
     $dueDate  = $d['due_date']        ?? '30-06-2026';
     $sn       = $d['challan_number']  ?? 'JDCA-2026-0042';
     $feeLabel = $d['fee_label']       ?? 'Semester Fee';
+    $installmentLabel = $d['installment_label'] ?? '';
 }
 
 // ── Template settings ─────────────────────────────────────────────────
@@ -277,6 +279,12 @@ $paymentQrSrc = \App\Support\PaymentQr::forSlip($college, $net, $sn, $bankAcct);
         <td style="font-weight:bold;width:15%;white-space:nowrap;">Sem:</td>
         <td style="width:15%;">{{ $sSem }}</td>
       </tr>
+      @if(!empty($installmentLabel))
+      <tr>
+        <td class="lb">Remarks</td>
+        <td colspan="3">{{ $installmentLabel }}</td>
+      </tr>
+      @endif
     </table>
   </td>
 </tr>

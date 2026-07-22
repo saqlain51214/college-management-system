@@ -10,7 +10,6 @@ use App\Models\AcademicYear;
 use App\Models\FeePayment;
 use App\Models\FeeStructure;
 use App\Models\Student;
-use App\Services\NotificationService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -142,8 +141,18 @@ class FeePaymentResource extends Resource
                     ->formatStateUsing(fn($state) => $state instanceof FeeTypeEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof FeeTypeEnum ? $state->color() : 'gray'),
                 Tables\Columns\TextColumn::make('semester_number')->label('Sem')->prefix('S')->placeholder('â€”'),
+                Tables\Columns\TextColumn::make('installment_no')
+                    ->label('Installment')
+                    ->formatStateUsing(fn (FeePayment $r) => 'S' . ($r->semester_number ?? '—') . ' · #' . $r->installment_no)
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('amount_due')->label('Due')->money('PKR')->sortable(),
                 Tables\Columns\TextColumn::make('amount_paid')->label('Paid')->money('PKR')->sortable(),
+                Tables\Columns\TextColumn::make('balance')
+                    ->label('Balance')
+                    ->state(fn (FeePayment $r) => $r->balance)
+                    ->money('PKR')
+                    ->color(fn (FeePayment $r) => $r->balance > 0 ? 'danger' : 'success')
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('payment_status')
                     ->badge()
                     ->formatStateUsing(fn($state) => $state instanceof PaymentStatusEnum ? $state->label() : $state)
@@ -166,6 +175,27 @@ class FeePaymentResource extends Resource
                         : $query),
                 Tables\Filters\SelectFilter::make('payment_status')->options(PaymentStatusEnum::options()),
                 Tables\Filters\SelectFilter::make('fee_type')->options(FeeTypeEnum::options()),
+                Tables\Filters\SelectFilter::make('academic_year_id')
+                    ->label('Academic Year')
+                    ->options(fn () => AcademicYear::selectOptions()),
+                Tables\Filters\SelectFilter::make('due_month')
+                    ->label('Month (Due Date)')
+                    ->options(function () {
+                        $months = [];
+                        $cursor = now()->startOfMonth();
+                        for ($i = 0; $i < 24; $i++) {
+                            $months[$cursor->format('Y-m')] = $cursor->format('F Y');
+                            $cursor->subMonth();
+                        }
+                        return $months;
+                    })
+                    ->query(function ($query, array $data) {
+                        if (blank($data['value'] ?? null)) {
+                            return $query;
+                        }
+                        [$year, $month] = explode('-', $data['value']);
+                        return $query->whereYear('due_date', $year)->whereMonth('due_date', $month);
+                    }),
                 Tables\Filters\Filter::make('has_proof')
                     ->label('Has Payment Proof')
                     ->query(fn($query) => $query->whereNotNull('payment_proof_path')),
@@ -211,18 +241,34 @@ class FeePaymentResource extends Resource
                     ->modalHeading('Mark as Paid')
                     ->modalDescription('This will mark the fee as paid and notify the student.')
                     ->visible(fn(FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid)
-                    ->action(function (FeePayment $r) {
-                        $r->markAsPaid(auth()->id());
-                        if ($r->student) {
-                            $feeType = $r->fee_type instanceof FeeTypeEnum ? $r->fee_type->label() : ($r->fee_type ?? 'Fee');
-                            app(NotificationService::class)->send($r->student, 'fee_payment_confirmed', [
-                                'student_name' => $r->student->name,
-                                'amount'       => number_format((float) $r->amount_due),
-                                'fee_type'     => $feeType,
-                                'payment_date' => now()->format('d M Y'),
-                            ]);
-                        }
-                    }),
+                    ->action(fn (FeePayment $r) => $r->markAsPaid(auth()->id())),
+
+                Tables\Actions\Action::make('confirmProofPayment')
+                    ->label('Confirm Payment')
+                    ->icon('heroicon-o-shield-check')
+                    ->color('success')
+                    ->iconButton()
+                    ->tooltip('Student claims this was paid — review and confirm')
+                    ->visible(fn (FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid && ! empty($r->payment_proof_path))
+                    ->form(fn (FeePayment $r) => [
+                        Forms\Components\Placeholder::make('claimed')
+                            ->label('Student Claims')
+                            ->content(fn () => 'Rs. ' . number_format((float) ($r->proof_claimed_amount ?? $r->amount_due))
+                                . ' on ' . ($r->proof_claimed_date?->format('d M Y') ?? '—')),
+                        Forms\Components\TextInput::make('payment_date')
+                            ->label('Payment Date')
+                            ->default(fn () => $r->proof_claimed_date?->toDateString() ?? now()->toDateString())
+                            ->required(),
+                        Forms\Components\Select::make('payment_method')
+                            ->label('Payment Method')
+                            ->options(PaymentMethodEnum::options())
+                            ->default(PaymentMethodEnum::BankDraft->value),
+                    ])
+                    ->action(fn (FeePayment $r, array $data) => $r->markAsPaid(
+                        auth()->id(),
+                        $data['payment_date'] ?? null,
+                        $data['payment_method'] ?? null,
+                    )),
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn(FeePayment $r) => ! $r->isLocked()),
                 Tables\Actions\ForceDeleteAction::make()
