@@ -163,6 +163,8 @@
                                 <label class="block text-sm font-medium text-ink">CNIC / B-Form <span class="text-red-600">*</span></label>
                                 <input type="text" name="cnic" required value="{{ old('cnic') }}"
                                        placeholder="xxxxx-xxxxxxx-x" inputmode="numeric"
+                                       pattern="^[0-9]{5}-?[0-9]{7}-?[0-9]{1}$"
+                                       title="CNIC / B-Form format: xxxxx-xxxxxxx-x (dashes optional)"
                                        class="mt-1.5 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:border-brand focus:ring-2 @error('cnic') border-red-400 @enderror">
                                 @error('cnic')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                             </div>
@@ -189,6 +191,8 @@
                                 <label class="block text-sm font-medium text-ink">Cell No. (Student) <span class="text-red-600">*</span></label>
                                 <input type="tel" name="student_phone" required value="{{ old('student_phone') }}"
                                        placeholder="03xx-xxxxxxx" autocomplete="tel"
+                                       pattern="^(?:\+92|0)?3[0-9]{2}-?[0-9]{3}-?[0-9]{4}$"
+                                       title="Pakistani mobile number, e.g. 03xx-xxxxxxx"
                                        class="mt-1.5 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:border-brand focus:ring-2 @error('student_phone') border-red-400 @enderror">
                                 @error('student_phone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                             </div>
@@ -211,7 +215,10 @@
                                 <label class="block text-sm font-medium text-ink">Father's Cell No.</label>
                                 <input type="tel" name="father_phone" value="{{ old('father_phone') }}"
                                        placeholder="03xx-xxxxxxx"
-                                       class="mt-1.5 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:border-brand focus:ring-2">
+                                       pattern="^(?:\+92|0)?3[0-9]{2}-?[0-9]{3}-?[0-9]{4}$"
+                                       title="Pakistani mobile number, e.g. 03xx-xxxxxxx"
+                                       class="mt-1.5 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:border-brand focus:ring-2 @error('father_phone') border-red-400 @enderror">
+                                @error('father_phone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                             </div>
                         </div>
 
@@ -225,7 +232,10 @@
                                 <label class="block text-sm font-medium text-ink">Guardian's Cell No.</label>
                                 <input type="tel" name="guardian_phone" value="{{ old('guardian_phone') }}"
                                        placeholder="03xx-xxxxxxx"
-                                       class="mt-1.5 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:border-brand focus:ring-2">
+                                       pattern="^(?:\+92|0)?3[0-9]{2}-?[0-9]{3}-?[0-9]{4}$"
+                                       title="Pakistani mobile number, e.g. 03xx-xxxxxxx"
+                                       class="mt-1.5 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm outline-none ring-brand/20 focus:border-brand focus:ring-2 @error('guardian_phone') border-red-400 @enderror">
+                                @error('guardian_phone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                             </div>
                         </div>
 

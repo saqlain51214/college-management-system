@@ -273,26 +273,33 @@ class PublicController extends Controller
 
     public function admissionInquiry(Request $request)
     {
+        // Phone/CNIC patterns are deliberately lenient (dashes optional, +92 or
+        // leading 0 both accepted) — matched by the same `pattern` attribute on
+        // the client-side inputs so a value the browser accepts never bounces
+        // back from the server.
+        $phoneRule = ['regex:/^(?:\+92|0)?3[0-9]{2}-?[0-9]{3}-?[0-9]{4}$/'];
+        $cnicRule  = ['regex:/^[0-9]{5}-?[0-9]{7}-?[0-9]{1}$/'];
+
         $validated = $request->validate([
             'semester'          => 'required|string',
             'program_type'      => 'nullable|string',
             'program_name'      => 'required|string',
             'name'              => 'required|string',
-            'cnic'              => 'required|string',
+            'cnic'              => array_merge(['required', 'string'], $cnicRule),
             'gender'            => 'required|string',
             'dob'               => 'required|string',
-            'student_phone'     => 'required|string',
+            'student_phone'     => array_merge(['required', 'string'], $phoneRule),
             'father_name'       => 'required|string',
             'father_occupation' => 'nullable|string',
-            'father_phone'      => 'nullable|string',
+            'father_phone'      => array_merge(['nullable', 'string'], $phoneRule),
             'guardian_name'     => 'nullable|string',
-            'guardian_phone'    => 'nullable|string',
+            'guardian_phone'    => array_merge(['nullable', 'string'], $phoneRule),
             'address'           => 'required|string',
             'district'          => 'required|string',
             'tehsil'            => 'nullable|string',
             'village'           => 'nullable|string',
             'post_office'       => 'nullable|string',
-            'email'             => 'required|string',
+            'email'             => 'required|email',
             'academic'          => 'nullable|array',
             'declare_true'      => 'required',
             'message'           => 'nullable|string',
@@ -304,6 +311,11 @@ class PublicController extends Controller
             'doc_migration'     => 'nullable|file|max:4096',
             'doc_bachelors'     => 'nullable|file|max:4096',
             'doc_mabs'          => 'nullable|file|max:4096',
+        ], [
+            'cnic.regex' => 'CNIC / B-Form format should be xxxxx-xxxxxxx-x (dashes optional).',
+            'student_phone.regex' => 'Cell number should be a Pakistani mobile, e.g. 03xx-xxxxxxx.',
+            'father_phone.regex' => 'Cell number should be a Pakistani mobile, e.g. 03xx-xxxxxxx.',
+            'guardian_phone.regex' => 'Cell number should be a Pakistani mobile, e.g. 03xx-xxxxxxx.',
         ]);
 
         $academicDetails = $validated['academic'] ?? [];

@@ -326,17 +326,15 @@ class DepartmentResource extends Resource
                     ->description(fn(Department $r) => $r->hod_designation ?? '')
                     ->toggleable(),
 
-                Tables\Columns\IconColumn::make('is_active')
+                Tables\Columns\ToggleColumn::make('is_active')
                     ->label('Active')
-                    ->boolean()
-                    ->trueColor('success')
-                    ->falseColor('danger'),
+                    ->onColor('success')
+                    ->offColor('danger'),
 
-                Tables\Columns\IconColumn::make('show_on_website')
+                Tables\Columns\ToggleColumn::make('show_on_website')
                     ->label('Website')
-                    ->boolean()
-                    ->trueColor('success')
-                    ->falseColor('danger')
+                    ->onColor('success')
+                    ->offColor('danger')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('sort_order')
@@ -366,16 +364,6 @@ class DepartmentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-
-                Tables\Actions\Action::make('toggleStatus')
-                    ->label(fn(Department $r) => $r->is_active ? 'Deactivate' : 'Activate')
-                    ->icon(fn(Department $r) => $r->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                    ->color(fn(Department $r) => $r->is_active ? 'danger' : 'success')
-                    ->iconButton()
-                    ->requiresConfirmation()
-                    ->modalHeading(fn(Department $r) => ($r->is_active ? 'Deactivate ' : 'Activate ') . $r->name)
-                    ->modalDescription('Are you sure you want to change the status of this department?')
-                    ->action(fn(Department $r) => $r->update(['is_active' => ! $r->is_active])),
 
                 Tables\Actions\DeleteAction::make()
                     ->modalDescription('Soft delete — record can be restored. Images are kept.'),

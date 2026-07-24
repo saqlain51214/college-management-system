@@ -342,17 +342,15 @@ class AcademicProgramResource extends Resource
                     ->suffix(' cr')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\IconColumn::make('is_active')
+                Tables\Columns\ToggleColumn::make('is_active')
                     ->label('Active')
-                    ->boolean()
-                    ->trueColor('success')
-                    ->falseColor('danger'),
+                    ->onColor('success')
+                    ->offColor('danger'),
 
-                Tables\Columns\IconColumn::make('show_on_website')
+                Tables\Columns\ToggleColumn::make('show_on_website')
                     ->label('Website')
-                    ->boolean()
-                    ->trueColor('success')
-                    ->falseColor('danger')
+                    ->onColor('success')
+                    ->offColor('danger')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -384,16 +382,6 @@ class AcademicProgramResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-
-                Tables\Actions\Action::make('toggleStatus')
-                    ->label(fn(AcademicProgram $r) => $r->is_active ? 'Deactivate' : 'Activate')
-                    ->icon(fn(AcademicProgram $r) => $r->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                    ->color(fn(AcademicProgram $r) => $r->is_active ? 'danger' : 'success')
-                    ->iconButton()
-                    ->requiresConfirmation()
-                    ->modalHeading(fn(AcademicProgram $r) => ($r->is_active ? 'Deactivate ' : 'Activate ') . $r->name)
-                    ->modalDescription('Are you sure you want to change this program\'s status?')
-                    ->action(fn(AcademicProgram $r) => $r->update(['is_active' => ! $r->is_active])),
 
                 Tables\Actions\DeleteAction::make()
                     ->modalDescription('Soft delete — record can be restored later.'),
