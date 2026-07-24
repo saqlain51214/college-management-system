@@ -337,7 +337,7 @@ class PublicController extends Controller
             'guardian_name'     => $validated['guardian_name'] ?? null,
             'guardian_phone'    => AdmissionValidation::normalizePhone($validated['guardian_phone'] ?? null),
             'email'             => $validated['email'],
-            'phone'             => AdmissionValidation::normalizePhone($validated['guardian_phone'] ?? null),
+            'phone'             => AdmissionValidation::normalizePhone($validated['guardian_phone'] ?? $validated['father_phone'] ?? $validated['student_phone']),
             'student_phone'     => AdmissionValidation::normalizePhone($validated['student_phone']),
             'cnic'              => $validated['cnic'],
             'dob'               => $validated['dob'],

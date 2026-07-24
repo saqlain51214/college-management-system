@@ -20,7 +20,11 @@ class Dashboard extends BaseDashboard
     {
         return array_values(array_filter(
             Filament::getWidgets(),
-            fn (string $widget): bool => ! in_array($widget, self::HIDDEN_WIDGETS, true),
+            // class_exists() guards against stale widget references left over from
+            // a partial deploy (e.g. FTP uploads never delete removed files, or a
+            // cached component/autoload list still names a class whose file was
+            // since deleted) — skip it instead of crashing the whole dashboard.
+            fn (string $widget): bool => class_exists($widget) && ! in_array($widget, self::HIDDEN_WIDGETS, true),
         ));
     }
 

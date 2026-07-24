@@ -4,12 +4,9 @@ namespace Database\Seeders;
 
 use App\Enums\AdmissionCategoryEnum;
 use App\Enums\AdmissionTypeEnum;
-use App\Enums\AttendanceStatusEnum;
-use App\Enums\BookStatusEnum;
 use App\Enums\DegreeTypeEnum;
 use App\Enums\DepartmentTypeEnum;
 use App\Enums\EmploymentTypeEnum;
-use App\Enums\ExamTypeEnum;
 use App\Enums\FeeTypeEnum;
 use App\Enums\GenderEnum;
 use App\Enums\PaymentMethodEnum;
@@ -22,28 +19,18 @@ use App\Enums\TeacherStatusEnum;
 use App\Models\AcademicProgram;
 use App\Models\AcademicYear;
 use App\Models\Announcement;
-use App\Models\AttendanceRecord;
-use App\Models\AttendanceSession;
-use App\Models\Book;
-use App\Models\BookIssue;
 use App\Models\Course;
 use App\Models\Department;
-use App\Models\Exam;
-use App\Models\ExamResult;
 use App\Models\FeePayment;
 use App\Models\FeeStructure;
-use App\Models\LmsAssignment;
-use App\Models\LmsMaterial;
 use App\Models\NewsArticle;
 use App\Models\Scholarship;
 use App\Models\ScholarshipAward;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Models\Teacher;
-use App\Models\Timetable;
 use App\Models\WebsiteEvent;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class MinimalCoreDataSeeder extends Seeder
 {
