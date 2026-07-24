@@ -4,8 +4,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    @php
+        $gtmId = \App\Models\CollegeSetting::get('google_tag_manager_id');
+        $gaId  = \App\Models\CollegeSetting::get('google_analytics_id');
+        $googleSiteVerification = \App\Models\CollegeSetting::get('seo_google_site_verification');
+        $seoMetaDescription = \App\Models\CollegeSetting::get('seo_meta_description', 'Jinnah Degree College Astore (JDCA) — Quality education in Gilgit-Baltistan, Pakistan.');
+    @endphp
+
+    {{-- Google Tag Manager --}}
+    @if($gtmId)
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ $gtmId }}');</script>
+    @endif
+
+    {{-- Google Analytics (GA4) — independent of Tag Manager, only loads if a Measurement ID is set --}}
+    @if($gaId)
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaId }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ $gaId }}');
+    </script>
+    @endif
+
     <title>@yield('title', 'Jinnah Degree College Astore') — JDCA</title>
-    <meta name="description" content="@yield('meta_description', 'Jinnah Degree College Astore (JDCA) — Quality education in Gilgit-Baltistan, Pakistan.')">
+    <meta name="description" content="@yield('meta_description', $seoMetaDescription)">
+    <link rel="canonical" href="{{ url()->current() }}">
+    @if($googleSiteVerification)
+    <meta name="google-site-verification" content="{{ $googleSiteVerification }}">
+    @endif
+
+    {{-- Open Graph / Twitter Card — social share previews --}}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ $college->college_name ?? 'Jinnah Degree College Astore' }}">
+    <meta property="og:title" content="@yield('title', 'Jinnah Degree College Astore') — JDCA">
+    <meta property="og:description" content="@yield('meta_description', $seoMetaDescription)">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @if(!empty($college->logo_url ?? null))
+    <meta property="og:image" content="{{ $college->logo_url }}">
+    @endif
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'Jinnah Degree College Astore') — JDCA">
+    <meta name="twitter:description" content="@yield('meta_description', $seoMetaDescription)">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Favicon: uploaded college logo when set, otherwise the bundled JDCA mark --}}
@@ -105,6 +150,11 @@
 </head>
 
 <body class="font-sans text-stone-800 antialiased overflow-x-hidden" style="background:var(--site-body-bg)">
+
+@if($gtmId)
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+@endif
 
 <a href="#main"
    class="absolute left-[-9999px] top-0 z-[300] whitespace-nowrap rounded-md bg-white px-4 py-2 text-sm font-semibold text-brand shadow-lg transition-none focus:left-4 focus:top-4 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand">Skip to main content</a>

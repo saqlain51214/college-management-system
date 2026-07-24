@@ -176,6 +176,38 @@ class AdmissionInquiryResource extends Resource
                         }),
                 ]),
 
+            // ── Row 4b: Uploaded documents ───────────────────────────────
+            Infolists\Components\Section::make('Uploaded Documents')
+                ->schema([
+                    Infolists\Components\TextEntry::make('documents')
+                        ->label('')
+                        ->columnSpanFull()
+                        ->html()
+                        ->state(function ($record): string {
+                            $documents = $record->documents;
+
+                            if (blank($documents) || !is_array($documents)) {
+                                return '<p class="text-sm text-gray-400 italic">No documents were uploaded with this application.</p>';
+                            }
+
+                            $html = '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+                            foreach ($documents as $doc) {
+                                $label = e($doc['label'] ?? 'Document');
+                                $path  = $doc['path'] ?? null;
+                                if (!$path) {
+                                    continue;
+                                }
+                                $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+                                $html .= '<a href="' . e($url) . '" target="_blank" rel="noopener" '
+                                    . 'style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:#f3f4f6;color:#374151;font-size:13px;font-weight:600;text-decoration:none;border:1px solid #e5e7eb;">'
+                                    . '📄 ' . $label . '</a>';
+                            }
+                            $html .= '</div>';
+
+                            return $html;
+                        }),
+                ]),
+
             // ── Row 5: Message & Notes ──────────────────────────────────
             Infolists\Components\Section::make('Message & Notes')
                 ->columns(2)

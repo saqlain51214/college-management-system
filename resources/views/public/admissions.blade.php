@@ -18,8 +18,6 @@
     </div>
 </div>
 
-<main id="main" tabindex="-1" class="site-main outline-none [&_h1]:font-display [&_h2]:font-display [&_h3]:font-sans [&_h4]:font-sans [&_h1]:tracking-tight [&_h2]:tracking-tight [&_h3]:tracking-tight [&_h4]:tracking-tight">
-
     {{-- Page hero --}}
     <section class="relative overflow-hidden bg-ink pt-28 pb-12 text-white sm:pt-32 sm:pb-14" aria-labelledby="page-title">
         <div class="absolute inset-0 bg-gradient-to-br from-brand/90 via-ink/95 to-ink"></div>
@@ -538,8 +536,6 @@
             </div>
         </div>
     </section>
-
-</main>
 
 @push('scripts')
 <script>

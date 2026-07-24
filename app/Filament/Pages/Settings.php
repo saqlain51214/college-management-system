@@ -336,6 +336,35 @@ class Settings extends Page implements HasForms
                             ->columnSpan(1),
                     ]),
 
+                Section::make('SEO & Analytics')
+                    ->icon('heroicon-o-chart-bar')
+                    ->description('Search engine visibility and visitor-tracking scripts for the public website.')
+                    ->columns(2)
+                    ->schema([
+                        Textarea::make('seo_meta_description')
+                            ->label('Default Meta Description')
+                            ->helperText('Shown in Google search results for pages that don\'t set their own description. Keep it under ~160 characters.')
+                            ->rows(2)
+                            ->columnSpanFull(),
+
+                        TextInput::make('seo_google_site_verification')
+                            ->label('Google Search Console Verification Code')
+                            ->helperText('The "content" value Google gives you when verifying site ownership — paste only the code, not the full HTML tag.')
+                            ->columnSpan(1),
+
+                        TextInput::make('google_tag_manager_id')
+                            ->label('Google Tag Manager ID')
+                            ->placeholder('GTM-XXXXXXX')
+                            ->helperText('Leave empty to disable Google Tag Manager.')
+                            ->columnSpan(1),
+
+                        TextInput::make('google_analytics_id')
+                            ->label('Google Analytics Measurement ID')
+                            ->placeholder('G-XXXXXXXXXX')
+                            ->helperText('GA4 Measurement ID. Leave empty to disable direct Google Analytics tracking (skip this if you already track via Tag Manager above).')
+                            ->columnSpan(1),
+                    ]),
+
                 Section::make('System Settings')
                     ->icon('heroicon-o-wrench-screwdriver')
                     ->columns(2)
@@ -457,6 +486,10 @@ class Settings extends Page implements HasForms
             'system_date_format'         => 'system',
             'system_currency'            => 'system',
             'system_language'            => 'system',
+            'seo_meta_description'              => 'seo',
+            'seo_google_site_verification'       => 'seo',
+            'google_tag_manager_id'              => 'seo',
+            'google_analytics_id'                => 'seo',
         ];
 
         foreach ($data as $key => $value) {

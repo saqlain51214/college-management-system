@@ -460,6 +460,18 @@ class StudentResource extends Resource
                     ->wrap()
                     ->description(fn(Student $r) => $r->father_name ? 'S/O ' . $r->father_name : null),
 
+                Tables\Columns\TextColumn::make('cnic')
+                    ->label('CNIC / B-Form')
+                    ->searchable()
+                    ->copyable()
+                    ->placeholder('—'),
+
+                Tables\Columns\TextColumn::make('department.name')
+                    ->label('Department')
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder('—'),
+
                 Tables\Columns\TextColumn::make('academicProgram.short_name')
                     ->label('Program')
                     ->badge()
@@ -523,7 +535,7 @@ class StudentResource extends Resource
                     ->label('Admitted')
                     ->date('M Y')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
