@@ -16,6 +16,7 @@ return [
         'admissions_per_minute' => (int) env('RATE_LIMIT_ADMISSIONS_PER_MINUTE', 40),
         'student_login_per_minute' => (int) env('RATE_LIMIT_STUDENT_LOGIN_PER_MINUTE', 5),
         'teacher_login_per_minute' => (int) env('RATE_LIMIT_TEACHER_LOGIN_PER_MINUTE', 5),
+        'fee_challan_per_minute' => (int) env('RATE_LIMIT_FEE_CHALLAN_PER_MINUTE', 10),
     ],
 
     'notifications' => [

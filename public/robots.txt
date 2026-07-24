@@ -1,2 +1,8 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /portal
+Disallow: /teacher
+Disallow: /fee-challan
+Disallow: /search
+
+Sitemap: /sitemap.xml

@@ -22,6 +22,7 @@ Route::get('/storage/{path}', function (string $path) {
 
 // ── Public website ──────────────────────────────────────────────────────
 Route::get('/',              [PublicController::class, 'home'])->name('home');
+Route::get('/sitemap.xml',   [PublicController::class, 'sitemap'])->name('sitemap');
 
 // About Us
 Route::get('/about',               [PublicController::class, 'about'])->name('about');

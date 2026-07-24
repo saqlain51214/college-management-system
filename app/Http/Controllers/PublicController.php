@@ -112,6 +112,46 @@ class PublicController extends Controller
         return $sections;
     }
 
+    /** XML sitemap for search engines — static pages + published news/events/departments. */
+    public function sitemap()
+    {
+        $urls = collect();
+
+        $static = [
+            ['route' => 'home', 'priority' => '1.0'],
+            ['route' => 'about', 'priority' => '0.8'],
+            ['route' => 'programs', 'priority' => '0.8'],
+            ['route' => 'departments', 'priority' => '0.7'],
+            ['route' => 'faculty', 'priority' => '0.6'],
+            ['route' => 'admissions', 'priority' => '0.9'],
+            ['route' => 'admissions.procedure', 'priority' => '0.6'],
+            ['route' => 'admissions.fee-structure', 'priority' => '0.6'],
+            ['route' => 'scholarships', 'priority' => '0.6'],
+            ['route' => 'contact', 'priority' => '0.5'],
+            ['route' => 'news', 'priority' => '0.7'],
+            ['route' => 'events', 'priority' => '0.6'],
+            ['route' => 'notices', 'priority' => '0.6'],
+            ['route' => 'gallery', 'priority' => '0.5'],
+            ['route' => 'downloads', 'priority' => '0.4'],
+            ['route' => 'course-outlines', 'priority' => '0.5'],
+        ];
+
+        foreach ($static as $s) {
+            if (\Illuminate\Support\Facades\Route::has($s['route'])) {
+                $urls->push(['loc' => route($s['route']), 'priority' => $s['priority'], 'lastmod' => null]);
+            }
+        }
+
+        NewsArticle::where('is_published', true)->latest('published_date')->limit(200)->get()
+            ->each(fn ($n) => $urls->push(['loc' => route('news.show', $n->slug), 'priority' => '0.6', 'lastmod' => $n->updated_at]));
+
+        Department::where('show_on_website', true)->where('is_active', true)->get()
+            ->each(fn ($d) => $urls->push(['loc' => route('departments.show', $d->slug), 'priority' => '0.6', 'lastmod' => $d->updated_at]));
+
+        return response()->view('sitemap', compact('urls'))
+            ->header('Content-Type', 'text/xml');
+    }
+
     public function home()
     {
         $college  = $this->college();
