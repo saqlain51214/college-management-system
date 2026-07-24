@@ -12,7 +12,7 @@ use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web:      __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -74,3 +74,15 @@ return Application::configure(basePath: dirname(__DIR__))
             );
         });
     })->create();
+
+// cPanel-style shared hosting: the web root (public_html) is a SEPARATE folder
+// from the app root, not the app's own `public/` subfolder — so Laravel must be
+// told the real served path, otherwise storage:link, asset(), and Vite would all
+// generate paths inside the (unserved) `public/` folder instead. Only kicks in
+// when that sibling folder actually exists, so local dev / other hosts are unaffected.
+$cpanelPublicPath = dirname(__DIR__) . '/../public_html';
+if (is_dir($cpanelPublicPath)) {
+    $app->usePublicPath(realpath($cpanelPublicPath));
+}
+
+return $app;
