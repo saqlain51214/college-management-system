@@ -3,6 +3,21 @@
 
 @section('content')
 
+{{-- Full-page loading overlay shown while the admission form submits (can take
+     a few seconds with document uploads) — prevents the user from thinking the
+     click didn't register and from double-submitting. --}}
+<div id="admissionSubmitOverlay"
+     class="fixed inset-0 z-[100] hidden items-center justify-center bg-white/70 backdrop-blur-sm">
+    <div class="flex flex-col items-center gap-4 rounded-2xl bg-white px-10 py-8 shadow-xl ring-1 ring-stone-200">
+        <svg class="h-10 w-10 animate-spin text-brand" viewBox="0 0 24 24" fill="none">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+        <p class="text-sm font-semibold text-ink">Submitting your application…</p>
+        <p class="text-xs text-stone-500">Please wait, this can take a few seconds.</p>
+    </div>
+</div>
+
 <main id="main" tabindex="-1" class="site-main outline-none [&_h1]:font-display [&_h2]:font-display [&_h3]:font-sans [&_h4]:font-sans [&_h1]:tracking-tight [&_h2]:tracking-tight [&_h3]:tracking-tight [&_h4]:tracking-tight">
 
     {{-- Page hero --}}
@@ -62,7 +77,7 @@
                 </div>
             @else
 
-            <form action="{{ route('admissions.inquiry') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+            <form id="admissionForm" action="{{ route('admissions.inquiry') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                 @csrf
 
                 {{-- ── Header: Semester + Program type ── --}}
@@ -478,9 +493,9 @@
                 {{-- ── Submit ── --}}
                 <div class="flex items-center justify-between border-t border-stone-200/80 pt-4">
                     <p class="text-xs text-stone-500">Fields marked <span class="text-red-600 font-bold">*</span> are required.</p>
-                    <button type="submit"
-                            class="site-brand-gradient rounded-lg px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2">
-                        Submit Application
+                    <button type="submit" id="admissionSubmitBtn"
+                            class="site-brand-gradient inline-flex items-center gap-2 rounded-lg px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70">
+                        <span>Submit Application</span>
                     </button>
                 </div>
             </form>
@@ -576,6 +591,19 @@
         if (sel) {
             sel.addEventListener('change', updateFields);
             updateFields(); // restore state for old() values after validation error
+        }
+
+        var form = document.getElementById('admissionForm');
+        var overlay = document.getElementById('admissionSubmitOverlay');
+        var submitBtn = document.getElementById('admissionSubmitBtn');
+        if (form && overlay && submitBtn) {
+            form.addEventListener('submit', function () {
+                if (!form.checkValidity()) return; // let the browser show validation errors first
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                submitBtn.disabled = true;
+                submitBtn.querySelector('span').textContent = 'Submitting…';
+            });
         }
     });
 })();
