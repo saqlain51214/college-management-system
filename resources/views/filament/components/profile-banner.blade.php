@@ -6,7 +6,7 @@
 
     $avatar = $user->avatar
         ? Storage::disk('public')->url($user->avatar)
-        : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&size=128&background=f59e0b&color=ffffff&bold=true&length=2';
+        : asset('images/avatar-placeholder.svg');
 @endphp
 
 <div style="

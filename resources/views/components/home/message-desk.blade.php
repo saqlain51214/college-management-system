@@ -16,8 +16,8 @@
 @if($leaders->isNotEmpty())
 <section class="relative overflow-hidden py-10 sm:py-14" style="background:var(--site-body-bg)">
     {{-- soft decorative accents --}}
-    <div class="pointer-events-none absolute right-[-10%] top-[-10%] h-96 w-96 rounded-full opacity-[0.04]" style="background:var(--site-brand)"></div>
-    <div class="pointer-events-none absolute left-[-10%] bottom-[-10%] h-96 w-96 rounded-full opacity-[0.05]" style="background:var(--site-gold)"></div>
+    <div class="pointer-events-none absolute right-[-10%] top-[-10%] h-96 w-96 rounded-full opacity-10 blur-3xl" style="background:var(--site-brand)"></div>
+    <div class="pointer-events-none absolute left-[-10%] bottom-[-10%] h-96 w-96 rounded-full opacity-10 blur-3xl" style="background:var(--site-gold)"></div>
 
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div class="mb-8 text-center" data-reveal>

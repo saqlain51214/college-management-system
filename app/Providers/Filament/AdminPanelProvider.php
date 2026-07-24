@@ -9,6 +9,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\Auth\EditProfile;
+use Filament\Enums\ThemeMode;
 use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
@@ -33,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->darkMode(true)
+            ->defaultThemeMode(ThemeMode::Dark)
             ->brandName(fn() => \App\Models\CollegeSetting::get('college_name', 'JDCA'))
             ->brandLogo(function () {
                 $logo = \App\Models\CollegeSetting::get('college_logo');

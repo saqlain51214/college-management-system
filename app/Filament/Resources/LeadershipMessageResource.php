@@ -64,7 +64,7 @@ class LeadershipMessageResource extends Resource
             ->reorderable('sort_order')
             ->columns([
                 Tables\Columns\ImageColumn::make('photo')->label('')->circular()->height(44)
-                    ->defaultImageUrl(fn () => null),
+                    ->defaultImageUrl(asset('images/avatar-placeholder.svg')),
                 Tables\Columns\TextColumn::make('name')->label('Name')->searchable()->sortable()->weight('bold'),
                 Tables\Columns\TextColumn::make('designation')->label('Designation')->searchable(),
                 Tables\Columns\TextColumn::make('organization')->label('Organization')->toggleable()->placeholder('—'),

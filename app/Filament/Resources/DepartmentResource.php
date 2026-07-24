@@ -303,7 +303,7 @@ class DepartmentResource extends Resource
                     ->disk('public')
                     ->circular()
                     ->size(40)
-                    ->defaultImageUrl('https://ui-avatars.com/api/?name=HOD&background=e2e8f0&color=64748b'),
+                    ->defaultImageUrl(asset('images/avatar-placeholder.svg')),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Department')

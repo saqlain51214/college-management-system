@@ -14,8 +14,8 @@
 
 <section class="relative overflow-hidden py-10 sm:py-12 site-brand-gradient">
     {{-- decorative accents --}}
-    <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full opacity-10" style="background:var(--site-gold)"></div>
-    <div class="pointer-events-none absolute -left-20 bottom-0 h-72 w-72 rounded-full opacity-[0.07] bg-white"></div>
+    <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full opacity-20 blur-3xl" style="background:var(--site-gold)"></div>
+    <div class="pointer-events-none absolute -left-20 bottom-0 h-72 w-72 rounded-full opacity-10 blur-3xl bg-white"></div>
 
     <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div class="mb-8 text-center" data-reveal>

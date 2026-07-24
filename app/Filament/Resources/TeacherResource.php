@@ -336,6 +336,7 @@ class TeacherResource extends Resource
                     ->circular()
                     ->width(40)
                     ->height(40)
+                    ->defaultImageUrl(asset('images/avatar-placeholder.svg'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('employee_id')
