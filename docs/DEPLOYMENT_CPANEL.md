@@ -50,32 +50,56 @@ Check first whether cPanel → **Domains** lets you set a custom **Document Root
 
 ---
 
-## 4. Get the code onto the server (via SSH)
+## 4. Get the code onto the server — via FileZilla (FTP)
+
+### 4a. Connect FileZilla
+
+Open FileZilla → **File → Site Manager → New Site**, fill in:
+
+| Field | Value |
+|---|---|
+| Protocol | `FTP - File Transfer Protocol` |
+| Host | `ftp.jinnahdegreecollegeastore.com` |
+| Port | `21` |
+| Encryption | `Require explicit FTP over TLS` (try this first — more secure; if it fails to connect, switch to `Use plain FTP`) |
+| Logon Type | `Normal` |
+| User | `jinnahde` |
+| Password | your cPanel password (rotate it after you're done, per the warning at the top) |
+
+Click **Connect**. The right-hand pane ("Remote site") shows your server's home folder — you should see `public_html/` there already.
+
+### 4b. Build the front-end assets locally first (shared hosting has no Node.js)
+
+On **your own computer**, in the project folder:
+
+```powershell
+npm ci
+npm run build
+```
+
+This creates/updates `public/build/` — you're uploading this pre-built folder, not building it on the server.
+
+### 4c. Create the app folder and upload
+
+1. In FileZilla's remote pane, right-click the home folder (`/home/jinnahde` — one level above `public_html`) → **Create directory** → name it `jdca_app`.
+2. In the **local pane** (left side), navigate to your project folder (e.g. `E:\Dashboard-J`).
+3. Select **everything except** these — do not upload them:
+   - `node_modules/` (huge, not needed on the server)
+   - `.git/` (not needed; keep your git history local/on GitHub instead)
+   - `.env` (you'll create a fresh one directly on the server in step 5 — never upload your local `.env`)
+   - `database/*.sqlite` (any local test databases)
+4. Drag the selected files/folders into `jdca_app/` on the right. This will take a while (thousands of small files) — FileZilla's transfer queue at the bottom shows progress. If it stalls, right-click the queue → **Process queue** to resume.
+5. Once done, you should have `/home/jinnahde/jdca_app/app`, `.../database`, `.../public`, etc.
+
+### 4d. Install PHP dependencies (needs SSH — Composer can't run over plain FTP)
 
 ```bash
 ssh jinnahde@jinnahdegreecollegeastore.com     # or the IP HosterPK gave you
-cd ~
-git clone https://github.com/<your-github-username>/college-management-system.git jdca_app
-cd jdca_app
-git checkout main
-```
-
-If `git` isn't available or GitHub access is blocked, use cPanel's **Git Version Control** feature instead (Setup a new repository, paste your GitHub URL), or upload a zip via **File Manager** and extract it into `~/jdca_app`.
-
-### Install PHP dependencies + build assets
-
-```bash
+cd ~/jdca_app
 composer install --no-dev --optimize-autoloader
 ```
 
-Front-end assets (`npm run build`) need Node, which shared hosting usually doesn't have. Build them **locally on your machine** first and commit `public/build/` (or upload it via FTP after building locally):
-
-```powershell
-# on your own computer, in the project folder
-npm ci
-npm run build
-# then upload the generated public/build/ folder to the server (FTP or git)
-```
+If Terminal/SSH isn't available on your plan, open a HosterPK support ticket asking them to run `composer install --no-dev` inside `~/jdca_app` for you, or to enable SSH access.
 
 ### Set the PHP version
 
@@ -163,11 +187,7 @@ Add this exactly as one Cron Job entry in cPanel (Common Settings: "Once Per Min
 Create a second, isolated copy so you can test changes before they reach the real site:
 
 1. cPanel → **Subdomains** → create `staging.jinnahdegreecollegeastore.com`, document root `/home/jinnahde/jdca_staging/public` (or the mirrored `public_html` fallback under a separate folder, same trick as step 1/4).
-2. Clone the code again into a **separate** folder:
-   ```bash
-   git clone https://github.com/<your-username>/college-management-system.git jdca_staging
-   cd jdca_staging && git checkout develop      # staging tracks the `develop` branch
-   ```
+2. Repeat step 4 (FileZilla upload) into a **new, separate** folder named `jdca_staging` instead of `jdca_app` — same exclude list (no `node_modules/`, `.git/`, `.env`). Then over SSH: `cd ~/jdca_staging && composer install --no-dev --optimize-autoloader`.
 3. Create a **separate MySQL database** for staging (repeat step 2 with a different DB name, e.g. `jinnahde_jdca_stg`) — never point staging at the real production database.
 4. Copy `.env.cpanel.example` → `.env` for staging too, but set:
    - `APP_ENV=staging`
@@ -183,12 +203,15 @@ Create a second, isolated copy so you can test changes before they reach the rea
 
 ## Quick reference — redeploying after a code change
 
+**Since you deployed via FileZilla (no git on the server):** for each changed file, re-run `npm run build` locally if you touched front-end assets, then in FileZilla drag just the **changed files/folders** (e.g. the specific `app/...` file, or the whole `public/build/` folder) over the existing ones in `jdca_app/` on the server — FileZilla will ask to overwrite, confirm yes. Then re-run the artisan commands over SSH:
+
 ```bash
 ssh jinnahde@jinnahdegreecollegeastore.com
 cd ~/jdca_app
-git pull origin main
-composer install --no-dev --optimize-autoloader
 php artisan migrate --force
-php artisan config:cache && php artisan route:cache && php artisan view:cache
+php artisan config:clear && php artisan config:cache
+php artisan route:clear && php artisan route:cache
+php artisan view:clear && php artisan view:cache
 ```
-(Re-upload `public/build/` too, if front-end assets changed — see step 4.)
+
+(If you later switch to git-based deploys instead of FileZilla, replace the FileZilla step with `git pull origin main && composer install --no-dev --optimize-autoloader`.)
