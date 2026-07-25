@@ -30,20 +30,22 @@ class Student extends Model implements AuthenticatableContract
         'photo', 'batch_year', 'current_semester', 'section',
         'admission_date', 'admission_type', 'previous_qualification',
         'previous_marks', 'previous_board', 'previous_year',
+        'scholarship_type', 'scholarship_value',
         'status', 'disability', 'is_hosteler', 'is_active', 'remarks',
         'portal_password',
     ];
 
     protected $casts = [
-        'date_of_birth'  => 'date',
-        'admission_date' => 'date',
-        'status'         => StudentStatusEnum::class,
-        'gender'         => GenderEnum::class,
-        'blood_group'    => BloodGroupEnum::class,
-        'admission_type' => AdmissionTypeEnum::class,
-        'is_hosteler'    => 'boolean',
-        'is_active'      => 'boolean',
-        'previous_marks' => 'decimal:2',
+        'date_of_birth'     => 'date',
+        'admission_date'    => 'date',
+        'status'            => StudentStatusEnum::class,
+        'gender'            => GenderEnum::class,
+        'blood_group'       => BloodGroupEnum::class,
+        'admission_type'    => AdmissionTypeEnum::class,
+        'is_hosteler'       => 'boolean',
+        'is_active'         => 'boolean',
+        'previous_marks'    => 'decimal:2',
+        'scholarship_value' => 'decimal:2',
     ];
 
     protected $hidden = ['portal_password', 'remember_token'];
@@ -76,6 +78,41 @@ class Student extends Model implements AuthenticatableContract
         return Attribute::get(
             fn() => $this->date_of_birth ? $this->date_of_birth->age : null
         );
+    }
+
+    /**
+     * Apply this student's scholarship (if any) to a base fee amount, returning
+     * what they actually owe. Used everywhere a fee total is calculated — bulk
+     * billing, individual slip generation, and the ledger — so a scholarship
+     * only ever needs to be set in one place (here) to take effect everywhere.
+     */
+    public function applyScholarship(float $baseFee): float
+    {
+        if (blank($this->scholarship_type) || blank($this->scholarship_value)) {
+            return $baseFee;
+        }
+
+        $discount = $this->scholarship_type === 'percentage'
+            ? $baseFee * ((float) $this->scholarship_value / 100)
+            : (float) $this->scholarship_value;
+
+        return max(0, round($baseFee - $discount, 2));
+    }
+
+    public function getHasScholarshipAttribute(): bool
+    {
+        return filled($this->scholarship_type) && filled($this->scholarship_value);
+    }
+
+    public function getScholarshipLabelAttribute(): ?string
+    {
+        if (! $this->has_scholarship) {
+            return null;
+        }
+
+        return $this->scholarship_type === 'percentage'
+            ? number_format((float) $this->scholarship_value, 0) . '% scholarship'
+            : 'Rs. ' . number_format((float) $this->scholarship_value) . ' scholarship';
     }
 
     protected function portalPassword(): Attribute

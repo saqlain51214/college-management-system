@@ -49,9 +49,15 @@ class AdminPanelProvider extends PanelProvider
                 'gray'    => Color::Slate,
             ])
             ->maxContentWidth(MaxWidth::Full)
+            ->sidebarWidth('15rem')
             ->renderHook(
                 'panels::head.end',
-                fn (): string => '<style>.jdca-review-row, .jdca-review-row td { background-color: rgba(251, 191, 36, 0.14) !important; }</style>',
+                fn (): string => '<style>
+                    .jdca-review-row, .jdca-review-row td { background-color: rgba(251, 191, 36, 0.14) !important; }
+                    /* Give tables the full content width to shrink before falling back to horizontal scroll */
+                    .fi-ta-content { width: 100%; }
+                    .fi-ta-table { width: 100%; table-layout: auto; }
+                </style>',
             )
             ->plugins([
                 FilamentShieldPlugin::make()

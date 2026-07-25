@@ -11,7 +11,7 @@ class FeeReports extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $navigationGroup = 'Fees & Billing';
 
     protected static ?string $navigationLabel = 'Fee Reports';
 

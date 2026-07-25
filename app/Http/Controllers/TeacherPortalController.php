@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\Teacher;
+use App\Models\TeacherSalaryPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -28,6 +29,23 @@ class TeacherPortalController extends Controller
             ->get();
 
         return view('teacher.dashboard', compact('teacher', 'notices'));
+    }
+
+    public function salary()
+    {
+        $teacher = $this->teacher();
+
+        $payments = TeacherSalaryPayment::where('teacher_id', $teacher->id)
+            ->orderByDesc('year')
+            ->orderByDesc('month')
+            ->get();
+
+        $summary = [
+            'total_paid'    => (float) $payments->where('payment_status', 'paid')->sum('amount_paid'),
+            'total_pending' => (float) $payments->where('payment_status', '!=', 'paid')->sum('net_amount'),
+        ];
+
+        return view('teacher.salary', compact('teacher', 'payments', 'summary'));
     }
 
     public function notices()

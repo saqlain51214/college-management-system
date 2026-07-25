@@ -20,7 +20,7 @@ class ScholarshipAwardResource extends Resource
     protected static ?string $model = ScholarshipAward::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-trophy';
-    protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $navigationGroup = 'Scholarships';
     protected static ?string $navigationLabel = 'Scholarship Awards';
     protected static ?int    $navigationSort  = 6;
 

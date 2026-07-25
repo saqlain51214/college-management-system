@@ -201,13 +201,15 @@ class FeePayment extends Model
 
     protected static function resolveFeeStructureTotal(Student $student, string $feeType, ?int $semester, ?int $academicYearId): float
     {
-        return (float) FeeStructure::query()
+        $baseTotal = (float) FeeStructure::query()
             ->where('is_active', true)
             ->where('fee_type', $feeType)
             ->where(fn ($q) => $q->whereNull('academic_program_id')->orWhere('academic_program_id', $student->academic_program_id))
             ->where(fn ($q) => $q->whereNull('academic_year_id')->orWhere('academic_year_id', $academicYearId))
             ->where(fn ($q) => $q->whereNull('semester_number')->orWhere('semester_number', $semester))
             ->sum('amount');
+
+        return $student->applyScholarship($baseTotal);
     }
 
     protected static function resolveFeeStructure(Student $student, string $feeType, ?int $semester, ?int $academicYearId): ?FeeStructure

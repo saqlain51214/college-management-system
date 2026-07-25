@@ -14,7 +14,7 @@ class NotificationTemplateResource extends Resource
 {
     protected static ?string $model = NotificationTemplate::class;
     protected static ?string $navigationIcon  = 'heroicon-o-envelope';
-    protected static ?string $navigationGroup = 'System';
+    protected static ?string $navigationGroup = 'Communications';
     protected static ?string $navigationLabel = 'Email Templates';
     protected static ?int    $navigationSort  = 20;
 

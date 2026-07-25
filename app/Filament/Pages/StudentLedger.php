@@ -14,7 +14,7 @@ class StudentLedger extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-identification';
 
-    protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $navigationGroup = 'Fees & Billing';
 
     protected static ?string $navigationLabel = 'Student Account';
 
@@ -98,6 +98,7 @@ class StudentLedger extends Page
             'phone'       => $student->phone,
             'gender'      => $student->gender instanceof \BackedEnum ? $student->gender->value : $student->gender,
             'active'      => (bool) $student->is_active,
+            'scholarship' => $student->scholarship_label,
         ];
 
         // Default the slip form to the student's current semester/enrollment year.

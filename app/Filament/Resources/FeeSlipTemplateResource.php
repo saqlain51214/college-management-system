@@ -15,7 +15,7 @@ class FeeSlipTemplateResource extends Resource
     protected static ?string $model = FeeSlipTemplate::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-document-text';
-    protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $navigationGroup = 'Fees & Billing';
     protected static ?string $navigationLabel = 'Fee Slip Templates';
     protected static ?int    $navigationSort  = 10;
 

@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JDCA Admin — Structure &amp; Fee Flow Mockup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --paper: #EFE9DC;
+    --paper-raised: #F7F3E9;
+    --ink: #211318;
+    --ink-soft: #4A3A40;
+    --brand: #6E2E3A;
+    --brand-dark: #4B1F28;
+    --gold: #A9803C;
+    --gold-soft: #C9A876;
+    --line: #D9CFBB;
+    --line-soft: #E4DCC9;
+    --good: #3F6B4A;
+    --good-bg: #E1EBE2;
+    --warn: #9C6B1F;
+    --warn-bg: #F1E5CC;
+    --bad: #8A2F2F;
+    --bad-bg: #F1DEDC;
+    --shadow: 0 1px 2px rgba(33,19,24,0.06), 0 8px 24px -12px rgba(33,19,24,0.18);
+    --radius: 10px;
+    --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", "URW Palladio", "Times New Roman", serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SF Mono", "Cascadia Code", Consolas, "Roboto Mono", monospace;
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #1B1013;
+    --paper-raised: #241519;
+    --ink: #F1E7E3;
+    --ink-soft: #C9B7BC;
+    --brand: #D98A9B;
+    --brand-dark: #B96477;
+    --gold: #D8B36E;
+    --gold-soft: #A98A54;
+    --line: #3A2A2F;
+    --line-soft: #2E2024;
+    --good: #7FBD8C;
+    --good-bg: #1E2C20;
+    --warn: #D9A94A;
+    --warn-bg: #2E2610;
+    --bad: #E08A8A;
+    --bad-bg: #301C1C;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 28px -14px rgba(0,0,0,0.6);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1B1013;
+      --paper-raised: #241519;
+      --ink: #F1E7E3;
+      --ink-soft: #C9B7BC;
+      --brand: #D98A9B;
+      --brand-dark: #B96477;
+      --gold: #D8B36E;
+      --gold-soft: #A98A54;
+      --line: #3A2A2F;
+      --line-soft: #2E2024;
+      --good: #7FBD8C;
+      --good-bg: #1E2C20;
+      --warn: #D9A94A;
+      --warn-bg: #2E2610;
+      --bad: #E08A8A;
+      --bad-bg: #301C1C;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--brand); }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+  }
+
+  /* ── Masthead ─────────────────────────────────────────────────────── */
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 36px;
+    margin-bottom: 44px;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(28px, 4vw, 40px);
+    margin: 0;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  .masthead p {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+  }
+
+  section.block { margin-bottom: 72px; }
+  .block-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .block-head h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 26px;
+    margin: 0;
+  }
+  .block-sub {
+    color: var(--ink-soft);
+    font-size: 14px;
+    max-width: 60ch;
+    margin: 0 0 28px;
+  }
+
+  /* ── Part 1: module map ──────────────────────────────────────────── */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .module-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 20px 18px;
+    position: relative;
+  }
+  .module-card.system-tier { border-style: dashed; }
+
+  .module-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .module-icon {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--brand) 12%, transparent);
+    color: var(--brand);
+  }
+  .module-icon svg { width: 18px; height: 18px; }
+  .module-title-group { flex: 1; min-width: 0; }
+  .module-title {
+    font-weight: 650;
+    font-size: 15.5px;
+    margin: 0 0 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .module-purpose {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin: 0;
+  }
+
+  .info-dot {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-soft);
+    color: var(--gold);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: help;
+    position: relative;
+  }
+  .info-dot .tip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 230px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 1.45;
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: 0 12px 24px -8px rgba(0,0,0,0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+    z-index: 5;
+    pointer-events: none;
+  }
+  :root[data-theme="dark"] .info-dot .tip { background: var(--gold); color: var(--ink); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .info-dot .tip { background: var(--gold); color: var(--ink); }
+  }
+  .info-dot:hover .tip, .info-dot:focus-visible .tip { opacity: 1; visibility: visible; }
+
+  .module-items {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 12px 0 0;
+    border-top: 1px dashed var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .module-items li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .module-items li::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold-soft);
+    flex: none;
+  }
+  .item-key {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    background: var(--line-soft);
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+  }
+
+  .module-card.merge-note {
+    background: transparent;
+    border: 1px dashed var(--bad);
+    box-shadow: none;
+  }
+  .merge-note .module-purpose { color: var(--bad); }
+
+  /* ── Part 2: flow ─────────────────────────────────────────────────── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .flow-step {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 20px;
+    position: relative;
+    padding-bottom: 34px;
+  }
+  .flow-step:last-child { padding-bottom: 0; }
+  .flow-rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .flow-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: var(--paper-raised);
+    font-family: var(--font-display);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-shadow: var(--shadow);
+  }
+  .flow-line {
+    flex: 1;
+    width: 2px;
+    background: var(--line);
+    margin-top: 6px;
+  }
+  .flow-step:last-child .flow-line { display: none; }
+
+  .flow-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 22px;
+  }
+  .flow-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .flow-icon {
+    width: 26px; height: 26px;
+    color: var(--brand);
+    flex: none;
+  }
+  .flow-icon svg { width: 100%; height: 100%; }
+  .flow-title {
+    font-weight: 650;
+    font-size: 16px;
+    margin: 0;
+  }
+  .flow-tag {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .flow-tag.bulk { background: var(--warn-bg); color: var(--warn); }
+  .flow-tag.individual { background: var(--good-bg); color: var(--good); }
+  .flow-tag.auto { background: color-mix(in srgb, var(--gold) 18%, transparent); color: var(--gold); }
+
+  .flow-desc {
+    margin: 0 0 10px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    max-width: 68ch;
+  }
+
+  .flow-detail {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    background: color-mix(in srgb, var(--gold) 8%, transparent);
+    border-left: 2px solid var(--gold-soft);
+    padding: 9px 12px;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+  }
+  .flow-detail .info-dot { margin-top: 2px; }
+  .flow-detail p { margin: 0; color: var(--ink); }
+
+  .calc-strip {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .calc-strip span { color: var(--ink-soft); }
+  .calc-strip b { color: var(--ink); font-weight: 650; }
+  .calc-strip .result b { color: var(--brand); }
+
+  footer.note {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <span class="eyebrow">JDCA Admin Panel — Working Draft</span>
+    <h1>Module structure &amp; the student fee flow</h1>
+    <p>A mockup for discussion, not the live interface. Left: how the sidebar's modules regroup so related tools sit together. Right: what actually happens, step by step, from adding a student to a paid installment landing in the ledger.</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PART 1 — MODULE STRUCTURE                                    -->
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="block-head">
+      <h2>Redesigned sidebar structure</h2>
+    </div>
+    <p class="block-sub">Today, <b>Finance</b> holds eight unrelated screens in one bucket. Below, it splits into three — Fees, Scholarships, Payroll — so each group answers one question at a glance. Hover the <span class="info-dot" tabindex="0">i<span class="tip">These info dots explain the reasoning — they're part of this mockup, not the real app.</span></span> marks for the reasoning behind each group.</p>
+
+    <div class="module-grid">
+
+      <div class="module-card">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">College Setup</p>
+            <p class="module-purpose">What departments and programmes exist</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Departments <span class="item-key">departments</span></li>
+          <li>Academic Programs <span class="item-key">academic-programs</span></li>
+          <li>Course Outlines <span class="item-key">course-outlines</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-4.13a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">Students &amp; Admissions</p>
+            <p class="module-purpose">From applicant to enrolled record</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Admission Inquiries <span class="item-key">admissions</span></li>
+          <li>Students <span class="item-key">students</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v7m-8-4.5V17c0 1.1 3.6 2 8 2s8-.9 8-2v-4.5"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">Faculty &amp; Staff</p>
+            <p class="module-purpose">Employee profiles and portal access</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Teachers <span class="item-key">teachers</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H7"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">Fees &amp; Billing
+              <span class="info-dot" tabindex="0">i<span class="tip">Was mixed into "Finance" with scholarships and payroll. Now it's just: what's owed, what's been billed, what's been paid.</span></span>
+            </p>
+            <p class="module-purpose">What a student owes and has paid</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Fee Structures <span class="item-key">fee-structures</span></li>
+          <li>Fee Payments <span class="item-key">fee-payments</span></li>
+          <li>Student Ledger <span class="item-key">student-ledger</span></li>
+          <li>Fee Slip Templates <span class="item-key">slip-templates</span></li>
+          <li>Fee Reports <span class="item-key">fee-reports</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6M12 3v13m0 0l-4-4m4 4l4-4M4 12l1.5-6h13L20 12"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">Scholarships
+              <span class="info-dot" tabindex="0">i<span class="tip">Split out of Finance so aid programmes and who received them read as their own subject, not a fee sub-topic.</span></span>
+            </p>
+            <p class="module-purpose">Aid programmes and who's been awarded them</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Scholarships <span class="item-key">scholarships</span></li>
+          <li>Scholarship Awards <span class="item-key">scholarship-awards</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><path stroke-linecap="round" d="M3 10h18M8 15h3"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">Payroll
+              <span class="info-dot" tabindex="0">i<span class="tip">Teacher salaries have nothing to do with student fees beyond sharing the word "money" — its own group avoids confusing the two.</span></span>
+            </p>
+            <p class="module-purpose">Monthly staff compensation</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Teacher Salaries <span class="item-key">teacher-salaries</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M8 12h8M12 8v8"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">Website Content</p>
+            <p class="module-purpose">Everything visitors see on the public site</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Home Sections <span class="item-key">home-sections</span></li>
+          <li>News Articles <span class="item-key">news</span></li>
+          <li>Website Events <span class="item-key">events</span></li>
+          <li>Announcements <span class="item-key">announcements</span></li>
+          <li>Downloads <span class="item-key">downloads</span></li>
+          <li>Leadership Messages <span class="item-key">leadership</span></li>
+          <li>Website Pages <span class="item-key">pages</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9 6 9-6M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">Communications
+              <span class="info-dot" tabindex="0">i<span class="tip">Contact form submissions and the wording of outbound emails both live here — anything about talking to people, in or out.</span></span>
+            </p>
+            <p class="module-purpose">Inbound messages, outbound wording</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Contact Messages <span class="item-key">contact</span></li>
+          <li>Email Templates <span class="item-key">notification-templates</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card system-tier">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1.04 1.56V21a2 2 0 01-4 0v-.09A1.7 1.7 0 008.9 19.4a1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.7 1.7 0 004.6 15a1.7 1.7 0 00-1.56-1.04H3a2 2 0 010-4h.09A1.7 1.7 0 004.6 8.9a1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06A1.7 1.7 0 008.9 4.6a1.7 1.7 0 001.04-1.56V3a2 2 0 014 0v.09c.03.7.44 1.32 1.04 1.56.63.26 1.35.12 1.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06c-.46.52-.6 1.24-.34 1.87.24.6.86 1.01 1.56 1.04H21a2 2 0 010 4h-.09c-.7.03-1.32.44-1.56 1.04z"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">System</p>
+            <p class="module-purpose">Access control and configuration</p>
+          </div>
+        </div>
+        <ul class="module-items">
+          <li>Roles &amp; Permissions <span class="item-key">roles</span></li>
+          <li>Activity Log <span class="item-key">activity-log</span></li>
+          <li>List Items <span class="item-key">list-items</span></li>
+          <li>Settings <span class="item-key">settings</span></li>
+        </ul>
+      </div>
+
+      <div class="module-card merge-note">
+        <div class="module-top">
+          <span class="module-icon" aria-hidden="true" style="background:transparent;color:var(--bad)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          </span>
+          <div class="module-title-group">
+            <p class="module-title">Before: "Finance"</p>
+            <p class="module-purpose">Fee Payments · Fee Slip Templates · Fee Structures · Scholarship Awards · Scholarships · Teacher Salaries · Fee Reports · Student Ledger — eight screens, three unrelated subjects</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PART 2 — STUDENT / SCHOLARSHIP / FEE FLOW                    -->
+  <!-- ============================================================ -->
+  <section class="block">
+    <div class="block-head">
+      <h2>Student → scholarship → fee slip → installment</h2>
+    </div>
+    <p class="block-sub">The full path from a new admission to a payment landing in the ledger. <span class="flow-tag bulk">bulk</span> steps run once for many students; <span class="flow-tag individual">individual</span> steps run per student; <span class="flow-tag auto">auto</span> means the system computes it — nobody has to.</p>
+
+    <div class="flow">
+
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-num">1</div><div class="flow-line"></div></div>
+        <div class="flow-card">
+          <div class="flow-title-row">
+            <span class="flow-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM19 8v6M22 11h-6"/></svg></span>
+            <p class="flow-title">Add the student</p>
+          </div>
+          <p class="flow-desc">Admin creates the record — programme, semester, contact details. If this student has financial aid, it's set right here: <b>Scholarship: None / Percentage / Fixed amount</b>.</p>
+          <div class="flow-detail">
+            <span class="info-dot" tabindex="0">i<span class="tip">A formal Scholarship Award (with an approval date) can also feed this field automatically — the student record stays the single source of truth either way.</span></span>
+            <p>Nothing downstream needs to know <em>why</em> the discount exists — only that it does.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-num">2</div><div class="flow-line"></div></div>
+        <div class="flow-card">
+          <div class="flow-title-row">
+            <span class="flow-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
+            <p class="flow-title">Adjusted total is computed</p>
+            <span class="flow-tag auto">auto</span>
+          </div>
+          <p class="flow-desc">Every screen that shows this student's fees — ledger, portal, slip generation — reads the <em>adjusted</em> total, not the department's flat rate.</p>
+          <div class="calc-strip">
+            <span>Fee Structure <b>Rs. 28,000</b></span>
+            <span>Scholarship (50%) <b>− Rs. 14,000</b></span>
+            <span class="result">Owed by this student <b>Rs. 14,000</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-num">3</div><div class="flow-line"></div></div>
+        <div class="flow-card">
+          <div class="flow-title-row">
+            <span class="flow-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg></span>
+            <p class="flow-title">Generate a fee slip</p>
+          </div>
+          <p class="flow-desc">Two ways to create one — same rule underneath: no slip, or combination of slips, can ever exceed what's actually owed.</p>
+          <div class="flow-detail">
+            <span class="flow-tag bulk">bulk</span>
+            <p><b>Whole department, term starts:</b> one click bills every active student — but scholarship students are skipped automatically, so they're never billed the flat rate by mistake.</p>
+          </div>
+          <div class="flow-detail" style="margin-top:8px">
+            <span class="flow-tag individual">individual</span>
+            <p><b>One student, any time:</b> admin or the student themself picks an amount — up to 3 unpaid instalments at once, each with its own due date.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-num">4</div><div class="flow-line"></div></div>
+        <div class="flow-card">
+          <div class="flow-title-row">
+            <span class="flow-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16l-4 4V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2H7z"/></svg></span>
+            <p class="flow-title">Student pays &amp; uploads proof</p>
+          </div>
+          <p class="flow-desc">Student downloads the slip, deposits at the bank, then uploads the receipt with the amount and date they paid. Status: <b style="color:var(--warn)">Verification Pending</b> — not yet counted as paid.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-num">5</div><div class="flow-line"></div></div>
+        <div class="flow-card">
+          <div class="flow-title-row">
+            <span class="flow-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></span>
+            <p class="flow-title">Admin confirms the payment</p>
+          </div>
+          <p class="flow-desc">Admin checks the proof against the deposit, then confirms — this is the only action that moves a slip to <b style="color:var(--good)">Paid</b>. A student's own claim never does it alone.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-num">6</div></div>
+        <div class="flow-card">
+          <div class="flow-title-row">
+            <span class="flow-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m6 10v-4M4 21h16a1 1 0 001-1V4a1 1 0 00-1-1H4a1 1 0 00-1 1v16a1 1 0 001 1z"/></svg></span>
+            <p class="flow-title">Ledger &amp; history</p>
+            <span class="flow-tag auto">auto</span>
+          </div>
+          <p class="flow-desc">Every instalment for this student sits in one place — Student Ledger — with its number, dates, and status. Anything still unpaid past its due date starts accruing a late fee automatically, without anyone triggering it.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="note">
+    Working draft for review — nothing on this page is live data. Once the module grouping and flow are agreed, they get built into the actual admin panel.
+  </footer>
+
+</div>
+</body>
+</html>

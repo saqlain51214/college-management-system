@@ -22,7 +22,7 @@ class FeePaymentResource extends Resource
     protected static ?string $model = FeePayment::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-credit-card';
-    protected static ?string $navigationGroup = 'Finance';
+    protected static ?string $navigationGroup = 'Fees & Billing';
     protected static ?string $navigationLabel = 'Fee Payments';
     protected static ?int    $navigationSort  = 4;
 

@@ -37,9 +37,16 @@
                     <h2 class="text-lg font-bold text-gray-900 dark:text-gray-50">{{ $student['name'] }}</h2>
                     <p class="text-sm text-gray-500">S/D of {{ $student['father'] ?: '—' }}</p>
                 </div>
-                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $student['active'] ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600' }}">
-                    {{ $student['active'] ? 'Active' : 'Inactive' }}
-                </span>
+                <div class="flex flex-wrap items-center gap-2">
+                    @if($student['scholarship'])
+                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                            🎓 {{ $student['scholarship'] }}
+                        </span>
+                    @endif
+                    <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $student['active'] ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600' }}">
+                        {{ $student['active'] ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3 lg:grid-cols-4">
                 @foreach ([

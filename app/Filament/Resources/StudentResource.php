@@ -305,6 +305,31 @@ class StudentResource extends Resource
                                         ->default(now()),
                                 ]),
 
+                            Forms\Components\Section::make('Scholarship')
+                                ->description('If this student receives financial aid, set it here — every fee slip generated for them (bulk or individual) automatically applies this discount. Leave both fields empty for no scholarship.')
+                                ->columns(2)
+                                ->schema([
+                                    Forms\Components\Select::make('scholarship_type')
+                                        ->label('Scholarship Type')
+                                        ->options([
+                                            'percentage' => 'Percentage off',
+                                            'fixed'      => 'Fixed amount off',
+                                        ])
+                                        ->placeholder('No scholarship')
+                                        ->live(),
+
+                                    Forms\Components\TextInput::make('scholarship_value')
+                                        ->label(fn (Forms\Get $get) => $get('scholarship_type') === 'fixed' ? 'Amount Off (Rs.)' : 'Percentage Off (%)')
+                                        ->numeric()
+                                        ->minValue(0)
+                                        ->maxValue(fn (Forms\Get $get) => $get('scholarship_type') === 'percentage' ? 100 : null)
+                                        ->visible(fn (Forms\Get $get) => filled($get('scholarship_type')))
+                                        ->required(fn (Forms\Get $get) => filled($get('scholarship_type')))
+                                        ->helperText(fn (Forms\Get $get) => $get('scholarship_type') === 'percentage'
+                                            ? 'e.g. 50 for 50% off every fee slip.'
+                                            : 'e.g. 5000 for Rs. 5,000 off every fee slip.'),
+                                ]),
+
                             Forms\Components\Section::make('Admission Type & Status')
                                 ->columns(2)
                                 ->schema([
@@ -501,6 +526,13 @@ class StudentResource extends Resource
                     ->formatStateUsing(fn($state) => $state instanceof StudentStatusEnum ? $state->label() : $state)
                     ->badge()
                     ->color(fn($state) => $state instanceof StudentStatusEnum ? $state->color() : 'gray'),
+
+                Tables\Columns\TextColumn::make('scholarship_label')
+                    ->label('Scholarship')
+                    ->badge()
+                    ->color('success')
+                    ->placeholder('—')
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('review_flag')
                     ->label('Review')

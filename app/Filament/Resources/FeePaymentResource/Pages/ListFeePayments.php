@@ -72,6 +72,7 @@ class ListFeePayments extends ListRecords
 
                     $created = 0;
                     $skipped = 0;
+                    $adjusted = 0;
 
                     foreach ($students as $student) {
                         $exists = FeePayment::where('student_id', $student->id)
@@ -85,11 +86,20 @@ class ListFeePayments extends ListRecords
                             continue;
                         }
 
+                        // Scholarship students never get billed the flat department rate —
+                        // their amount is reduced automatically from the one scholarship
+                        // field on their profile, so nobody has to remember to handle them
+                        // separately.
+                        $amountDue = $student->applyScholarship((float) $data['amount_due']);
+                        if ($amountDue < (float) $data['amount_due']) {
+                            $adjusted++;
+                        }
+
                         FeePayment::create([
                             'student_id'       => $student->id,
                             'challan_number'   => 'CHN-' . strtoupper(Str::random(8)),
                             'fee_type'         => $data['fee_type'],
-                            'amount_due'       => $data['amount_due'],
+                            'amount_due'       => $amountDue,
                             'fine_amount'      => 0,
                             'discount_amount'  => 0,
                             'amount_paid'      => 0,
@@ -102,9 +112,15 @@ class ListFeePayments extends ListRecords
                         $created++;
                     }
 
-                    Notification::make()
-                        ->title("Generated {$created} challan(s)" . ($skipped ? " — {$skipped} skipped (already had an unpaid challan)" : ''))
-                        ->success()->send();
+                    $summary = "Generated {$created} challan(s)";
+                    if ($adjusted) {
+                        $summary .= " — {$adjusted} reduced for scholarship students";
+                    }
+                    if ($skipped) {
+                        $summary .= " — {$skipped} skipped (already had an unpaid challan)";
+                    }
+
+                    Notification::make()->title($summary)->success()->send();
                 }),
 
             ExportAction::make()->exports([

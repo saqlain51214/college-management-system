@@ -112,6 +112,7 @@ Route::prefix('teacher')->name('teacher.')->group(function () {
 
     Route::middleware('auth.teacher')->group(function () {
         Route::get('/',                   [TeacherPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('/salary',             [TeacherPortalController::class, 'salary'])->name('salary');
         Route::get('/notices',            [TeacherPortalController::class, 'notices'])->name('notices');
         Route::get('/profile',            [TeacherPortalController::class, 'profile'])->name('profile');
         Route::post('/profile/password',  [TeacherPortalController::class, 'updatePassword'])->name('profile.password');
