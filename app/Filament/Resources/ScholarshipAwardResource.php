@@ -88,6 +88,7 @@ class ScholarshipAwardResource extends Resource
                 Tables\Filters\SelectFilter::make('status')->options(ScholarshipStatusEnum::options()),
                 Tables\Filters\SelectFilter::make('scholarship_id')->label('Scholarship')->relationship('scholarship', 'name'),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('approve')

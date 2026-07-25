@@ -112,6 +112,7 @@ class TeacherResource extends Resource
                                 ->schema([
                                     Forms\Components\FileUpload::make('photo')
                                         ->label('Profile Photo')
+                                        ->avatar()
                                         ->image()
                                         ->directory('teachers/photos')
                                         ->maxSize(2048)
@@ -119,8 +120,7 @@ class TeacherResource extends Resource
                                         ->imageCropAspectRatio('1:1')
                                         ->imageResizeTargetWidth('300')
                                         ->imageResizeTargetHeight('300')
-                                        ->helperText('Max 2MB. Square photo recommended.')
-                                        ->columnSpanFull(),
+                                        ->helperText('Max 2MB. Square photo recommended.'),
                                 ]),
                         ]),
 

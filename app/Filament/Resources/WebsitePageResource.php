@@ -205,6 +205,7 @@ class WebsitePageResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')->label('Last Updated')->dateTime('d M Y')->sortable(),
             ])
             ->filters([Tables\Filters\TernaryFilter::make('is_published'), Tables\Filters\TrashedFilter::make()])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\Action::make('view')
                     ->label('View')

@@ -91,6 +91,11 @@ class Teacher extends Model implements AuthenticatableContract
         return $this->belongsTo(Department::class);
     }
 
+    public function salaryPayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TeacherSalaryPayment::class);
+    }
+
     protected function portalPassword(): Attribute
     {
         return Attribute::make(

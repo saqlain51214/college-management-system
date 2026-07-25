@@ -300,6 +300,7 @@ class FeeSlipTemplateResource extends Resource
                     ->sortable(),
             ])
             ->filters([])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
 

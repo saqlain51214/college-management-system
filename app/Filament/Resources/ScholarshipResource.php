@@ -82,6 +82,7 @@ class ScholarshipResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
                 Tables\Filters\TrashedFilter::make(),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

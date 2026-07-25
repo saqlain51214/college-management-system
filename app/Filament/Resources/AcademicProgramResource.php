@@ -380,6 +380,7 @@ class AcademicProgramResource extends Resource
 
                 Tables\Filters\TrashedFilter::make(),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
 

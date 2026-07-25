@@ -71,6 +71,7 @@ class LeadershipMessageResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('Order')->sortable()->alignCenter(),
                 Tables\Columns\ToggleColumn::make('is_active')->label('Active'),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

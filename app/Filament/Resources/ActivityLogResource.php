@@ -89,6 +89,7 @@ class ActivityLogResource extends Resource
                             ->when($data['until'] ?? null, fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
                     }),
             ])
+            ->recordUrl(null)
             ->actions([])
             ->bulkActions([])
             ->paginated([25, 50, 100]);

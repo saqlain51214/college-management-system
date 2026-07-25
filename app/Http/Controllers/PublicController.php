@@ -695,17 +695,6 @@ class PublicController extends Controller
         $feeType = 'tuition';
         $semester = $student->current_semester;
 
-        $pendingCount = \App\Models\FeePayment::where('student_id', $student->id)
-            ->where('fee_type', $feeType)
-            ->when($semester, fn ($q) => $q->where('semester_number', $semester), fn ($q) => $q->whereNull('semester_number'))
-            ->where('payment_status', '!=', 'paid')
-            ->count();
-
-        if ($pendingCount >= 3) {
-            return $this->renderFeeChallanLookup($identifier, null,
-                'You already have 3 unpaid challans for this semester. Please pay or clear an existing one before generating another, or log in to the student portal for more options.');
-        }
-
         try {
             $slip = \App\Models\FeePayment::generateSlip($student, [
                 'fee_type'         => $feeType,

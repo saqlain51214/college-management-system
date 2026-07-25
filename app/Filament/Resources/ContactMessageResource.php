@@ -49,6 +49,7 @@ class ContactMessageResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_read')->label('Read'),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->after(fn(ContactMessage $r) => $r->update(['is_read'=>true])),

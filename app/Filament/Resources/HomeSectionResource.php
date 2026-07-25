@@ -154,6 +154,7 @@ class HomeSectionResource extends Resource
                 Tables\Columns\ToggleColumn::make('is_active')->label('Active'),
                 Tables\Columns\TextColumn::make('updated_at')->dateTime('d M Y'),
             ])
+            ->recordUrl(null)
             ->actions([Tables\Actions\EditAction::make()])
             ->defaultSort('sort_order');
     }

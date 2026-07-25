@@ -86,6 +86,7 @@ class CourseOutlineResource extends Resource
                 Tables\Filters\SelectFilter::make('semester_number')->label('Semester')
                     ->options(collect(range(1, 8))->mapWithKeys(fn ($n) => [$n => "Semester $n"])->all()),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

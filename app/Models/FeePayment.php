@@ -160,12 +160,23 @@ class FeePayment extends Model
             );
         }
 
-        $installmentNo = (int) static::query()
+        // Cap self-chosen installments at 3 per (student, fee type, semester, year) —
+        // applies to admin, portal, and public self-service alike, so a student can't
+        // pile up unlimited unpaid slips. Pay/waive an existing one to free up a slot.
+        $groupQuery = fn () => static::query()
             ->where('student_id', $student->id)
             ->where('fee_type', $feeType)
             ->when($semester, fn ($q) => $q->where('semester_number', $semester), fn ($q) => $q->whereNull('semester_number'))
-            ->when($academicYearId, fn ($q) => $q->where('academic_year_id', $academicYearId), fn ($q) => $q->whereNull('academic_year_id'))
-            ->count() + 1;
+            ->when($academicYearId, fn ($q) => $q->where('academic_year_id', $academicYearId), fn ($q) => $q->whereNull('academic_year_id'));
+
+        $pendingCount = (int) $groupQuery()->where('payment_status', '!=', PaymentStatusEnum::Paid)->count();
+        if ($pendingCount >= 3) {
+            throw new \InvalidArgumentException(
+                'This student already has 3 unpaid installments for this period. Pay or waive an existing one before generating another.'
+            );
+        }
+
+        $installmentNo = (int) $groupQuery()->count() + 1;
 
         $structure = static::resolveFeeStructure($student, $feeType, $semester, $academicYearId);
 

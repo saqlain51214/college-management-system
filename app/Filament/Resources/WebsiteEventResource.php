@@ -66,6 +66,7 @@ class WebsiteEventResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_featured'),
                 Tables\Filters\TrashedFilter::make(),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

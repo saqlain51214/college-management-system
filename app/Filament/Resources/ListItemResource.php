@@ -137,6 +137,7 @@ class ListItemResource extends Resource
 
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()

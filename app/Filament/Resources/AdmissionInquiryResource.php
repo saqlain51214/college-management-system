@@ -245,6 +245,7 @@ class AdmissionInquiryResource extends Resource
                 Tables\Filters\SelectFilter::make('program_id')->label('Program')
                     ->options(AcademicProgram::active()->pluck('name','id')),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\Action::make('convertToStudent')
                     ->label('Enroll as Student')

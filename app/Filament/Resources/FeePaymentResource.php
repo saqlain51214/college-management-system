@@ -205,6 +205,7 @@ class FeePaymentResource extends Resource
                         ->where('payment_status', '!=', PaymentStatusEnum::Paid->value)),
                 Tables\Filters\TrashedFilter::make(),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->visible(fn(FeePayment $r) => ! $r->isLocked() || (auth()->user()?->hasRole('super_admin') ?? false)),

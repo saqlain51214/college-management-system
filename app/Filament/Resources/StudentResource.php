@@ -139,6 +139,7 @@ class StudentResource extends Resource
                                 ->schema([
                                     Forms\Components\FileUpload::make('photo')
                                         ->label('Student Photo')
+                                        ->avatar()
                                         ->image()
                                         ->directory('students/photos')
                                         ->maxSize(2048)
@@ -146,8 +147,7 @@ class StudentResource extends Resource
                                         ->imageCropAspectRatio('3:4')
                                         ->imageResizeTargetWidth('300')
                                         ->imageResizeTargetHeight('400')
-                                        ->helperText('Max 2MB. Recommended: 3×4 passport size.')
-                                        ->columnSpanFull(),
+                                        ->helperText('Max 2MB. Recommended: 3×4 passport size.'),
                                 ]),
                         ]),
 

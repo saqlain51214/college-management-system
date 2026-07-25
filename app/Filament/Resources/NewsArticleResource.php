@@ -71,6 +71,7 @@ class NewsArticleResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_featured')->label('Featured'),
                 Tables\Filters\TrashedFilter::make(),
             ])
+            ->recordUrl(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('publish')
