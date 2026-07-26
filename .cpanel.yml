@@ -11,3 +11,7 @@ deployment:
     - /opt/cpanel/ea-php83/root/usr/bin/php $DEPLOYPATH/artisan config:clear
     - /opt/cpanel/ea-php83/root/usr/bin/php $DEPLOYPATH/artisan view:clear
     - /opt/cpanel/ea-php83/root/usr/bin/php $DEPLOYPATH/artisan route:clear
+    # Filament caches its panel/resource/widget discovery — without clearing this,
+    # newly added or removed admin modules don't show up until the next unrelated
+    # cache bust, which is confusing after every deploy.
+    - /bin/rm -rf $DEPLOYPATH/bootstrap/cache/filament
