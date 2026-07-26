@@ -19,7 +19,7 @@
     </div>
 
     {{-- Collection snapshot --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900">
             <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Collected Today</p>
             <p class="mt-1 text-xl font-bold text-gray-800 dark:text-gray-100">{{ $rs($summary['collected_today'] ?? 0) }}</p>
@@ -31,6 +31,10 @@
         <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900">
             <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Paid Challans</p>
             <p class="mt-1 text-xl font-bold text-gray-800 dark:text-gray-100">{{ number_format($summary['paid_count'] ?? 0) }}</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900">
+            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">🎓 Scholarship Students</p>
+            <p class="mt-1 text-xl font-bold text-amber-600">{{ number_format($summary['scholarship_count'] ?? 0) }}</p>
         </div>
     </div>
 
@@ -57,7 +61,12 @@
                     @forelse ($outstanding as $row)
                         <tr class="border-b border-gray-100 dark:border-white/5">
                             <td class="px-4 py-2 font-mono text-xs text-gray-600 dark:text-gray-300">{{ $row['challan'] }}</td>
-                            <td class="px-4 py-2 text-gray-800 dark:text-gray-100">{{ $row['student'] }}</td>
+                            <td class="px-4 py-2 text-gray-800 dark:text-gray-100">
+                                {{ $row['student'] }}
+                                @if(!empty($row['scholarship']))
+                                    <span class="ml-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">🎓 {{ $row['scholarship'] }}</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-2 text-gray-500">{{ $row['roll'] }}</td>
                             <td class="px-4 py-2 text-right font-semibold text-amber-700 dark:text-amber-400">{{ $rs($row['balance']) }}</td>
                             <td class="px-4 py-2">

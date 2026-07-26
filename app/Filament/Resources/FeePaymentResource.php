@@ -135,7 +135,11 @@ class FeePaymentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('student.name')->label('Student')->searchable()->wrap(),
+                Tables\Columns\TextColumn::make('student.name')
+                    ->label('Student')
+                    ->searchable()
+                    ->wrap()
+                    ->description(fn (FeePayment $r) => $r->student?->scholarship_label ? '🎓 ' . $r->student->scholarship_label : null),
                 Tables\Columns\TextColumn::make('fee_type')
                     ->badge()
                     ->formatStateUsing(fn($state) => $state instanceof FeeTypeEnum ? $state->label() : $state)
@@ -173,6 +177,15 @@ class FeePaymentResource extends Resource
                     ->query(fn ($query, array $data) => filled($data['value'] ?? null)
                         ? $query->whereHas('student', fn ($q) => $q->where('academic_program_id', $data['value']))
                         : $query),
+                Tables\Filters\TernaryFilter::make('has_scholarship')
+                    ->label('Scholarship')
+                    ->placeholder('All students')
+                    ->trueLabel('Scholarship students only')
+                    ->falseLabel('No scholarship')
+                    ->queries(
+                        true: fn ($query) => $query->whereHas('student', fn ($q) => $q->whereNotNull('scholarship_type')->whereNotNull('scholarship_value')),
+                        false: fn ($query) => $query->whereHas('student', fn ($q) => $q->whereNull('scholarship_type')->orWhereNull('scholarship_value')),
+                    ),
                 Tables\Filters\SelectFilter::make('payment_status')->options(PaymentStatusEnum::options()),
                 Tables\Filters\SelectFilter::make('fee_type')->options(FeeTypeEnum::options()),
                 Tables\Filters\SelectFilter::make('academic_year_id')

@@ -79,7 +79,10 @@
             @endforeach
         </div>
 
-        {{-- Generate Fee Slip (custom, self-chosen amount) --}}
+        {{-- Generate Fee Slip — admin-only. Students can no longer self-generate;
+             they can only view/download challans below. Admin picks Full Payment
+             (one slip for the whole remaining balance) or Installments (split the
+             remaining balance evenly across N slips, due dates staggered). --}}
         <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900">
             <h3 class="mb-3 text-sm font-bold text-gray-800 dark:text-gray-100">Generate Fee Slip</h3>
 
@@ -113,7 +116,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Due Date</label>
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">First Due Date</label>
                     <input type="date" wire:model="slipDueDate" class="w-full rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"/>
                 </div>
             </div>
@@ -126,18 +129,47 @@
                 </div>
             @endif
 
-            <form wire:submit.prevent="generateSlip" class="mt-3 flex flex-wrap items-end gap-3">
-                <div>
-                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Amount to Invoice (Rs.)</label>
-                    <input type="number" step="0.01" min="0" wire:model="slipAmount"
-                           placeholder="e.g. 10000"
-                           class="w-40 rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"/>
-                </div>
-                <button type="submit"
-                        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500">
-                    Generate Slip
+            {{-- Full Payment / Installments toggle --}}
+            <div class="mt-4 flex flex-wrap items-center gap-2">
+                <button type="button" wire:click="$set('slipMode', 'full')"
+                        class="rounded-lg border px-4 py-2 text-sm font-semibold transition
+                        {{ $slipMode === 'full' ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300' : 'border-gray-300 text-gray-600 dark:border-white/10 dark:text-gray-300' }}">
+                    Full Payment — one slip
                 </button>
-            </form>
+                <button type="button" wire:click="$set('slipMode', 'installments')"
+                        class="rounded-lg border px-4 py-2 text-sm font-semibold transition
+                        {{ $slipMode === 'installments' ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300' : 'border-gray-300 text-gray-600 dark:border-white/10 dark:text-gray-300' }}">
+                    Installments — split evenly
+                </button>
+            </div>
+
+            @if ($slipMode === 'installments')
+                <div class="mt-3 flex flex-wrap items-end gap-3 rounded-lg bg-gray-50 p-3 dark:bg-white/5">
+                    <div>
+                        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Number of Installments</label>
+                        <select wire:model="slipInstallmentCount" class="w-32 rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Days Between Due Dates</label>
+                        <input type="number" min="1" wire:model="slipInstallmentGapDays" class="w-32 rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"/>
+                    </div>
+                    @if ($slip && $slip['available'] > 0)
+                        <p class="text-xs text-gray-500">
+                            Will create {{ $slipInstallmentCount }} slips of ~{{ $rs($slip['available'] / max(1, $slipInstallmentCount)) }} each.
+                        </p>
+                    @endif
+                </div>
+            @endif
+
+            <div class="mt-3">
+                <button type="button" wire:click="generateSlip"
+                        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500">
+                    {{ $slipMode === 'installments' ? 'Generate Installment Plan' : 'Generate Full Slip' }}
+                </button>
+            </div>
 
             @if ($slipSuccess)
                 <p class="mt-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">{{ $slipSuccess }}</p>

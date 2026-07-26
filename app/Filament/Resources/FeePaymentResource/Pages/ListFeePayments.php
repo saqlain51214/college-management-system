@@ -14,7 +14,6 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Support\Str;
 use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use pxlrbt\FilamentExcel\Columns\Column;
@@ -49,14 +48,30 @@ class ListFeePayments extends ListRecords
                         ->label('Fee Type')->options(FeeTypeEnum::options())
                         ->default(FeeTypeEnum::Tuition->value)->required(),
                     Forms\Components\TextInput::make('amount_due')
-                        ->label('Amount (Rs.)')->numeric()->prefix('Rs.')->minValue(1)->required()
-                        ->placeholder('e.g. 28000'),
+                        ->label('Total Amount (Rs.)')->numeric()->prefix('Rs.')->minValue(1)->required()
+                        ->placeholder('e.g. 28000')
+                        ->helperText('The full fee for the period — scholarship students get this reduced automatically.'),
+                    Forms\Components\Select::make('plan')
+                        ->label('Payment Plan')
+                        ->options(['full' => 'Full Payment — one challan per student', 'installments' => 'Installments — split evenly per student'])
+                        ->default('full')->required()->live(),
+                    Forms\Components\Select::make('installment_count')
+                        ->label('Number of Installments')
+                        ->options(['2' => '2', '3' => '3'])
+                        ->default('2')
+                        ->visible(fn (Forms\Get $get) => $get('plan') === 'installments')
+                        ->required(fn (Forms\Get $get) => $get('plan') === 'installments'),
+                    Forms\Components\TextInput::make('installment_gap_days')
+                        ->label('Days Between Due Dates')
+                        ->numeric()->default(30)
+                        ->visible(fn (Forms\Get $get) => $get('plan') === 'installments')
+                        ->required(fn (Forms\Get $get) => $get('plan') === 'installments'),
                     Forms\Components\Select::make('semester_number')
                         ->label('Semester')
                         ->options(collect(range(1, 8))->mapWithKeys(fn ($n) => [$n => "Semester $n"])->all())
                         ->placeholder('Not applicable'),
                     Forms\Components\DatePicker::make('due_date')
-                        ->label('Due Date')->required()->native(false)->displayFormat('d M Y'),
+                        ->label('First Due Date')->required()->native(false)->displayFormat('d M Y'),
                     Forms\Components\Select::make('academic_year_id')
                         ->label('Academic Year')
                         ->options(fn () => AcademicYear::selectOptions())->searchable(),
@@ -69,6 +84,10 @@ class ListFeePayments extends ListRecords
                         ->where('department_id', $data['department_id'])
                         ->when($data['academic_program_id'] ?? null, fn ($q, $p) => $q->where('academic_program_id', $p))
                         ->get();
+
+                    $isInstallments = ($data['plan'] ?? 'full') === 'installments';
+                    $installmentCount = (int) ($data['installment_count'] ?? 2);
+                    $gapDays = (int) ($data['installment_gap_days'] ?? 30);
 
                     $created = 0;
                     $skipped = 0;
@@ -95,21 +114,25 @@ class ListFeePayments extends ListRecords
                             $adjusted++;
                         }
 
-                        FeePayment::create([
-                            'student_id'       => $student->id,
-                            'challan_number'   => 'CHN-' . strtoupper(Str::random(8)),
+                        $slipData = [
                             'fee_type'         => $data['fee_type'],
-                            'amount_due'       => $amountDue,
-                            'fine_amount'      => 0,
-                            'discount_amount'  => 0,
-                            'amount_paid'      => 0,
-                            'payment_status'   => PaymentStatusEnum::Pending->value,
-                            'due_date'         => $data['due_date'],
                             'semester_number'  => $data['semester_number'] ?? null,
                             'academic_year_id' => $data['academic_year_id'] ?? null,
+                            'amount'           => $amountDue,
+                            'due_date'         => $data['due_date'],
                             'remarks'          => $data['remarks'] ?? null,
-                        ]);
-                        $created++;
+                        ];
+
+                        try {
+                            if ($isInstallments) {
+                                $created += count(FeePayment::generateInstallmentPlan($student, $slipData, $installmentCount, $gapDays));
+                            } else {
+                                FeePayment::generateSlip($student, $slipData);
+                                $created++;
+                            }
+                        } catch (\InvalidArgumentException) {
+                            $skipped++;
+                        }
                     }
 
                     $summary = "Generated {$created} challan(s)";

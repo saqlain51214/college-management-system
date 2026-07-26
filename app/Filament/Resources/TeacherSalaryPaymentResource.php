@@ -181,6 +181,12 @@ class TeacherSalaryPaymentResource extends Resource
                         Notification::make()->title('Salary marked as paid')->success()->send();
                     }),
 
+                Tables\Actions\Action::make('viewHistory')
+                    ->label('View History')
+                    ->icon('heroicon-o-clock')
+                    ->color('gray')
+                    ->url(fn (TeacherSalaryPayment $r) => \App\Filament\Pages\TeacherPayrollLedger::getUrl(['teacher' => $r->teacher_id])),
+
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

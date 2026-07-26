@@ -52,6 +52,7 @@ class FeeReports extends Page
                 ->whereMonth('payment_date', $today->month)
                 ->sum('amount_paid'),
             'paid_count'      => FeePayment::where('payment_status', PaymentStatusEnum::Paid->value)->count(),
+            'scholarship_count' => \App\Models\Student::whereNotNull('scholarship_type')->whereNotNull('scholarship_value')->count(),
         ];
 
         $this->outstanding = FeePayment::with('student')
@@ -65,9 +66,10 @@ class FeeReports extends Page
                     : (string) $p->payment_status;
 
                 return [
-                    'challan'   => $p->challan_number,
-                    'student'   => $p->student?->name ?? '—',
-                    'roll'      => $p->student?->roll_number ?? '—',
+                    'challan'      => $p->challan_number,
+                    'student'      => $p->student?->name ?? '—',
+                    'roll'         => $p->student?->roll_number ?? '—',
+                    'scholarship'  => $p->student?->scholarship_label,
                     'net'       => $p->net_amount,
                     'paid'      => (float) $p->amount_paid,
                     'balance'   => max(0, $p->net_amount - (float) $p->amount_paid),

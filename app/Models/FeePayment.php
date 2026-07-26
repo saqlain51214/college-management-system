@@ -199,6 +199,64 @@ class FeePayment extends Model
         ]);
     }
 
+    /**
+     * Split a total into $count roughly-equal installment amounts (each
+     * rounded to 2dp), with any rounding remainder absorbed by the last
+     * installment so the parts always sum exactly back to $total.
+     *
+     * @return array<int,float>
+     */
+    public static function splitInstallments(float $total, int $count): array
+    {
+        $count = max(1, $count);
+        $base  = round($total / $count, 2);
+        $parts = array_fill(0, $count, $base);
+        $parts[$count - 1] = round($total - $base * ($count - 1), 2);
+
+        return $parts;
+    }
+
+    /**
+     * Generate a full plan in one go: either a single slip for the whole
+     * available amount, or several installment slips splitting it evenly,
+     * each due a fixed number of days apart. Used by the admin-only slip
+     * generators (Student Ledger, dept-wise bulk generator) — students no
+     * longer have a self-service equivalent, admins decide the plan.
+     *
+     * @return array<int,self>
+     */
+    public static function generateInstallmentPlan(Student $student, array $data, int $installments, int $gapDays = 30): array
+    {
+        $amount = round((float) $data['amount'], 2);
+        $parts  = static::splitInstallments($amount, $installments);
+
+        $pendingCount = (int) static::query()
+            ->where('student_id', $student->id)
+            ->where('fee_type', $data['fee_type'])
+            ->when($data['semester_number'] ?? null, fn ($q, $s) => $q->where('semester_number', $s), fn ($q) => $q->whereNull('semester_number'))
+            ->when($data['academic_year_id'] ?? null, fn ($q, $y) => $q->where('academic_year_id', $y), fn ($q) => $q->whereNull('academic_year_id'))
+            ->where('payment_status', '!=', PaymentStatusEnum::Paid)
+            ->count();
+
+        if ($pendingCount + $installments > 3) {
+            throw new \InvalidArgumentException(
+                'This plan would exceed the 3 unpaid installments allowed for this period (' . $pendingCount . ' already pending). Pay or waive an existing one, or choose fewer installments.'
+            );
+        }
+
+        $firstDue = $data['due_date'] ?? now()->addDays(15)->toDateString();
+
+        $slips = [];
+        foreach ($parts as $i => $part) {
+            $slips[] = static::generateSlip($student, array_merge($data, [
+                'amount'   => $part,
+                'due_date' => \Illuminate\Support\Carbon::parse($firstDue)->addDays($gapDays * $i)->toDateString(),
+            ]));
+        }
+
+        return $slips;
+    }
+
     protected static function resolveFeeStructureTotal(Student $student, string $feeType, ?int $semester, ?int $academicYearId): float
     {
         $baseTotal = (float) FeeStructure::query()
