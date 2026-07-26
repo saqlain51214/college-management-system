@@ -44,10 +44,11 @@ class CourseOutlineResource extends Resource
                     Forms\Components\TextInput::make('title')
                         ->label('Title')->required()->maxLength(200)
                         ->placeholder('e.g. Semester 1 — Course Outline'),
-                    Forms\Components\FileUpload::make('file_path')
-                        ->label('Upload PDF')->disk('public')->directory('course-outlines')
+                    Forms\Components\FileUpload::make('file_paths')
+                        ->label('Upload PDF(s)')->disk('public')->directory('course-outlines')
                         ->acceptedFileTypes(['application/pdf'])->maxSize(20480)
-                        ->helperText('Upload the outline as a PDF (up to 20 MB). Or use a link below instead.')
+                        ->multiple()->reorderable()->maxFiles(10)
+                        ->helperText('Upload one or more PDFs (up to 20 MB each) — use the + button to add more. Or use a link below instead.')
                         ->columnSpanFull(),
                     Forms\Components\TextInput::make('external_url')
                         ->label('…or External Link (optional)')->url()->maxLength(500)
@@ -76,8 +77,12 @@ class CourseOutlineResource extends Resource
                 Tables\Columns\TextColumn::make('semester_number')->label('Sem')
                     ->formatStateUsing(fn ($state) => $state ? "S{$state}" : '—')->alignCenter(),
                 Tables\Columns\TextColumn::make('title')->label('Title')->searchable()->wrap(),
-                Tables\Columns\IconColumn::make('file_path')->label('PDF')->boolean()
-                    ->trueIcon('heroicon-o-document-arrow-down')->falseIcon('heroicon-o-link'),
+                Tables\Columns\TextColumn::make('file_paths')
+                    ->label('PDFs')
+                    ->state(fn (CourseOutline $r) => count($r->file_paths ?? []) ?: null)
+                    ->formatStateUsing(fn (?int $state) => $state ? $state . ' file' . ($state > 1 ? 's' : '') : 'Link only')
+                    ->badge()
+                    ->color(fn (CourseOutline $r) => filled($r->file_paths) ? 'success' : 'gray'),
                 Tables\Columns\ToggleColumn::make('is_active')->label('Active'),
             ])
             ->filters([

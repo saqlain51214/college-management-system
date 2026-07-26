@@ -38,23 +38,51 @@
                             </p>
                             <div class="grid gap-3 sm:grid-cols-2">
                                 @foreach($outlines as $o)
-                                    <a href="{{ $o->url ?: '#' }}" @if($o->url) target="_blank" @endif
-                                       class="group flex items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-4 py-3 transition hover:border-stone-200 hover:bg-white hover:shadow-sm">
-                                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white" style="background:var(--site-brand)">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V4a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg>
-                                        </span>
-                                        <span class="min-w-0 flex-1">
-                                            <span class="block text-sm font-semibold text-stone-800 truncate">{{ $o->title }}</span>
-                                            @if($o->academicProgram)
-                                                <span class="block text-xs text-stone-400 truncate">{{ $o->academicProgram->name }}</span>
-                                            @elseif($o->description)
-                                                <span class="block text-xs text-stone-400 truncate">{{ $o->description }}</span>
+                                    @php
+                                        $fileCount = count($o->files);
+                                        $totalItems = $fileCount + ($o->external_url ? 1 : 0);
+                                    @endphp
+                                    <div class="rounded-xl border border-stone-100 bg-stone-50/60 px-4 py-3 transition hover:border-stone-200 hover:bg-white hover:shadow-sm">
+                                        <div class="flex items-center gap-3">
+                                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white" style="background:var(--site-brand)">
+                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V4a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg>
+                                            </span>
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block text-sm font-semibold text-stone-800 truncate">{{ $o->title }}</span>
+                                                @if($o->academicProgram)
+                                                    <span class="block text-xs text-stone-400 truncate">{{ $o->academicProgram->name }}</span>
+                                                @elseif($o->description)
+                                                    <span class="block text-xs text-stone-400 truncate">{{ $o->description }}</span>
+                                                @endif
+                                            </span>
+                                            @if($totalItems <= 1)
+                                                <a href="{{ $o->url ?: '#' }}" @if($o->url) target="_blank" @endif
+                                                   class="shrink-0 text-xs font-semibold" style="color:var(--site-gold)">
+                                                    {{ $fileCount ? 'PDF ↓' : ($o->external_url ? 'Open ↗' : '—') }}
+                                                </a>
                                             @endif
-                                        </span>
-                                        <span class="shrink-0 text-xs font-semibold" style="color:var(--site-gold)">
-                                            {{ $o->file_path ? 'PDF ↓' : 'Open ↗' }}
-                                        </span>
-                                    </a>
+                                        </div>
+
+                                        {{-- More than one file/link — list each individually --}}
+                                        @if($totalItems > 1)
+                                            <div class="mt-2.5 flex flex-wrap gap-1.5 pl-[52px]">
+                                                @foreach($o->files as $f)
+                                                    <a href="{{ $f['url'] }}" target="_blank"
+                                                       class="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold ring-1 ring-stone-200 transition hover:ring-stone-300"
+                                                       style="color:var(--site-brand)">
+                                                        {{ $f['name'] }}
+                                                    </a>
+                                                @endforeach
+                                                @if($o->external_url)
+                                                    <a href="{{ $o->external_url }}" target="_blank"
+                                                       class="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold ring-1 ring-stone-200 transition hover:ring-stone-300"
+                                                       style="color:var(--site-gold)">
+                                                        External Link ↗
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
                                 @endforeach
                             </div>
                         </div>

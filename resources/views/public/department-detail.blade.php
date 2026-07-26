@@ -189,7 +189,7 @@
                                     <span class="block text-sm font-semibold text-stone-800 truncate">{{ $o->title }}</span>
                                     @if($o->academicProgram)<span class="block text-xs text-stone-400 truncate">{{ $o->academicProgram->name }}</span>@endif
                                 </span>
-                                <span class="shrink-0 text-xs font-semibold" style="color:var(--site-gold)">{{ $o->file_path ? 'PDF ↓' : 'Open ↗' }}</span>
+                                <span class="shrink-0 text-xs font-semibold" style="color:var(--site-gold)">{{ count($o->files) ? (count($o->files) > 1 ? count($o->files) . ' PDFs ↓' : 'PDF ↓') : 'Open ↗' }}</span>
                             </a>
                         @endforeach
                     </div>

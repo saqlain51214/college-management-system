@@ -9,13 +9,14 @@ class CourseOutline extends Model
 {
     protected $fillable = [
         'department_id', 'academic_program_id', 'semester_number',
-        'title', 'file_path', 'external_url', 'description', 'sort_order', 'is_active',
+        'title', 'file_paths', 'external_url', 'description', 'sort_order', 'is_active',
     ];
 
     protected $casts = [
         'is_active'       => 'boolean',
         'semester_number' => 'integer',
         'sort_order'      => 'integer',
+        'file_paths'      => 'array',
     ];
 
     public function department(): BelongsTo
@@ -33,11 +34,22 @@ class CourseOutline extends Model
         return $query->where('is_active', true);
     }
 
-    /** Public URL to download/open the outline (uploaded file or external link). */
+    /** One entry per uploaded PDF: ['name' => 'Syllabus.pdf', 'url' => '...']. */
+    public function getFilesAttribute(): array
+    {
+        return collect($this->file_paths ?? [])
+            ->map(fn ($path) => [
+                'name' => basename($path),
+                'url'  => asset('storage/' . $path),
+            ])
+            ->all();
+    }
+
+    /** Public URL to download/open the outline — first uploaded file, or the external link. */
     public function getUrlAttribute(): ?string
     {
-        if ($this->file_path) {
-            return asset('storage/' . $this->file_path);
+        if (filled($this->file_paths)) {
+            return asset('storage/' . $this->file_paths[0]);
         }
 
         return $this->external_url ?: null;
