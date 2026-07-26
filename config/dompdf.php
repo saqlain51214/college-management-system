@@ -13,7 +13,13 @@ return [
     */
     'show_warnings' => false,   // Throw an Exception on warnings from dompdf
 
-    'public_path' => null,  // Override the public path if needed
+    // Explicitly use Laravel's own public_path() rather than DomPDF's internal
+    // fallback to base_path('public') — on this host the app root (jdca_app)
+    // and the served web root (public_html) are separate sibling directories
+    // (see bootstrap/app.php's usePublicPath() override), so base_path('public')
+    // does not reliably resolve. public_path() always points at the real,
+    // permission-correct, actively-served directory.
+    'public_path' => public_path(),
 
     /*
      * Dejavu Sans font is missing glyphs for converted entities, turn it off if you need to show € and £.

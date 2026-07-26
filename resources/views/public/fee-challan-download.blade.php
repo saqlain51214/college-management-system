@@ -8,7 +8,7 @@
 
             <div class="mb-8 text-center">
                 <h1 class="font-display text-2xl sm:text-3xl font-bold text-stone-900">Download Fee Challan</h1>
-                <p class="mt-2 text-sm text-stone-500">Enter your Registration or Roll Number to view your dues, download challans, or generate a new fee slip.</p>
+                <p class="mt-2 text-sm text-stone-500">Enter your Registration or Roll Number to view your dues and download your fee challans.</p>
             </div>
 
             {{-- Lookup form --}}
@@ -26,12 +26,6 @@
             </form>
             @error('identifier')<p class="mt-2 text-center text-sm text-red-600">{{ $message }}</p>@enderror
 
-            @if(!empty($slipSuccess))
-                <div class="mx-auto mt-4 max-w-xl rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center text-sm font-semibold text-emerald-700">
-                    {{ $slipSuccess }}
-                </div>
-            @endif
-
             {{-- Results --}}
             @if(!empty($searched))
                 @if(!empty($notFound))
@@ -42,73 +36,12 @@
                 @elseif(!empty($result))
                     @php $student = $result['student']; $unpaid = $result['unpaid']; $paid = $result['paidThisMonth']; $byMonth = $result['byMonth']; @endphp
 
-                    <div class="mt-8 rounded-2xl bg-white p-5 ring-1 ring-stone-200" x-data="{ genMode: 'full' }">
+                    <div class="mt-8 rounded-2xl bg-white p-5 ring-1 ring-stone-200">
                         <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
                             <div>
                                 <p class="font-display text-lg font-bold text-stone-900">{{ $student->name }}</p>
                                 <p class="text-xs text-stone-500">Reg No: {{ $student->registration_number ?: $student->roll_number }}</p>
                             </div>
-                            <span class="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-500">{{ $slipCount ?? 0 }} slip(s) generated so far</span>
-                        </div>
-
-                        {{-- Semester fee summary --}}
-                        @if($invoice)
-                        <div class="mb-5 flex flex-wrap gap-4 rounded-xl bg-stone-50 p-3 text-xs">
-                            <span class="text-stone-500">Total Semester Fee: <b class="text-stone-800">Rs. {{ number_format($invoice['total']) }}</b></span>
-                            <span class="text-stone-500">Already Invoiced: <b class="text-stone-800">Rs. {{ number_format($invoice['already_invoiced']) }}</b></span>
-                            <span class="text-stone-500">Available to Generate: <b class="text-emerald-700">Rs. {{ number_format($invoice['available']) }}</b></span>
-                        </div>
-                        @endif
-
-                        {{-- Generate a new slip — full remaining balance, or a chosen partial amount --}}
-                        <div class="mb-6 rounded-xl border border-stone-200 p-4">
-                            <h3 class="mb-1 text-sm font-bold text-stone-800">Generate a Fee Slip</h3>
-                            <p class="mb-3 text-xs text-stone-500">Choose to pay the full semester at once, or generate a slip for whatever amount you want to deposit right now.</p>
-
-                            @if(!empty($slipError))
-                                <div class="mb-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-700">
-                                    {{ $slipError }}
-                                </div>
-                            @endif
-
-                            @if($invoice && $invoice['available'] > 0)
-                                <form method="POST" action="{{ route('fee-challan.generate-slip') }}" class="flex flex-wrap items-end gap-3">
-                                    @csrf
-                                    <input type="hidden" name="identifier" value="{{ $identifier }}">
-                                    <input type="hidden" name="mode" :value="genMode">
-
-                                    <div class="flex gap-2">
-                                        <button type="button" @click="genMode = 'full'"
-                                                :class="genMode === 'full' ? 'text-white' : 'border-stone-300 text-stone-600'"
-                                                :style="genMode === 'full' ? 'background:var(--site-brand)' : ''"
-                                                class="rounded-lg border px-4 py-2 text-sm font-semibold transition">
-                                            Full Payment
-                                        </button>
-                                        <button type="button" @click="genMode = 'partial'"
-                                                :class="genMode === 'partial' ? 'text-white' : 'border-stone-300 text-stone-600'"
-                                                :style="genMode === 'partial' ? 'background:var(--site-brand)' : ''"
-                                                class="rounded-lg border px-4 py-2 text-sm font-semibold transition">
-                                            Partial Amount
-                                        </button>
-                                    </div>
-
-                                    <div x-show="genMode === 'partial'" x-cloak>
-                                        <label class="mb-1 block text-[11px] font-medium uppercase tracking-wide text-stone-500">Amount (Rs.)</label>
-                                        <input type="number" name="amount" step="0.01" min="1" max="{{ $invoice['available'] }}"
-                                               :required="genMode === 'partial'"
-                                               placeholder="e.g. 10000"
-                                               class="w-40 rounded-lg border border-stone-300 px-3 py-2 text-sm">
-                                    </div>
-
-                                    <button type="submit"
-                                            class="rounded-lg px-5 py-2 text-sm font-bold text-white transition hover:opacity-90"
-                                            style="background:var(--site-brand)">
-                                        Generate Slip
-                                    </button>
-                                </form>
-                            @else
-                                <p class="text-xs text-stone-400">This semester's fee has been fully invoiced already — check "Payable Challans" below for outstanding balances.</p>
-                            @endif
                         </div>
 
                         {{-- Unpaid / due challans --}}

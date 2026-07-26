@@ -2,7 +2,7 @@
 @section('title', 'Fee Status')
 @section('content')
 
-<div x-data="{ uploadModal: { open: false, url: '', challan: '', suggested: 0 }, genMode: 'full' }">
+<div x-data="{ uploadModal: { open: false, url: '', challan: '', suggested: 0 } }">
 
 {{-- Flash messages --}}
 @if(session('proof_uploaded'))
@@ -47,96 +47,6 @@
   @endforeach
 </div>
 
-{{-- ── Generate a Fee Slip ── --}}
-<div class="mb-6 rounded-2xl border border-stone-200 bg-white p-6">
-  <div class="mb-4 flex items-start justify-between gap-3">
-    <div class="flex items-start gap-3">
-      <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl" style="background:color-mix(in srgb, var(--site-brand, #6b2d39) 12%, transparent); color:var(--site-brand, #6b2d39)">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-      </span>
-      <div>
-        <h3 class="font-semibold text-stone-800">Generate a Fee Slip</h3>
-        <p class="mt-0.5 text-xs text-stone-400">Pay your whole semester fee at once, or generate a slip for whatever amount you want to pay right now — the rest can be paid later as another installment.</p>
-      </div>
-    </div>
-    <span class="shrink-0 rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-500">{{ $slipCount }} slip(s) generated so far</span>
-  </div>
-
-  @if($errors->has('amount'))
-    <div class="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">
-      {{ $errors->first('amount') }}
-    </div>
-  @endif
-
-  <form action="{{ route('portal.fees') }}" method="GET" class="mb-4">
-    <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-stone-400">Fee Type</label>
-    <select name="fee_type" onchange="this.form.submit()"
-            class="w-full max-w-xs rounded-lg border-stone-300 text-sm focus:border-stone-400 focus:ring-stone-400 sm:w-auto">
-      @foreach($feeTypeOptions as $value => $label)
-        <option value="{{ $value }}" @selected($slipFeeType === $value)>{{ $label }}</option>
-      @endforeach
-    </select>
-  </form>
-
-  <div class="mb-4 grid grid-cols-1 gap-3 rounded-xl bg-stone-50 p-4 sm:grid-cols-3">
-    <div>
-      <p class="text-[11px] font-semibold uppercase tracking-wide text-stone-400">Total for this semester</p>
-      <p class="mt-0.5 text-lg font-bold text-stone-700">Rs. {{ number_format($invoice['total']) }}</p>
-    </div>
-    <div>
-      <p class="text-[11px] font-semibold uppercase tracking-wide text-stone-400">Already invoiced</p>
-      <p class="mt-0.5 text-lg font-bold text-stone-700">Rs. {{ number_format($invoice['already_invoiced']) }}</p>
-    </div>
-    <div>
-      <p class="text-[11px] font-semibold uppercase tracking-wide text-stone-400">Available to invoice</p>
-      <p class="mt-0.5 text-lg font-bold text-emerald-600">Rs. {{ number_format($invoice['available']) }}</p>
-    </div>
-  </div>
-
-  @if($invoice['available'] > 0)
-    <form action="{{ route('portal.fees.generate-slip') }}" method="POST" class="flex flex-wrap items-end gap-3">
-      @csrf
-      <input type="hidden" name="fee_type" value="{{ $slipFeeType }}">
-      <input type="hidden" name="mode" :value="genMode">
-
-      <div class="flex gap-2">
-        <button type="button" @click="genMode = 'full'"
-                :class="genMode === 'full' ? 'text-white' : 'border-stone-300 text-stone-600'"
-                :style="genMode === 'full' ? 'background:var(--site-brand, #6b2d39)' : ''"
-                class="rounded-lg border px-4 py-2.5 text-sm font-semibold transition">
-          Full Payment
-        </button>
-        <button type="button" @click="genMode = 'partial'"
-                :class="genMode === 'partial' ? 'text-white' : 'border-stone-300 text-stone-600'"
-                :style="genMode === 'partial' ? 'background:var(--site-brand, #6b2d39)' : ''"
-                class="rounded-lg border px-4 py-2.5 text-sm font-semibold transition">
-          Partial Amount
-        </button>
-      </div>
-
-      <div x-show="genMode === 'partial'" x-cloak>
-        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-stone-400">Amount to Pay Now (Rs.)</label>
-        <input type="number" name="amount" step="0.01" min="1" max="{{ $invoice['available'] }}"
-               placeholder="e.g. 10000" :required="genMode === 'partial'"
-               class="w-44 rounded-lg border-stone-300 text-sm focus:border-stone-400 focus:ring-stone-400">
-      </div>
-
-      <div x-show="genMode === 'full'">
-        <p class="text-xs text-stone-500">Full remaining balance: <b class="text-stone-800">Rs. {{ number_format($invoice['available']) }}</b></p>
-      </div>
-
-      <button type="submit"
-              class="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
-              style="background:var(--site-brand, #6b2d39)">
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-        Generate Slip
-      </button>
-    </form>
-  @else
-    <p class="text-xs text-stone-400">This semester's {{ strtolower($feeTypeOptions[$slipFeeType] ?? 'fee') }} has been fully invoiced. Check your challans below for outstanding balances.</p>
-  @endif
-</div>
-
 {{-- ── Fee challans table ── --}}
 @if($payments->isEmpty())
 <div class="rounded-2xl border border-stone-200 bg-white p-16 text-center">
@@ -144,7 +54,7 @@
     <svg class="h-7 w-7 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
   </div>
   <h3 class="mb-1 font-semibold text-stone-500">No Fee Records</h3>
-  <p class="text-sm text-stone-400">Your fee challans will appear here — generate one above, or the accounts office may generate it for you.</p>
+  <p class="text-sm text-stone-400">Your fee challans will appear here once the accounts office generates them.</p>
 </div>
 @else
 <div class="rounded-2xl border border-stone-200 bg-white">
