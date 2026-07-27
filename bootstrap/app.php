@@ -19,6 +19,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health:   '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Must run before StartSession — see SetGuardSessionCookie's docblock for why
+        // admin/student/teacher each need their own session cookie.
+        $middleware->web(prepend: [\App\Http\Middleware\SetGuardSessionCookie::class]);
+
         // Trust the platform proxy (Railway/Vercel/etc.) so Laravel detects
         // the original HTTPS scheme and handles secure session/CSRF cookies.
         $middleware->trustProxies(at: '*', headers:
