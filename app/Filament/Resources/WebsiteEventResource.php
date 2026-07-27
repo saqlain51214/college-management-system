@@ -56,8 +56,8 @@ class WebsiteEventResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')->searchable()->wrap()->sortable(),
                 Tables\Columns\TextColumn::make('start_datetime')->label('Date')->dateTime('d M Y, h:i A')->sortable(),
-                Tables\Columns\TextColumn::make('venue')->placeholder('â€”')->toggleable(),
-                Tables\Columns\TextColumn::make('organizer')->placeholder('â€”')->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('venue')->placeholder('—')->toggleable(),
+                Tables\Columns\TextColumn::make('organizer')->placeholder('—')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_featured')->label('Featured')->boolean(),
                 Tables\Columns\IconColumn::make('is_published')->label('Published')->boolean(),
             ])

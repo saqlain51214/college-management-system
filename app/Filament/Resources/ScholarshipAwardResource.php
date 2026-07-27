@@ -40,7 +40,7 @@ class ScholarshipAwardResource extends Resource
                     Forms\Components\Select::make('student_id')
                         ->label('Student')
                         ->options(fn() => Student::where('is_active', true)->orderBy('name')
-                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' â€” ' . $s->name]))
+                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' — ' . $s->name]))
                         ->searchable()
                         ->preload()
                         ->required(),
@@ -76,12 +76,12 @@ class ScholarshipAwardResource extends Resource
                 Tables\Columns\TextColumn::make('student.roll_number')->label('Roll No.')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('student.name')->label('Student')->searchable()->wrap(),
                 Tables\Columns\TextColumn::make('scholarship.name')->label('Scholarship')->wrap()->sortable(),
-                Tables\Columns\TextColumn::make('academicYear.name')->label('Year')->placeholder('â€”'),
+                Tables\Columns\TextColumn::make('academicYear.name')->label('Year')->placeholder('—'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->formatStateUsing(fn($state) => $state instanceof ScholarshipStatusEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof ScholarshipStatusEnum ? $state->color() : 'gray'),
-                Tables\Columns\TextColumn::make('amount_awarded')->label('Amount')->money('PKR')->placeholder('â€”'),
+                Tables\Columns\TextColumn::make('amount_awarded')->label('Amount')->money('PKR')->placeholder('—'),
                 Tables\Columns\TextColumn::make('application_date')->label('Applied')->date('d M Y')->sortable(),
             ])
             ->filters([

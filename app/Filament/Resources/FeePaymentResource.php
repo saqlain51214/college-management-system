@@ -42,7 +42,7 @@ class FeePaymentResource extends Resource
                     Forms\Components\Select::make('student_id')
                         ->label('Student')
                         ->options(fn() => Student::where('is_active', true)->orderBy('name')
-                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' â€” ' . $s->name]))
+                            ->get()->mapWithKeys(fn($s) => [$s->id => $s->roll_number . ' — ' . $s->name]))
                         ->searchable()
                         ->preload()
                         ->required(),
@@ -165,7 +165,7 @@ class FeePaymentResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn($state) => $state instanceof FeeTypeEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof FeeTypeEnum ? $state->color() : 'gray'),
-                Tables\Columns\TextColumn::make('semester_number')->label('Sem')->prefix('S')->placeholder('â€”'),
+                Tables\Columns\TextColumn::make('semester_number')->label('Sem')->prefix('S')->placeholder('—'),
                 Tables\Columns\TextColumn::make('installment_no')
                     ->label('Installment')
                     ->formatStateUsing(fn (FeePayment $r) => 'S' . ($r->semester_number ?? '—') . ' · #' . $r->installment_no)
@@ -183,7 +183,7 @@ class FeePaymentResource extends Resource
                     ->formatStateUsing(fn($state) => $state instanceof PaymentStatusEnum ? $state->label() : $state)
                     ->color(fn($state) => $state instanceof PaymentStatusEnum ? $state->color() : 'gray'),
                 Tables\Columns\TextColumn::make('due_date')->label('Due Date')->date('d M Y')->sortable()->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('payment_date')->label('Paid On')->date('d M Y')->sortable()->placeholder('â€”'),
+                Tables\Columns\TextColumn::make('payment_date')->label('Paid On')->date('d M Y')->sortable()->placeholder('—'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('department')

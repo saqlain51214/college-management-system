@@ -66,12 +66,12 @@ $textColor    = $template->text_color    ?? '#111827';
 
 if ($payment !== null) {
     $s        = $payment->student;
-    $sName    = $s?->name ?? 'â€”';
-    $sFather  = $s?->father_name ?? 'â€”';
-    $sRoll    = $s?->registration_number ?: ($s?->roll_number ?? 'â€”');
-    $sProgram = $s?->academicProgram?->name ?? 'â€”';
-    $sSem     = $payment->semester_number ?? 'â€”';
-    $sSession = $payment->academicYear?->name ?? 'â€”';
+    $sName    = $s?->name ?? '—';
+    $sFather  = $s?->father_name ?? '—';
+    $sRoll    = $s?->registration_number ?: ($s?->roll_number ?? '—');
+    $sProgram = $s?->academicProgram?->name ?? '—';
+    $sSem     = $payment->semester_number ?? '—';
+    $sSession = $payment->academicYear?->name ?? '—';
     $installmentLabel = $payment->installment_no ? "Installment #{$payment->installment_no}" : '';
     if ($payment->payment_status?->value === 'paid' && !empty($payment->receipt_number)) {
         $installmentLabel = trim($installmentLabel . ($installmentLabel ? ' | ' : '') . "Receipt No: {$payment->receipt_number}");
@@ -84,7 +84,7 @@ if ($payment !== null) {
     $isPaid   = strtolower($stVal) === 'paid';
     $paidDate = $isPaid && $payment->payment_date ? Carbon::parse($payment->payment_date)->format('d-m-Y') : '';
     $dueDate  = $payment->due_date ? Carbon::parse($payment->due_date)->format('d-m-Y') : '';
-    $sn       = $payment->challan_number ?? 'â€”';
+    $sn       = $payment->challan_number ?? '—';
     $feeLabel = $payment->feeStructure?->title
         ?? ucwords(str_replace('_', ' ', $payment->fee_type instanceof \BackedEnum
             ? $payment->fee_type->value : ($payment->fee_type ?? 'Semester Fee')));
@@ -112,7 +112,7 @@ $college      = $template->college_name ?? \App\Models\CollegeSetting::get('coll
 $collegeSub   = $template->college_subtitle ?? '';
 $collegeShort = $template->college_short_name ?? 'JDCA';
 $bankName     = $template->bank_name ?? 'KCBL';
-$bankAcct     = $template->bank_account ?? 'â€”';
+$bankAcct     = $template->bank_account ?? '—';
 $bankTitle    = $template->bank_account_title ?? $college;
 $bankBranch   = $template->bank_branch ?? '';
 $refPfx       = $template->ref_prefix ?? 'JDCA';
