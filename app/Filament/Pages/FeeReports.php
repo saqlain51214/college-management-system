@@ -3,7 +3,10 @@
 namespace App\Filament\Pages;
 
 use App\Enums\PaymentStatusEnum;
+use App\Enums\RefundStatusEnum;
+use App\Models\ActivityLog;
 use App\Models\FeePayment;
+use App\Models\FeeRefund;
 use Filament\Pages\Page;
 use Illuminate\Support\Carbon;
 
@@ -26,6 +29,9 @@ class FeeReports extends Page
 
     /** @var array<int,array<string,mixed>> */
     public array $outstanding = [];
+
+    /** @var array<int,array<string,mixed>> */
+    public array $pendingRefunds = [];
 
     public static function canAccess(): bool
     {
@@ -53,6 +59,11 @@ class FeeReports extends Page
                 ->sum('amount_paid'),
             'paid_count'      => FeePayment::where('payment_status', PaymentStatusEnum::Paid->value)->count(),
             'scholarship_count' => \App\Models\Student::whereNotNull('scholarship_type')->whereNotNull('scholarship_value')->count(),
+            'total_refunded'  => (float) FeeRefund::where('status', RefundStatusEnum::Approved->value)->sum('amount'),
+            'pending_refunds' => FeeRefund::where('status', RefundStatusEnum::Pending->value)->count(),
+            'total_discounts' => (float) FeePayment::sum('discount_amount'),
+            'total_waived'    => (float) ActivityLog::where('event', 'fee.fine_waived')->get()
+                ->sum(fn ($log) => (float) ($log->meta['waived'] ?? 0)),
         ];
 
         $this->outstanding = FeePayment::with('student')
@@ -78,6 +89,19 @@ class FeeReports extends Page
                     'days_late' => ($p->due_date && $p->due_date->isPast()) ? $p->due_date->diffInDays($today) : 0,
                 ];
             })
+            ->all();
+
+        $this->pendingRefunds = FeeRefund::with('student')
+            ->where('status', RefundStatusEnum::Pending->value)
+            ->orderBy('created_at')
+            ->get()
+            ->map(fn (FeeRefund $r) => [
+                'student' => $r->student?->name ?? '—',
+                'roll'    => $r->student?->roll_number ?? '—',
+                'amount'  => (float) $r->amount,
+                'reason'  => $r->reason,
+                'date'    => $r->created_at?->format('d M Y'),
+            ])
             ->all();
     }
 }

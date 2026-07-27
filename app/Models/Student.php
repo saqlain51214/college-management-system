@@ -66,6 +66,7 @@ class Student extends Model implements AuthenticatableContract
     public function academicProgram(): BelongsTo{ return $this->belongsTo(AcademicProgram::class); }
     public function academicYear(): BelongsTo   { return $this->belongsTo(AcademicYear::class); }
     public function feePayments()               { return $this->hasMany(FeePayment::class); }
+    public function feeRefunds()                { return $this->hasMany(FeeRefund::class); }
 
     // ─── Accessors & Mutators ─────────────────────────────────────────────
     protected function fullName(): Attribute

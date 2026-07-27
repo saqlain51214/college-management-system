@@ -27,6 +27,12 @@ class TeacherResource extends Resource
     protected static ?int    $navigationSort  = 1;
     protected static ?string $recordTitleAttribute = 'name';
 
+    /** Lets admins ⌘K-search by employee ID, not just name. */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'employee_id'];
+    }
+
     // ─── Form ────────────────────────────────────────────────────────────────
 
     public static function form(Form $form): Form

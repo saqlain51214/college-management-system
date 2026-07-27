@@ -87,9 +87,21 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-users')
                     ->collapsed(false),
 
-                NavigationGroup::make('Finance')
+                NavigationGroup::make('Fees & Billing')
                     ->icon('heroicon-o-banknotes')
                     ->collapsed(false),
+
+                NavigationGroup::make('Scholarships')
+                    ->icon('heroicon-o-academic-cap')
+                    ->collapsed(false),
+
+                NavigationGroup::make('Payroll')
+                    ->icon('heroicon-o-wallet')
+                    ->collapsed(false),
+
+                NavigationGroup::make('Communications')
+                    ->icon('heroicon-o-envelope')
+                    ->collapsed(true),
 
                 NavigationGroup::make('Website Management')
                     ->icon('heroicon-o-globe-alt')

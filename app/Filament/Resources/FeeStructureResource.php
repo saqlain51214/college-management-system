@@ -65,7 +65,12 @@ class FeeStructureResource extends Resource
                         ->required()
                         ->minValue(0)
                         ->prefix('Rs.')
-                        ->placeholder('e.g. 25000'),
+                        ->placeholder('e.g. 25000')
+                        ->disabled(fn (?FeeStructure $record) => $record !== null)
+                        ->dehydrated()
+                        ->helperText(fn (?FeeStructure $record) => $record
+                            ? 'Use the "Update Amount" action on the table to change this — keeps a history and never affects already-generated challans.'
+                            : null),
 
                     Forms\Components\TextInput::make('late_fine_per_day')
                         ->label('Late Fine Per Day (PKR)')
@@ -120,6 +125,52 @@ class FeeStructureResource extends Resource
             ])
             ->recordUrl(null)
             ->actions([
+                Tables\Actions\Action::make('updateAmount')
+                    ->label('Update Amount')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('warning')
+                    ->form(fn (FeeStructure $r) => [
+                        Forms\Components\Placeholder::make('current')
+                            ->label('Current Amount')
+                            ->content(fn () => 'Rs. ' . number_format((float) $r->amount)),
+                        Forms\Components\TextInput::make('new_amount')
+                            ->label('New Amount (PKR)')
+                            ->numeric()->prefix('Rs.')->required()->minValue(0),
+                        Forms\Components\DatePicker::make('effective_from')
+                            ->label('Effective From')->default(now())->native(false)->displayFormat('d M Y')->required(),
+                        Forms\Components\Textarea::make('reason')
+                            ->label('Reason')->required()->rows(2),
+                    ])
+                    ->action(function (FeeStructure $r, array $data) {
+                        $oldAmount = (float) $r->amount;
+
+                        \App\Models\FeeStructureRevision::create([
+                            'fee_structure_id' => $r->id,
+                            'old_amount'       => $oldAmount,
+                            'new_amount'       => $data['new_amount'],
+                            'effective_from'   => $data['effective_from'],
+                            'reason'           => $data['reason'],
+                            'changed_by'       => auth()->id(),
+                        ]);
+
+                        $r->amount = $data['new_amount'];
+                        $r->save();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Amount updated')
+                            ->body('Already-generated challans keep their original amount — this only applies to new challans from now on.')
+                            ->success()
+                            ->send();
+                    }),
+                Tables\Actions\Action::make('revisionHistory')
+                    ->label('History')
+                    ->icon('heroicon-o-clock')
+                    ->color('gray')
+                    ->modalHeading('Amount Revision History')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->visible(fn (FeeStructure $r) => $r->revisions()->exists())
+                    ->modalContent(fn (FeeStructure $r) => view('filament.resources.fee-structure-resource.revision-history', ['revisions' => $r->revisions()->with('changedBy')->get()])),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),

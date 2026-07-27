@@ -37,6 +37,7 @@ class CollegeSettingSeeder extends Seeder
             // Fee Settings
             ['key' => 'fee_late_fine_per_day',  'value' => '100',           'group' => 'fee'],
             ['key' => 'fee_grace_days',         'value' => '7',             'group' => 'fee'],
+            ['key' => 'fee_reminder_days_before', 'value' => '3',           'group' => 'fee'],
             ['key' => 'fee_bank_name',          'value' => 'HBL',           'group' => 'fee'],
             ['key' => 'fee_bank_account',       'value' => '0001234567890', 'group' => 'fee'],
             ['key' => 'fee_bank_branch',        'value' => 'Main Branch, Lahore', 'group' => 'fee'],

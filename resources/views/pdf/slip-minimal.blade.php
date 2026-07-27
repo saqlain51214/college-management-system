@@ -85,6 +85,9 @@ if ($payment !== null) {
     $sSem     = $payment->semester_number ?? '—';
     $sSession = $payment->academicYear?->name ?? '—';
     $installmentLabel = $payment->installment_no ? "Installment #{$payment->installment_no}" : '';
+    if ($payment->payment_status?->value === 'paid' && !empty($payment->receipt_number)) {
+        $installmentLabel = trim($installmentLabel . ($installmentLabel ? ' | ' : '') . "Receipt No: {$payment->receipt_number}");
+    }
     $due      = (float)($payment->amount_due ?? 0);
     $fine     = (float)($payment->fine_amount ?? 0);
     $disc     = (float)($payment->discount_amount ?? 0);

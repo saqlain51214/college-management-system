@@ -25,6 +25,13 @@ class FeePaymentResource extends Resource
     protected static ?string $navigationGroup = 'Fees & Billing';
     protected static ?string $navigationLabel = 'Fee Payments';
     protected static ?int    $navigationSort  = 4;
+    protected static ?string $recordTitleAttribute = 'challan_number';
+
+    /** Lets admins ⌘K-search a challan/receipt directly, or by student name/roll. */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['challan_number', 'receipt_number', 'student.name', 'student.roll_number'];
+    }
 
     public static function form(Form $form): Form
     {
@@ -72,16 +79,30 @@ class FeePaymentResource extends Resource
                         ->searchable()
                         ->placeholder('Select if applicable'),
 
-                    Forms\Components\TextInput::make('amount_due')->label('Amount Due (PKR)')->numeric()->required()->prefix('Rs.'),
+                    Forms\Components\TextInput::make('amount_due')
+                        ->label('Amount Due (PKR)')->numeric()->required()->prefix('Rs.')
+                        ->helperText('Locked once any payment is recorded — generate a new challan instead of retyping this.')
+                        ->disabled(fn (?FeePayment $record) => $record && ((float) $record->amount_paid > 0 || $record->payment_status !== PaymentStatusEnum::Pending))
+                        ->dehydrated(),
                     Forms\Components\TextInput::make('amount_paid')->label('Amount Paid (PKR)')->numeric()->default(0)->prefix('Rs.'),
-                    Forms\Components\TextInput::make('fine_amount')->label('Late Fine (PKR)')->numeric()->default(0)->prefix('Rs.'),
-                    Forms\Components\TextInput::make('discount_amount')->label('Discount (PKR)')->numeric()->default(0)->prefix('Rs.'),
+                    Forms\Components\TextInput::make('fine_amount')
+                        ->label('Late Fine (PKR)')->numeric()->default(0)->prefix('Rs.')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->helperText('Read-only — use the "Waive Late Fee" action on the table to adjust this with a recorded reason.'),
+                    Forms\Components\TextInput::make('discount_amount')
+                        ->label('Discount (PKR)')->numeric()->default(0)->prefix('Rs.')
+                        ->disabled()
+                        ->dehydrated(false)
+                        ->helperText('Read-only — use the "Apply Discount" action on the table to adjust this with a recorded reason.'),
 
                     Forms\Components\Select::make('payment_status')
                         ->label('Payment Status')
                         ->options(PaymentStatusEnum::options())
                         ->default(PaymentStatusEnum::Pending->value)
-                        ->required(),
+                        ->required()
+                        ->disabled(fn (?FeePayment $record) => $record && $record->payment_status === PaymentStatusEnum::Paid)
+                        ->dehydrated(),
 
                     Forms\Components\Select::make('payment_method')
                         ->label('Payment Method')
@@ -236,15 +257,7 @@ class FeePaymentResource extends Resource
                     ->iconButton()
                     ->url(fn(FeePayment $r) => route('pdf.challan', $r))
                     ->openUrlInNewTab(),
-                Tables\Actions\Action::make('viewProof')
-                    ->label('View Proof')
-                    ->icon('heroicon-o-paper-clip')
-                    ->color('warning')
-                    ->iconButton()
-                    ->visible(fn(FeePayment $r) => !empty($r->payment_proof_path))
-                    ->url(fn(FeePayment $r) => asset('storage/' . $r->payment_proof_path))
-                    ->openUrlInNewTab()
-                    ->tooltip('View student-uploaded payment proof'),
+                ...self::proofReviewActions(),
 
                 Tables\Actions\Action::make('markPaid')
                     ->label('Mark Paid')
@@ -257,32 +270,70 @@ class FeePaymentResource extends Resource
                     ->visible(fn(FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid)
                     ->action(fn (FeePayment $r) => $r->markAsPaid(auth()->id())),
 
-                Tables\Actions\Action::make('confirmProofPayment')
-                    ->label('Confirm Payment')
-                    ->icon('heroicon-o-shield-check')
-                    ->color('success')
+                Tables\Actions\Action::make('waiveFine')
+                    ->label('Waive Late Fee')
+                    ->icon('heroicon-o-receipt-refund')
+                    ->color('warning')
                     ->iconButton()
-                    ->tooltip('Student claims this was paid — review and confirm')
-                    ->visible(fn (FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid && ! empty($r->payment_proof_path))
+                    ->tooltip('Waive Late Fee')
+                    ->visible(fn (FeePayment $r) => (float) $r->fine_amount > 0 && $r->payment_status !== PaymentStatusEnum::Paid)
                     ->form(fn (FeePayment $r) => [
-                        Forms\Components\Placeholder::make('claimed')
-                            ->label('Student Claims')
-                            ->content(fn () => 'Rs. ' . number_format((float) ($r->proof_claimed_amount ?? $r->amount_due))
-                                . ' on ' . ($r->proof_claimed_date?->format('d M Y') ?? '—')),
-                        Forms\Components\TextInput::make('payment_date')
-                            ->label('Payment Date')
-                            ->default(fn () => $r->proof_claimed_date?->toDateString() ?? now()->toDateString())
-                            ->required(),
-                        Forms\Components\Select::make('payment_method')
-                            ->label('Payment Method')
-                            ->options(PaymentMethodEnum::options())
-                            ->default(PaymentMethodEnum::BankDraft->value),
+                        Forms\Components\TextInput::make('waived_amount')
+                            ->label('Amount to Waive (PKR)')
+                            ->numeric()->prefix('Rs.')->required()
+                            ->default(fn () => (float) $r->fine_amount)
+                            ->maxValue(fn () => (float) $r->fine_amount),
+                        Forms\Components\Textarea::make('reason')
+                            ->label('Reason')->required()->rows(2),
                     ])
-                    ->action(fn (FeePayment $r, array $data) => $r->markAsPaid(
-                        auth()->id(),
-                        $data['payment_date'] ?? null,
-                        $data['payment_method'] ?? null,
-                    )),
+                    ->action(function (FeePayment $r, array $data) {
+                        $before = (float) $r->fine_amount;
+                        $waived = (float) $data['waived_amount'];
+                        $r->fine_amount = max(0, round($before - $waived, 2));
+                        $r->save();
+
+                        \App\Support\ActivityLogWriter::activity(
+                            'fee.fine_waived',
+                            subject: $r,
+                            message: "Waived Rs. " . number_format($waived) . " late fee on challan {$r->challan_number}. Reason: {$data['reason']}",
+                            meta: ['before' => $before, 'after' => (float) $r->fine_amount, 'waived' => $waived, 'reason' => $data['reason']],
+                        );
+
+                        \Filament\Notifications\Notification::make()->title('Late fee waived')->success()->send();
+                    }),
+
+                Tables\Actions\Action::make('applyDiscount')
+                    ->label('Apply Discount')
+                    ->icon('heroicon-o-tag')
+                    ->color('info')
+                    ->iconButton()
+                    ->tooltip('Apply Discount')
+                    ->visible(fn (FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid)
+                    ->form(fn (FeePayment $r) => [
+                        Forms\Components\TextInput::make('discount_amount')
+                            ->label('Discount Amount (PKR)')
+                            ->numeric()->prefix('Rs.')->required()
+                            ->default(fn () => (float) $r->discount_amount)
+                            ->maxValue(fn () => (float) $r->amount_due),
+                        Forms\Components\Textarea::make('reason')
+                            ->label('Reason')->required()->rows(2),
+                    ])
+                    ->action(function (FeePayment $r, array $data) {
+                        $before = (float) $r->discount_amount;
+                        $after  = (float) $data['discount_amount'];
+                        $r->discount_amount = $after;
+                        $r->save();
+
+                        \App\Support\ActivityLogWriter::activity(
+                            'fee.discount_applied',
+                            subject: $r,
+                            message: "Set discount to Rs. " . number_format($after) . " on challan {$r->challan_number}. Reason: {$data['reason']}",
+                            meta: ['before' => $before, 'after' => $after, 'reason' => $data['reason']],
+                        );
+
+                        \Filament\Notifications\Notification::make()->title('Discount applied')->success()->send();
+                    }),
+
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn(FeePayment $r) => ! $r->isLocked()),
                 Tables\Actions\ForceDeleteAction::make()
@@ -335,6 +386,86 @@ class FeePaymentResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->paginated([10, 25, 50, 100])
             ->striped();
+    }
+
+    /**
+     * The proof-review actions (view uploaded proof, confirm the student's claimed
+     * payment, or reject and ask them to re-upload) — shared verbatim between this
+     * resource's table and the dedicated ProofReview dashboard page, so there's one
+     * implementation of "how admin reviews an uploaded proof," not two.
+     *
+     * @return array<int, Tables\Actions\Action>
+     */
+    public static function proofReviewActions(): array
+    {
+        return [
+            Tables\Actions\Action::make('viewProof')
+                ->label('View Proof')
+                ->icon('heroicon-o-paper-clip')
+                ->color('warning')
+                ->iconButton()
+                ->visible(fn (FeePayment $r) => !empty($r->payment_proof_path))
+                ->url(fn (FeePayment $r) => asset('storage/' . $r->payment_proof_path))
+                ->openUrlInNewTab()
+                ->tooltip('View student-uploaded payment proof'),
+
+            Tables\Actions\Action::make('confirmProofPayment')
+                ->label('Confirm Payment')
+                ->icon('heroicon-o-shield-check')
+                ->color('success')
+                ->iconButton()
+                ->tooltip('Student claims this was paid — review and confirm')
+                ->visible(fn (FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid && ! empty($r->payment_proof_path))
+                ->form(fn (FeePayment $r) => [
+                    Forms\Components\Placeholder::make('claimed')
+                        ->label('Student Claims')
+                        ->content(fn () => 'Rs. ' . number_format((float) ($r->proof_claimed_amount ?? $r->amount_due))
+                            . ' on ' . ($r->proof_claimed_date?->format('d M Y') ?? '—')),
+                    Forms\Components\TextInput::make('payment_date')
+                        ->label('Payment Date')
+                        ->default(fn () => $r->proof_claimed_date?->toDateString() ?? now()->toDateString())
+                        ->required(),
+                    Forms\Components\Select::make('payment_method')
+                        ->label('Payment Method')
+                        ->options(PaymentMethodEnum::options())
+                        ->default(PaymentMethodEnum::BankDraft->value),
+                ])
+                ->action(fn (FeePayment $r, array $data) => $r->markAsPaid(
+                    auth()->id(),
+                    $data['payment_date'] ?? null,
+                    $data['payment_method'] ?? null,
+                )),
+
+            Tables\Actions\Action::make('rejectProof')
+                ->label('Reject Proof')
+                ->icon('heroicon-o-x-circle')
+                ->color('danger')
+                ->iconButton()
+                ->tooltip('Reject this proof — student will need to re-upload')
+                ->visible(fn (FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid && ! empty($r->payment_proof_path))
+                ->requiresConfirmation()
+                ->modalHeading('Reject Payment Proof')
+                ->modalDescription('This clears the uploaded proof so the student can upload a corrected one. The challan itself is not changed.')
+                ->form([
+                    Forms\Components\Textarea::make('reason')->label('Reason')->required()->rows(2),
+                ])
+                ->action(function (FeePayment $r, array $data) {
+                    \App\Support\ActivityLogWriter::activity(
+                        'fee.proof_rejected',
+                        subject: $r,
+                        message: "Rejected payment proof on challan {$r->challan_number}. Reason: {$data['reason']}",
+                        meta: ['reason' => $data['reason']],
+                    );
+
+                    $r->payment_proof_path    = null;
+                    $r->proof_uploaded_at     = null;
+                    $r->proof_claimed_amount  = null;
+                    $r->proof_claimed_date    = null;
+                    $r->save();
+
+                    \Filament\Notifications\Notification::make()->title('Proof rejected')->success()->send();
+                }),
+        ];
     }
 
     public static function getNavigationBadge(): ?string

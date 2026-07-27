@@ -19,6 +19,17 @@ class ActivityLogObserver
         );
     }
 
+    /**
+     * Financially sensitive columns get their old→new values captured in the
+     * audit log, not just the changed field name — these are the fields where
+     * "what changed" matters as much as "that something changed."
+     */
+    private const SENSITIVE_COLUMNS = [
+        \App\Models\FeePayment::class => ['amount_due', 'fine_amount', 'discount_amount', 'payment_status', 'amount_paid'],
+        \App\Models\TeacherSalaryPayment::class => ['net_amount', 'amount_paid', 'payment_status'],
+        \App\Models\FeeStructure::class => ['amount'],
+    ];
+
     public function updated(Model $model): void
     {
         $changed = collect(array_keys($model->getChanges()))
@@ -38,10 +49,26 @@ class ActivityLogObserver
             return;
         }
 
+        $meta = array_merge($this->baseMeta($model), ['changed' => $changed]);
+
+        $sensitive = self::SENSITIVE_COLUMNS[$model::class] ?? [];
+        if ($sensitive !== []) {
+            $values = [];
+            foreach (array_intersect($changed, $sensitive) as $column) {
+                $values[$column] = [
+                    'from' => $model->getOriginal($column),
+                    'to'   => $model->getAttribute($column),
+                ];
+            }
+            if ($values !== []) {
+                $meta['values'] = $values;
+            }
+        }
+
         ActivityLogWriter::activity(
             'updated',
             'Updated ' . $this->modelLabel($model),
-            array_merge($this->baseMeta($model), ['changed' => $changed]),
+            $meta,
             $model
         );
     }

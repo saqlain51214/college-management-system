@@ -102,7 +102,37 @@ class StudentPortalController extends Controller
             'proof_claimed_date'   => $request->input('deposit_date'),
         ]);
 
+        $this->notifyAdminsOfProofUpload($student, $payment);
+
         return back()->with('proof_uploaded', 'Payment proof uploaded. Admin will verify the amount and date, then mark it as paid.');
+    }
+
+    /**
+     * Same admin-alert pattern used by CheckOverdueFees and FeeRefund — only query
+     * roles that actually exist for this guard, so a missing dev-only role never
+     * crashes an otherwise-successful upload.
+     */
+    private function notifyAdminsOfProofUpload($student, FeePayment $payment): void
+    {
+        $existingRoles = \Spatie\Permission\Models\Role::whereIn('name', ['super_admin', 'Developer'])
+            ->where('guard_name', 'web')->pluck('name')->all();
+        $admins = $existingRoles ? \App\Models\User::role($existingRoles)->get() : collect();
+
+        \Filament\Notifications\Notification::make()
+            ->warning()
+            ->title('Payment Proof Uploaded')
+            ->body(
+                $student->name . ' claims Rs. ' . number_format((float) $payment->proof_claimed_amount) .
+                ' paid on ' . \Illuminate\Support\Carbon::parse($payment->proof_claimed_date)->format('d M Y') .
+                ' for challan ' . $payment->challan_number . '.'
+            )
+            ->actions([
+                \Filament\Notifications\Actions\Action::make('review')
+                    ->label('Review Proof')
+                    ->button()
+                    ->url(\App\Filament\Pages\ProofReview::getUrl()),
+            ])
+            ->sendToDatabase($admins);
     }
 
     public function notices()

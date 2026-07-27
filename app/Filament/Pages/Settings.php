@@ -173,6 +173,13 @@ class Settings extends Page implements HasForms
                             ->suffix('days')
                             ->columnSpan(1),
 
+                        TextInput::make('fee_reminder_days_before')
+                            ->label('Due-Date Reminder (days before)')
+                            ->numeric()
+                            ->suffix('days')
+                            ->helperText('Students get one reminder this many days before a challan is due.')
+                            ->columnSpan(1),
+
                         TextInput::make('fee_bank_name')
                             ->label('Bank Name')
                             ->placeholder('e.g. HBL, UBL')
@@ -460,6 +467,7 @@ class Settings extends Page implements HasForms
             'working_days_per_week'      => 'academic',
             'fee_late_fine_per_day'      => 'fee',
             'fee_grace_days'             => 'fee',
+            'fee_reminder_days_before'   => 'fee',
             'fee_bank_name'              => 'fee',
             'fee_bank_account'           => 'fee',
             'fee_bank_branch'            => 'fee',

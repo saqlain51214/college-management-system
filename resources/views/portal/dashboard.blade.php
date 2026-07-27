@@ -29,6 +29,12 @@
               style="background: rgba(196,151,58,0.25); color: #f4cc80">
           {{ $student->status instanceof \BackedEnum ? $student->status->value : ($student->status ?? 'active') }}
         </span>
+        @if($student->has_scholarship)
+        <span class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-medium"
+              style="background: rgba(34,197,94,0.2); color: #86efac">
+          🎓 {{ $student->scholarship_label }}
+        </span>
+        @endif
       </div>
       <div class="flex flex-wrap gap-2 mt-4">
         <a href="{{ route('portal.fees') }}" class="portal-chip" style="background: rgba(196,151,58,0.16); color: #fde68a; border-color: rgba(245,158,11,0.2)">Fee Summary</a>

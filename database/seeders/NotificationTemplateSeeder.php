@@ -53,6 +53,45 @@ class NotificationTemplateSeeder extends Seeder
             ],
 
             [
+                'key'          => 'fee_slip_generated',
+                'name'         => 'Fee Slip Generated — Student',
+                'description'  => 'Sent when a new fee challan is generated for a student (full or installment).',
+                'channel'      => 'both',
+                'subject'      => 'New Fee Challan Generated — PKR {{amount}} — JDCA',
+                'body'         => "Dear {{student_name}},\n\nA new fee challan has been generated for you.\n\n**Fee Type:** {{fee_type}}\n**Amount:** PKR {{amount}}\n**Challan No:** {{challan}}\n**Due Date:** {{due_date}}\n\nPlease log in to your student portal to download and pay this challan before the due date.",
+                'action_label' => 'View Fee Challan',
+                'action_url'   => '/portal/fees',
+                'in_app_icon'  => 'document-text',
+                'variables'    => ['student_name', 'amount', 'fee_type', 'challan', 'due_date'],
+            ],
+
+            [
+                'key'          => 'fee_due_reminder',
+                'name'         => 'Fee Due Reminder — Student',
+                'description'  => 'Sent a few days before a fee challan\'s due date by the fees:send-due-reminders command.',
+                'channel'      => 'both',
+                'subject'      => 'Fee Due Soon — PKR {{amount}} — JDCA',
+                'body'         => "Dear {{student_name}},\n\nThis is a friendly reminder that your fee payment of **PKR {{amount}}** for **{{fee_type}}** (Challan {{challan}}) is due on **{{due_date}}**.\n\nPlease pay before the due date to avoid a late fee.",
+                'action_label' => 'Pay Now',
+                'action_url'   => '/portal/fees',
+                'in_app_icon'  => 'bell-alert',
+                'variables'    => ['student_name', 'amount', 'fee_type', 'challan', 'due_date'],
+            ],
+
+            [
+                'key'          => 'refund_approved',
+                'name'         => 'Refund Approved — Student',
+                'description'  => 'Sent when the accounts office approves a student\'s refund request.',
+                'channel'      => 'both',
+                'subject'      => 'Refund Approved — PKR {{amount}} — JDCA',
+                'body'         => "Dear {{student_name}},\n\nYour refund request has been approved.\n\n**Amount:** PKR {{amount}}\n**Reason:** {{reason}}\n\nPlease contact the accounts office to collect your refund.",
+                'action_label' => null,
+                'action_url'   => null,
+                'in_app_icon'  => 'banknotes',
+                'variables'    => ['student_name', 'amount', 'reason'],
+            ],
+
+            [
                 'key'          => 'scholarship_awarded',
                 'name'         => 'Scholarship Awarded — Student',
                 'description'  => 'Sent when a scholarship is awarded to a student.',
@@ -156,6 +195,32 @@ class NotificationTemplateSeeder extends Seeder
                 'action_url'   => null,
                 'in_app_icon'  => 'pencil-square',
                 'variables'    => ['exam_name', 'course_name', 'deadline'],
+            ],
+
+            [
+                'key'          => 'teacher_salary_processed',
+                'name'         => 'Salary Processed — Teacher',
+                'description'  => 'In-app notification when a teacher\'s monthly salary record is generated (not yet paid).',
+                'channel'      => 'database',
+                'subject'      => 'Salary Processed — {{period}}',
+                'body'         => 'Your salary for **{{period}}** (PKR {{amount}}) has been processed and is pending payment.',
+                'action_label' => 'View Salary',
+                'action_url'   => '/teacher/salary',
+                'in_app_icon'  => 'banknotes',
+                'variables'    => ['teacher_name', 'amount', 'period'],
+            ],
+
+            [
+                'key'          => 'teacher_salary_paid',
+                'name'         => 'Salary Paid — Teacher',
+                'description'  => 'Sent when a teacher\'s salary is marked as paid.',
+                'channel'      => 'both',
+                'subject'      => 'Salary Paid — PKR {{amount}} — JDCA',
+                'body'         => "Dear {{teacher_name}},\n\nYour salary for **{{period}}** amounting to **PKR {{amount}}** has been paid.\n\nThank you for your continued service.",
+                'action_label' => 'View Salary History',
+                'action_url'   => '/teacher/salary',
+                'in_app_icon'  => 'check-circle',
+                'variables'    => ['teacher_name', 'amount', 'period'],
             ],
 
             [

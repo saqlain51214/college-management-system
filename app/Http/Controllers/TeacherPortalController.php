@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TeacherPortalPasswordChangedMail;
 use App\Models\Announcement;
 use App\Models\Teacher;
 use App\Models\TeacherSalaryPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class TeacherPortalController extends Controller
 {
@@ -83,6 +85,10 @@ class TeacherPortalController extends Controller
         }
 
         $teacher->update(['portal_password' => $request->password]);
+
+        if (filled($teacher->email)) {
+            Mail::to($teacher->email)->queue(new TeacherPortalPasswordChangedMail($teacher->fresh()));
+        }
 
         return back()->with('success', 'Password updated successfully.');
     }

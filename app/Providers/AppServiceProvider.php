@@ -7,6 +7,7 @@ use App\Models\Announcement;
 use App\Models\Course;
 use App\Models\Department;
 use App\Models\FeePayment;
+use App\Models\FeeRefund;
 use App\Models\FeeStructure;
 use App\Models\HomeSection;
 use App\Models\ListItem;
@@ -15,6 +16,7 @@ use App\Models\Scholarship;
 use App\Models\ScholarshipAward;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\TeacherSalaryPayment;
 use App\Models\WebsiteEvent;
 use App\Models\WebsitePage;
 use App\Observers\ActivityLogObserver;
@@ -70,6 +72,7 @@ class AppServiceProvider extends ServiceProvider
             Course::class,
             Department::class,
             FeePayment::class,
+            FeeRefund::class,
             FeeStructure::class,
             HomeSection::class,
             ListItem::class,
@@ -78,6 +81,7 @@ class AppServiceProvider extends ServiceProvider
             ScholarshipAward::class,
             Student::class,
             Teacher::class,
+            TeacherSalaryPayment::class,
             WebsiteEvent::class,
             WebsitePage::class,
         ] as $modelClass) {

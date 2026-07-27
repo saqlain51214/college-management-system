@@ -32,6 +32,12 @@ class StudentResource extends Resource
     protected static ?int    $navigationSort  = 1;
     protected static ?string $recordTitleAttribute = 'name';
 
+    /** Lets admins ⌘K-search by roll/registration number, not just name. */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'roll_number', 'registration_number'];
+    }
+
     // ─── Form ────────────────────────────────────────────────────────────────
 
     public static function form(Form $form): Form

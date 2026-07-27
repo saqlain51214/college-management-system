@@ -59,6 +59,16 @@ class StudentLedger extends Page
     public int $slipInstallmentCount = 2;
     public int $slipInstallmentGapDays = 30;
 
+    // ─── Request Refund ────────────────────────────────────────────────────
+    public ?string $refundAmount = null;
+    public ?string $refundReason = null;
+    public $refundFeePaymentId = null;
+    public ?string $refundSuccess = null;
+    public ?string $refundError = null;
+
+    /** @var array<int,array<string,mixed>> */
+    public array $refunds = [];
+
     public static function canAccess(): bool
     {
         return auth()->user()?->hasAnyRole(['super_admin', 'admin', 'Developer', 'panel_user']) ?? false;
@@ -66,7 +76,7 @@ class StudentLedger extends Page
 
     public function search(): void
     {
-        $this->reset(['student', 'payments', 'totals', 'notFound', 'studentId', 'slipSuccess', 'slipError']);
+        $this->reset(['student', 'payments', 'totals', 'notFound', 'studentId', 'slipSuccess', 'slipError', 'refunds', 'refundSuccess', 'refundError']);
         $this->searched = true;
 
         $term = trim($this->q);
@@ -149,6 +159,53 @@ class StudentLedger extends Page
             'count'       => count($rows),
             'unpaid'      => collect($rows)->where('balance', '>', 0)->count(),
         ];
+
+        $this->refunds = $student->feeRefunds()->with('feePayment')->orderByDesc('created_at')->get()
+            ->map(fn ($r) => [
+                'id'      => $r->id,
+                'amount'  => (float) $r->amount,
+                'reason'  => $r->reason,
+                'status'  => $r->status instanceof \App\Enums\RefundStatusEnum ? $r->status->value : (string) $r->status,
+                'challan' => $r->feePayment?->challan_number,
+                'date'    => $r->created_at?->format('d M Y'),
+            ])->all();
+    }
+
+    public function requestRefund(): void
+    {
+        $this->refundSuccess = null;
+        $this->refundError   = null;
+
+        $student = $this->studentId ? Student::find($this->studentId) : null;
+        if (! $student) {
+            $this->refundError = 'No student is loaded. Please search again.';
+            return;
+        }
+
+        if (blank($this->refundAmount) || (float) $this->refundAmount <= 0) {
+            $this->refundError = 'Please enter an amount greater than zero.';
+            return;
+        }
+
+        if (blank($this->refundReason)) {
+            $this->refundError = 'Please enter a reason for the refund.';
+            return;
+        }
+
+        \App\Models\FeeRefund::create([
+            'student_id'     => $student->id,
+            'fee_payment_id' => $this->normalizeInt($this->refundFeePaymentId),
+            'amount'         => $this->refundAmount,
+            'reason'         => $this->refundReason,
+            'status'         => 'pending',
+            'requested_by'   => auth()->id(),
+        ]);
+
+        $this->refundSuccess = 'Refund request of Rs. ' . number_format((float) $this->refundAmount) . ' submitted for approval.';
+        $this->refundAmount  = null;
+        $this->refundReason  = null;
+        $this->refundFeePaymentId = null;
+        $this->loadStudent($student->fresh(['academicProgram', 'department']));
     }
 
     /**

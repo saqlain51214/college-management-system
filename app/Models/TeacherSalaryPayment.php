@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\NotificationService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -60,6 +61,14 @@ class TeacherSalaryPayment extends Model
             $this->paid_by = $paidById;
         }
         $this->save();
+
+        if ($this->teacher) {
+            app(NotificationService::class)->send($this->teacher, 'teacher_salary_paid', [
+                'teacher_name' => $this->teacher->name,
+                'amount'       => number_format((float) $this->amount_paid),
+                'period'       => $this->month_label,
+            ]);
+        }
     }
 
     /**
@@ -84,7 +93,7 @@ class TeacherSalaryPayment extends Model
         $deductions  = (float) ($overrides['deductions'] ?? 0);
         $netAmount   = round($basicSalary + $allowances - $deductions, 2);
 
-        return static::create([
+        $payment = static::create([
             'teacher_id'      => $teacher->id,
             'reference_no'    => 'SAL-' . strtoupper(Str::random(8)),
             'year'            => $year,
@@ -98,5 +107,13 @@ class TeacherSalaryPayment extends Model
             'due_date'        => $overrides['due_date'] ?? \Illuminate\Support\Carbon::create($year, $month, 1)->endOfMonth()->toDateString(),
             'remarks'         => $overrides['remarks'] ?? null,
         ]);
+
+        app(NotificationService::class)->send($teacher, 'teacher_salary_processed', [
+            'teacher_name' => $teacher->name,
+            'amount'       => number_format($netAmount),
+            'period'       => $payment->month_label,
+        ]);
+
+        return $payment;
     }
 }

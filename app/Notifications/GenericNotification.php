@@ -20,11 +20,21 @@ class GenericNotification extends Notification implements ShouldQueue
 
     public function via(mixed $notifiable): array
     {
-        return match ($this->template->channel) {
+        $channels = match ($this->template->channel) {
             'mail'     => ['mail'],
             'database' => ['database'],
             default    => ['database', 'mail'],
         };
+
+        // A notifiable with no email on file (common for students/teachers who
+        // never provided one) would otherwise crash routeNotificationForMail()'s
+        // non-nullable return type — skip the mail channel entirely rather than
+        // losing the in-app notification too.
+        if (in_array('mail', $channels, true) && blank($notifiable->email ?? null)) {
+            $channels = array_values(array_diff($channels, ['mail']));
+        }
+
+        return $channels;
     }
 
     public function toDatabase(mixed $notifiable): array

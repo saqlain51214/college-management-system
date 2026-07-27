@@ -180,7 +180,7 @@ class FeePayment extends Model
 
         $structure = static::resolveFeeStructure($student, $feeType, $semester, $academicYearId);
 
-        return static::create([
+        $slip = static::create([
             'student_id'        => $student->id,
             'fee_structure_id'  => $structure?->id,
             'academic_year_id'  => $academicYearId,
@@ -196,6 +196,27 @@ class FeePayment extends Model
             'installment_no'    => $installmentNo,
             'late_fine_per_day' => $structure?->late_fine_per_day ?? \App\Models\CollegeSetting::get('fee_late_fine_per_day'),
             'remarks'           => $data['remarks'] ?? null,
+        ]);
+
+        $slip->sendSlipGeneratedNotification();
+
+        return $slip;
+    }
+
+    protected function sendSlipGeneratedNotification(): void
+    {
+        if (! $this->student) {
+            return;
+        }
+
+        $feeType = $this->fee_type instanceof FeeTypeEnum ? $this->fee_type->label() : ($this->fee_type ?? 'Fee');
+
+        app(NotificationService::class)->send($this->student, 'fee_slip_generated', [
+            'student_name' => $this->student->name,
+            'amount'       => number_format((float) $this->amount_due),
+            'fee_type'     => $feeType,
+            'challan'      => $this->challan_number,
+            'due_date'     => optional($this->due_date)->format('d M Y') ?? 'N/A',
         ]);
     }
 

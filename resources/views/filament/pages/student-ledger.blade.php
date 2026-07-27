@@ -179,6 +179,70 @@
             @endif
         </div>
 
+        {{-- Request Refund --}}
+        <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900">
+            <h3 class="mb-3 text-sm font-bold text-gray-800 dark:text-gray-100">Request Refund</h3>
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
+                <div>
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Related Challan (optional)</label>
+                    <select wire:model="refundFeePaymentId" class="w-full rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100">
+                        <option value="">Not tied to a challan</option>
+                        @foreach ($payments as $p)
+                            <option value="{{ $p['id'] }}">{{ $p['challan'] }} — {{ $rs($p['net']) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Amount (Rs.)</label>
+                    <input type="number" step="0.01" min="1" wire:model="refundAmount"
+                           placeholder="e.g. 5000"
+                           class="w-full rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"/>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">Reason</label>
+                    <input type="text" wire:model="refundReason"
+                           placeholder="e.g. withdrawal, duplicate payment"
+                           class="w-full rounded-lg border-gray-300 text-sm dark:border-white/10 dark:bg-gray-800 dark:text-gray-100"/>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="button" wire:click="requestRefund"
+                        class="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-500">
+                    Submit Refund Request
+                </button>
+            </div>
+
+            @if ($refundSuccess)
+                <p class="mt-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">{{ $refundSuccess }}</p>
+            @endif
+            @if ($refundError)
+                <p class="mt-2 text-sm font-medium text-red-600">{{ $refundError }}</p>
+            @endif
+
+            @if (count($refunds))
+                <div class="mt-4 space-y-1.5">
+                    @foreach ($refunds as $r)
+                        @php
+                            $refundBadge = match ($r['status']) {
+                                'approved' => 'bg-green-100 text-green-700',
+                                'rejected' => 'bg-red-100 text-red-700',
+                                default    => 'bg-amber-100 text-amber-700',
+                            };
+                        @endphp
+                        <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2 text-xs dark:bg-white/5">
+                            <span class="text-gray-600 dark:text-gray-300">{{ $r['date'] }} — {{ $r['reason'] }} @if($r['challan']) <span class="font-mono text-gray-400">({{ $r['challan'] }})</span> @endif</span>
+                            <span class="flex items-center gap-2">
+                                <span class="font-semibold text-gray-800 dark:text-gray-100">{{ $rs($r['amount']) }}</span>
+                                <span class="rounded-full px-2 py-0.5 font-medium {{ $refundBadge }}">{{ ucfirst($r['status']) }}</span>
+                            </span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
         {{-- Challan ledger --}}
         <div class="rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900">
             <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-white/10">

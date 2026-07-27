@@ -30,6 +30,7 @@ class FeeStructure extends Model
     public function academicProgram(): BelongsTo { return $this->belongsTo(AcademicProgram::class); }
     public function academicYear(): BelongsTo    { return $this->belongsTo(AcademicYear::class); }
     public function payments(): HasMany          { return $this->hasMany(FeePayment::class); }
+    public function revisions(): HasMany         { return $this->hasMany(FeeStructureRevision::class)->latest('effective_from'); }
 
     public function scopeActive($q) { return $q->where('is_active', true); }
 }
