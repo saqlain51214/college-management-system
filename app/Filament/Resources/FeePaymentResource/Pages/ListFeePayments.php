@@ -92,6 +92,7 @@ class ListFeePayments extends ListRecords
                     $created = 0;
                     $skipped = 0;
                     $adjusted = 0;
+                    $rejectionReasons = [];
 
                     foreach ($students as $student) {
                         $exists = FeePayment::where('student_id', $student->id)
@@ -130,8 +131,11 @@ class ListFeePayments extends ListRecords
                                 FeePayment::generateSlip($student, $slipData);
                                 $created++;
                             }
-                        } catch (\InvalidArgumentException) {
-                            $skipped++;
+                        } catch (\InvalidArgumentException $e) {
+                            // Could be a duplicate, the 3-installment cap, or no matching
+                            // FeeStructure — surface the real reason instead of always
+                            // blaming "already billed," which misleads the admin.
+                            $rejectionReasons[$e->getMessage()] = ($rejectionReasons[$e->getMessage()] ?? 0) + 1;
                         }
                     }
 
@@ -141,6 +145,9 @@ class ListFeePayments extends ListRecords
                     }
                     if ($skipped) {
                         $summary .= " — {$skipped} skipped (already had an unpaid challan)";
+                    }
+                    foreach ($rejectionReasons as $reason => $count) {
+                        $summary .= " — {$count} rejected ({$reason})";
                     }
 
                     Notification::make()->title($summary)->success()->send();
