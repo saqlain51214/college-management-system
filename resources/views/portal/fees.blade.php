@@ -88,7 +88,13 @@
           @if($p->semester_number) &middot; Sem {{ $p->semester_number }} @endif
         </p>
         <div class="mt-3 grid grid-cols-3 gap-2 text-sm">
-          <div><p class="text-[10px] uppercase text-stone-400">Amount</p><p class="font-semibold text-stone-700">{{ number_format($p->amount_due, 0) }}</p></div>
+          <div>
+            <p class="text-[10px] uppercase text-stone-400">Amount</p>
+            <p class="font-semibold text-stone-700">{{ number_format($p->net_amount, 0) }}</p>
+            @if(($p->discount_amount ?? 0) > 0)
+              <p class="text-[10px] font-medium text-emerald-600">-{{ number_format($p->discount_amount, 0) }} discount</p>
+            @endif
+          </div>
           <div><p class="text-[10px] uppercase text-stone-400">Paid</p><p class="font-semibold text-emerald-600">{{ number_format($p->amount_paid ?? 0, 0) }}</p></div>
           <div><p class="text-[10px] uppercase text-stone-400">Due</p><p class="font-semibold text-stone-500">{{ $p->due_date?->format('d M') ?? '—' }}</p></div>
         </div>
@@ -143,7 +149,12 @@
             {{ $p->fee_type instanceof \BackedEnum ? ucfirst(str_replace('_',' ',$p->fee_type->value)) : ucfirst(str_replace('_',' ',$p->fee_type ?? '')) }}
           </td>
           <td class="px-5 py-3.5 text-sm text-stone-500">{{ $p->semester_number ? 'Sem ' . $p->semester_number : '—' }}</td>
-          <td class="px-5 py-3.5 text-right font-semibold text-stone-700">{{ number_format($p->amount_due, 0) }}</td>
+          <td class="px-5 py-3.5 text-right font-semibold text-stone-700">
+            {{ number_format($p->net_amount, 0) }}
+            @if(($p->discount_amount ?? 0) > 0)
+              <span class="block text-[11px] font-medium text-emerald-600">-{{ number_format($p->discount_amount, 0) }} discount</span>
+            @endif
+          </td>
           <td class="px-5 py-3.5 text-right font-semibold text-emerald-600">{{ number_format($p->amount_paid ?? 0, 0) }}</td>
           <td class="px-5 py-3.5 text-right text-sm {{ ($p->fine_amount ?? 0) > 0 ? 'text-rose-600' : 'text-stone-300' }}">
             {{ ($p->fine_amount ?? 0) > 0 ? number_format($p->fine_amount, 0) : '—' }}

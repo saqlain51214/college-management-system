@@ -38,296 +38,258 @@ class TeacherResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Tabs::make('Teacher Profile')
-                ->tabs([
 
-                    // ── Tab 1: Personal Info ───────────────────────────────────
-                    Forms\Components\Tabs\Tab::make('Personal Info')
-                        ->icon('heroicon-o-user')
-                        ->schema([
+            // ── Essential — everything needed to add a teacher in one pass ────
+            Forms\Components\Section::make('Basic Information')
+                ->columns(2)
+                ->schema([
 
-                            Forms\Components\Section::make('Identity')
-                                ->columns(2)
-                                ->schema([
+                    Forms\Components\FileUpload::make('photo')
+                        ->label('Photo')
+                        ->avatar()
+                        ->image()
+                        ->directory('teachers/photos')
+                        ->maxSize(2048)
+                        ->imageResizeMode('cover')
+                        ->imageCropAspectRatio('1:1')
+                        ->imageResizeTargetWidth('300')
+                        ->imageResizeTargetHeight('300')
+                        ->columnSpanFull(),
 
-                                    Forms\Components\TextInput::make('name')
-                                        ->label('Full Name')
-                                        ->required()
-                                        ->minLength(3)
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. Dr. Muhammad Ahmed')
-                                        ->extraAttributes(ValidationHelper::nameAttrs(required: true))
-                                        ->validationMessages([
-                                            'required' => 'Name is required.',
-                                            'min'      => 'Name must be at least 3 characters.',
-                                        ]),
-
-                                    Forms\Components\TextInput::make('father_name')
-                                        ->label("Father's Name")
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. Haji Muhammad Yusuf')
-                                        ->extraAttributes(ValidationHelper::nameAttrs(required: false)),
-
-                                    Forms\Components\TextInput::make('name_urdu')
-                                        ->label('Name (Urdu)')
-                                        ->maxLength(150)
-                                        ->placeholder('ڈاکٹر محمد احمد')
-                                        ->extraAttributes(['dir' => 'rtl', 'lang' => 'ur']),
-
-                                    Forms\Components\DatePicker::make('date_of_birth')
-                                        ->label('Date of Birth')
-                                        ->maxDate(now()->subYears(22))
-                                        ->displayFormat('d M Y')
-                                        ->native(false),
-
-                                    Forms\Components\Select::make('gender')
-                                        ->label('Gender')
-                                        ->options(GenderEnum::options())
-                                        ->required()
-                                        ->validationMessages(['required' => 'Gender is required.']),
-
-                                    Forms\Components\Select::make('blood_group')
-                                        ->label('Blood Group')
-                                        ->options(BloodGroupEnum::options())
-                                        ->placeholder('Select'),
-
-                                    Forms\Components\TextInput::make('cnic')
-                                        ->label('CNIC')
-                                        ->maxLength(20)
-                                        ->placeholder('35202-1234567-1')
-                                        ->extraAttributes(ValidationHelper::cnicAttrs())
-                                        ->unique(table: 'teachers', column: 'cnic',
-                                            modifyRuleUsing: fn(Unique $rule, ?Teacher $record) =>
-                                                $record ? $rule->ignore($record->id) : $rule
-                                        )
-                                        ->helperText('Format: 35202-1234567-1')
-                                        ->validationMessages(['unique' => 'This CNIC is already registered.']),
-
-                                    Forms\Components\TextInput::make('religion')
-                                        ->label('Religion')
-                                        ->maxLength(50)
-                                        ->placeholder('e.g. Islam'),
-
-                                    Forms\Components\TextInput::make('nationality')
-                                        ->label('Nationality')
-                                        ->default('Pakistani')
-                                        ->maxLength(50),
-                                ]),
-
-                            Forms\Components\Section::make('Photo')
-                                ->schema([
-                                    Forms\Components\FileUpload::make('photo')
-                                        ->label('Profile Photo')
-                                        ->avatar()
-                                        ->image()
-                                        ->directory('teachers/photos')
-                                        ->maxSize(2048)
-                                        ->imageResizeMode('cover')
-                                        ->imageCropAspectRatio('1:1')
-                                        ->imageResizeTargetWidth('300')
-                                        ->imageResizeTargetHeight('300')
-                                        ->helperText('Max 2MB. Square photo recommended.'),
-                                ]),
+                    Forms\Components\TextInput::make('name')
+                        ->label('Full Name')
+                        ->required()
+                        ->minLength(3)
+                        ->maxLength(100)
+                        ->placeholder('e.g. Dr. Muhammad Ahmed')
+                        ->extraAttributes(ValidationHelper::nameAttrs(required: true))
+                        ->validationMessages([
+                            'required' => 'Name is required.',
+                            'min'      => 'Name must be at least 3 characters.',
                         ]),
 
-                    // ── Tab 2: Contact & Address ───────────────────────────────
-                    Forms\Components\Tabs\Tab::make('Contact')
-                        ->icon('heroicon-o-phone')
-                        ->schema([
+                    Forms\Components\Select::make('gender')
+                        ->label('Gender')
+                        ->options(GenderEnum::options())
+                        ->required()
+                        ->validationMessages(['required' => 'Gender is required.']),
 
-                            Forms\Components\Section::make('Contact Details')
-                                ->columns(2)
-                                ->schema([
+                    Forms\Components\TextInput::make('phone')
+                        ->label('Mobile Number')
+                        ->tel()
+                        ->maxLength(20)
+                        ->placeholder('03XX-XXXXXXX')
+                        ->extraAttributes(ValidationHelper::phoneAttrs()),
 
-                                    Forms\Components\TextInput::make('email')
-                                        ->label('Email Address')
-                                        ->email()
-                                        ->maxLength(150)
-                                        ->placeholder('teacher@college.edu.pk')
-                                        ->extraAttributes(ValidationHelper::emailAttrs())
-                                        ->unique(table: 'teachers', column: 'email',
-                                            modifyRuleUsing: fn(Unique $rule, ?Teacher $record) =>
-                                                $record ? $rule->ignore($record->id) : $rule
-                                        )
-                                        ->validationMessages(['unique' => 'This email is already in use.']),
+                    Forms\Components\TextInput::make('cnic')
+                        ->label('CNIC')
+                        ->maxLength(20)
+                        ->placeholder('35202-1234567-1')
+                        ->extraAttributes(ValidationHelper::cnicAttrs())
+                        ->unique(table: 'teachers', column: 'cnic',
+                            modifyRuleUsing: fn(Unique $rule, ?Teacher $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        ->helperText('Format: 35202-1234567-1')
+                        ->validationMessages(['unique' => 'This CNIC is already registered.']),
+                ]),
 
-                                    Forms\Components\TextInput::make('phone')
-                                        ->label('Mobile Number')
-                                        ->tel()
-                                        ->maxLength(20)
-                                        ->placeholder('03XX-XXXXXXX')
-                                        ->extraAttributes(ValidationHelper::phoneAttrs()),
+            Forms\Components\Section::make('Employment')
+                ->columns(2)
+                ->schema([
 
-                                    Forms\Components\TextInput::make('alternative_phone')
-                                        ->label('Alternative / Home Phone')
-                                        ->tel()
-                                        ->maxLength(20)
-                                        ->placeholder('042-XXXXXXX')
-                                        ->extraAttributes(ValidationHelper::phoneAttrs()),
+                    Forms\Components\Select::make('department_id')
+                        ->label('Department')
+                        ->options(fn() => Department::active()->ordered()->pluck('name', 'id'))
+                        ->searchable()
+                        ->preload()
+                        ->placeholder('Select Department'),
 
-                                    Forms\Components\TextInput::make('city')
-                                        ->label('City')
-                                        ->maxLength(80),
+                    Forms\Components\Select::make('designation')
+                        ->label('Designation')
+                        ->options(fn() => \App\Models\ListItem::getOptions('teacher_designation'))
+                        ->searchable()
+                        ->placeholder('Select Designation'),
 
-                                    Forms\Components\Select::make('province')
-                                        ->label('Province')
-                                        ->options(fn() => \App\Models\ListItem::getOptions('province'))
-                                        ->searchable()
-                                        ->placeholder('Select Province'),
+                    Forms\Components\Select::make('employment_type')
+                        ->label('Employment Type')
+                        ->options(EmploymentTypeEnum::options())
+                        ->default(EmploymentTypeEnum::Permanent->value)
+                        ->required(),
 
-                                    Forms\Components\Textarea::make('address')
-                                        ->label('Residential Address')
-                                        ->rows(2)
-                                        ->maxLength(500)
-                                        ->columnSpanFull(),
-                                ]),
-                        ]),
+                    Forms\Components\TextInput::make('basic_salary')
+                        ->label('Basic Salary (PKR)')
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(9999999)
+                        ->prefix('Rs.')
+                        ->placeholder('e.g. 50000')
+                        ->helperText('Used as the default when generating monthly payroll.'),
 
-                    // ── Tab 3: Academic & Qualification ───────────────────────
-                    Forms\Components\Tabs\Tab::make('Qualification')
-                        ->icon('heroicon-o-book-open')
-                        ->schema([
+                    Forms\Components\DatePicker::make('joining_date')
+                        ->label('Joining Date')
+                        ->displayFormat('d M Y')
+                        ->native(false)
+                        ->maxDate(now()),
+                ]),
 
-                            Forms\Components\Section::make('Highest Academic Qualification')
-                                ->columns(2)
-                                ->schema([
+            Forms\Components\Section::make('Status')
+                ->columns(2)
+                ->schema([
 
-                                    Forms\Components\Select::make('highest_qualification')
-                                        ->label('Highest Degree')
-                                        ->options(fn() => \App\Models\ListItem::getOptions('teacher_qualification'))
-                                        ->searchable()
-                                        ->placeholder('Select Qualification'),
+                    Forms\Components\Select::make('status')
+                        ->label('Employment Status')
+                        ->options(TeacherStatusEnum::options())
+                        ->default(TeacherStatusEnum::Active->value)
+                        ->required(),
 
-                                    Forms\Components\TextInput::make('specialization')
-                                        ->label('Specialization / Subject')
-                                        ->maxLength(150)
-                                        ->placeholder('e.g. Computer Science, Mathematics'),
+                    Forms\Components\Toggle::make('is_active')
+                        ->label('Active')
+                        ->default(true)
+                        ->onColor('success'),
+                ]),
 
-                                    Forms\Components\TextInput::make('qualification_institution')
-                                        ->label('Awarding Institution')
-                                        ->maxLength(200)
-                                        ->placeholder('e.g. University of Punjab')
-                                        ->columnSpanFull(),
+            // ── Everything else — rarely needed at add-time, collapsed by default ──
+            Forms\Components\Section::make('Additional Details (Optional)')
+                ->description('Fill in only if needed — none of this is required to add a teacher.')
+                ->collapsed()
+                ->columns(2)
+                ->schema([
 
-                                    Forms\Components\TextInput::make('qualification_year')
-                                        ->label('Year of Award')
-                                        ->numeric()
-                                        ->minValue(1970)
-                                        ->maxValue(now()->year)
-                                        ->placeholder(now()->year - 2)
-                                        ->extraAttributes(ValidationHelper::numberAttrs(min: 1970, max: now()->year)),
-                                ]),
-                        ]),
+                    Forms\Components\TextInput::make('father_name')
+                        ->label("Father's Name")
+                        ->maxLength(100)
+                        ->placeholder('e.g. Haji Muhammad Yusuf')
+                        ->extraAttributes(ValidationHelper::nameAttrs(required: false)),
 
-                    // ── Tab 4: Employment ──────────────────────────────────────
-                    Forms\Components\Tabs\Tab::make('Employment')
-                        ->icon('heroicon-o-briefcase')
-                        ->schema([
+                    Forms\Components\TextInput::make('name_urdu')
+                        ->label('Name (Urdu)')
+                        ->maxLength(150)
+                        ->placeholder('ڈاکٹر محمد احمد')
+                        ->extraAttributes(['dir' => 'rtl', 'lang' => 'ur']),
 
-                            Forms\Components\Section::make('Employment Details')
-                                ->columns(2)
-                                ->schema([
+                    Forms\Components\DatePicker::make('date_of_birth')
+                        ->label('Date of Birth')
+                        ->maxDate(now()->subYears(22))
+                        ->displayFormat('d M Y')
+                        ->native(false),
 
-                                    Forms\Components\TextInput::make('employee_id')
-                                        ->label('Employee ID')
-                                        ->maxLength(30)
-                                        ->placeholder('Auto-generated if blank')
-                                        ->unique(table: 'teachers', column: 'employee_id',
-                                            modifyRuleUsing: fn(Unique $rule, ?Teacher $record) =>
-                                                $record ? $rule->ignore($record->id) : $rule
-                                        )
-                                        ->helperText('Leave blank to auto-generate (EMP-0001 format).')
-                                        ->validationMessages(['unique' => 'This employee ID is already in use.']),
+                    Forms\Components\Select::make('blood_group')
+                        ->label('Blood Group')
+                        ->options(BloodGroupEnum::options())
+                        ->placeholder('Select'),
 
-                                    Forms\Components\Select::make('department_id')
-                                        ->label('Department')
-                                        ->options(fn() => Department::active()->ordered()->pluck('name', 'id'))
-                                        ->searchable()
-                                        ->preload()
-                                        ->placeholder('Select Department'),
+                    Forms\Components\TextInput::make('religion')
+                        ->label('Religion')
+                        ->maxLength(50)
+                        ->placeholder('e.g. Islam'),
 
-                                    Forms\Components\Select::make('designation')
-                                        ->label('Designation')
-                                        ->options(fn() => \App\Models\ListItem::getOptions('teacher_designation'))
-                                        ->searchable()
-                                        ->placeholder('Select Designation'),
+                    Forms\Components\TextInput::make('nationality')
+                        ->label('Nationality')
+                        ->default('Pakistani')
+                        ->maxLength(50),
 
-                                    Forms\Components\Select::make('employment_type')
-                                        ->label('Employment Type')
-                                        ->options(EmploymentTypeEnum::options())
-                                        ->default(EmploymentTypeEnum::Permanent->value)
-                                        ->required(),
+                    Forms\Components\TextInput::make('email')
+                        ->label('Email Address')
+                        ->email()
+                        ->maxLength(150)
+                        ->placeholder('teacher@college.edu.pk')
+                        ->extraAttributes(ValidationHelper::emailAttrs())
+                        ->unique(table: 'teachers', column: 'email',
+                            modifyRuleUsing: fn(Unique $rule, ?Teacher $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        ->validationMessages(['unique' => 'This email is already in use.']),
 
-                                    Forms\Components\TextInput::make('experience_years')
-                                        ->label('Total Experience (Years)')
-                                        ->numeric()
-                                        ->default(0)
-                                        ->minValue(0)
-                                        ->maxValue(50)
-                                        ->extraAttributes(ValidationHelper::numberAttrs(min: 0, max: 50)),
+                    Forms\Components\TextInput::make('alternative_phone')
+                        ->label('Alternative / Home Phone')
+                        ->tel()
+                        ->maxLength(20)
+                        ->placeholder('042-XXXXXXX')
+                        ->extraAttributes(ValidationHelper::phoneAttrs()),
 
-                                    Forms\Components\DatePicker::make('joining_date')
-                                        ->label('Joining Date')
-                                        ->displayFormat('d M Y')
-                                        ->native(false)
-                                        ->maxDate(now()),
+                    Forms\Components\TextInput::make('city')
+                        ->label('City')
+                        ->maxLength(80),
 
-                                    Forms\Components\DatePicker::make('leaving_date')
-                                        ->label('Leaving Date')
-                                        ->displayFormat('d M Y')
-                                        ->native(false)
-                                        ->helperText('Fill only if no longer employed.'),
-                                ]),
+                    Forms\Components\Select::make('province')
+                        ->label('Province')
+                        ->options(fn() => \App\Models\ListItem::getOptions('province'))
+                        ->searchable()
+                        ->placeholder('Select Province'),
 
-                            Forms\Components\Section::make('Salary & Grade')
-                                ->columns(2)
-                                ->schema([
+                    Forms\Components\Textarea::make('address')
+                        ->label('Residential Address')
+                        ->rows(2)
+                        ->maxLength(500)
+                        ->columnSpanFull(),
 
-                                    Forms\Components\Select::make('salary_grade')
-                                        ->label('BPS / Pay Scale')
-                                        ->options(
-                                            collect(range(1, 22))
-                                                ->mapWithKeys(fn($n) => ["BPS-$n" => "BPS-$n"])
-                                                ->all()
-                                        )
-                                        ->searchable()
-                                        ->placeholder('Select BPS Grade'),
+                    Forms\Components\Select::make('highest_qualification')
+                        ->label('Highest Degree')
+                        ->options(fn() => \App\Models\ListItem::getOptions('teacher_qualification'))
+                        ->searchable()
+                        ->placeholder('Select Qualification'),
 
-                                    Forms\Components\TextInput::make('basic_salary')
-                                        ->label('Basic Salary (PKR)')
-                                        ->numeric()
-                                        ->minValue(0)
-                                        ->maxValue(9999999)
-                                        ->prefix('Rs.')
-                                        ->placeholder('e.g. 50000'),
-                                ]),
+                    Forms\Components\TextInput::make('specialization')
+                        ->label('Specialization / Subject')
+                        ->maxLength(150)
+                        ->placeholder('e.g. Computer Science, Mathematics'),
 
-                            Forms\Components\Section::make('Status')
-                                ->columns(2)
-                                ->schema([
+                    Forms\Components\TextInput::make('qualification_institution')
+                        ->label('Awarding Institution')
+                        ->maxLength(200)
+                        ->placeholder('e.g. University of Punjab')
+                        ->columnSpanFull(),
 
-                                    Forms\Components\Select::make('status')
-                                        ->label('Employment Status')
-                                        ->options(TeacherStatusEnum::options())
-                                        ->default(TeacherStatusEnum::Active->value)
-                                        ->required(),
+                    Forms\Components\TextInput::make('qualification_year')
+                        ->label('Year of Award')
+                        ->numeric()
+                        ->minValue(1970)
+                        ->maxValue(now()->year)
+                        ->placeholder(now()->year - 2)
+                        ->extraAttributes(ValidationHelper::numberAttrs(min: 1970, max: now()->year)),
 
-                                    Forms\Components\Toggle::make('is_active')
-                                        ->label('Active')
-                                        ->default(true)
-                                        ->onColor('success'),
+                    Forms\Components\TextInput::make('employee_id')
+                        ->label('Employee ID')
+                        ->maxLength(30)
+                        ->placeholder('Auto-generated if blank')
+                        ->unique(table: 'teachers', column: 'employee_id',
+                            modifyRuleUsing: fn(Unique $rule, ?Teacher $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        ->helperText('Leave blank to auto-generate (EMP-0001 format).')
+                        ->validationMessages(['unique' => 'This employee ID is already in use.']),
 
-                                    Forms\Components\Textarea::make('remarks')
-                                        ->label('Remarks / Notes')
-                                        ->rows(2)
-                                        ->maxLength(1000)
-                                        ->columnSpanFull(),
-                                ]),
-                        ]),
+                    Forms\Components\TextInput::make('experience_years')
+                        ->label('Total Experience (Years)')
+                        ->numeric()
+                        ->default(0)
+                        ->minValue(0)
+                        ->maxValue(50)
+                        ->extraAttributes(ValidationHelper::numberAttrs(min: 0, max: 50)),
 
-                ])
-                ->columnSpanFull()
-                ->persistTabInQueryString(),
+                    Forms\Components\DatePicker::make('leaving_date')
+                        ->label('Leaving Date')
+                        ->displayFormat('d M Y')
+                        ->native(false)
+                        ->helperText('Fill only if no longer employed.'),
+
+                    Forms\Components\Select::make('salary_grade')
+                        ->label('BPS / Pay Scale')
+                        ->options(
+                            collect(range(1, 22))
+                                ->mapWithKeys(fn($n) => ["BPS-$n" => "BPS-$n"])
+                                ->all()
+                        )
+                        ->searchable()
+                        ->placeholder('Select BPS Grade'),
+
+                    Forms\Components\Textarea::make('remarks')
+                        ->label('Remarks / Notes')
+                        ->rows(2)
+                        ->maxLength(1000)
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 

@@ -43,414 +43,371 @@ class StudentResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Tabs::make('Student Profile')
-                ->tabs([
 
-                    // ── Tab 1: Personal Information ───────────────────────────
-                    Forms\Components\Tabs\Tab::make('Personal Info')
-                        ->icon('heroicon-o-user')
-                        ->schema([
+            // ── Essential — everything needed to add a student in one pass ────
+            Forms\Components\Section::make('Basic Information')
+                ->columns(2)
+                ->schema([
 
-                            Forms\Components\Section::make('Identity')
-                                ->columns(2)
-                                ->schema([
+                    Forms\Components\FileUpload::make('photo')
+                        ->label('Photo')
+                        ->avatar()
+                        ->image()
+                        ->directory('students/photos')
+                        ->maxSize(2048)
+                        ->imageResizeMode('cover')
+                        ->imageCropAspectRatio('3:4')
+                        ->imageResizeTargetWidth('300')
+                        ->imageResizeTargetHeight('400')
+                        ->columnSpanFull(),
 
-                                    Forms\Components\TextInput::make('name')
-                                        ->label('Full Name')
-                                        ->required()
-                                        ->minLength(3)
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. Muhammad Ali')
-                                        ->extraAttributes(ValidationHelper::nameAttrs(required: true))
-                                        ->validationMessages([
-                                            'required' => 'Student name is required.',
-                                            'min'      => 'Name must be at least 3 characters.',
-                                        ]),
-
-                                    Forms\Components\TextInput::make('father_name')
-                                        ->label("Father's Name")
-                                        ->required()
-                                        ->minLength(3)
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. Muhammad Hassan')
-                                        ->extraAttributes(ValidationHelper::nameAttrs(required: true))
-                                        ->validationMessages([
-                                            'required' => "Father's name is required.",
-                                        ]),
-
-                                    Forms\Components\TextInput::make('name_urdu')
-                                        ->label('Name (Urdu)')
-                                        ->maxLength(150)
-                                        ->placeholder('محمد علی')
-                                        ->extraAttributes(['dir' => 'rtl', 'lang' => 'ur']),
-
-                                    Forms\Components\TextInput::make('father_name_urdu')
-                                        ->label("Father's Name (Urdu)")
-                                        ->maxLength(150)
-                                        ->placeholder('محمد حسن')
-                                        ->extraAttributes(['dir' => 'rtl', 'lang' => 'ur']),
-
-                                    Forms\Components\TextInput::make('mother_name')
-                                        ->label("Mother's Name")
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. Amina Bibi'),
-
-                                    Forms\Components\DatePicker::make('date_of_birth')
-                                        ->label('Date of Birth')
-                                        ->maxDate(now()->subYears(14))
-                                        ->displayFormat('d M Y')
-                                        ->native(false),
-
-                                    Forms\Components\Select::make('gender')
-                                        ->label('Gender')
-                                        ->options(GenderEnum::options())
-                                        ->required()
-                                        ->validationMessages(['required' => 'Gender is required.']),
-
-                                    Forms\Components\Select::make('blood_group')
-                                        ->label('Blood Group')
-                                        ->options(BloodGroupEnum::options())
-                                        ->placeholder('Select'),
-
-                                    Forms\Components\TextInput::make('cnic')
-                                        ->label('CNIC')
-                                        ->maxLength(20)
-                                        ->placeholder('35202-1234567-1')
-                                        ->extraAttributes(ValidationHelper::cnicAttrs())
-                                        ->unique(table: 'students', column: 'cnic',
-                                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
-                                                $record ? $rule->ignore($record->id) : $rule
-                                        )
-                                        ->helperText('Format: 35202-1234567-1')
-                                        ->validationMessages(['unique' => 'This CNIC is already registered.']),
-
-                                    Forms\Components\TextInput::make('father_cnic')
-                                        ->label("Father's CNIC")
-                                        ->maxLength(20)
-                                        ->placeholder('35202-1234567-1')
-                                        ->extraAttributes(ValidationHelper::cnicAttrs()),
-
-                                    Forms\Components\TextInput::make('religion')
-                                        ->label('Religion')
-                                        ->maxLength(50)
-                                        ->placeholder('e.g. Islam'),
-
-                                    Forms\Components\TextInput::make('nationality')
-                                        ->label('Nationality')
-                                        ->maxLength(50)
-                                        ->default('Pakistani'),
-                                ]),
-
-                            Forms\Components\Section::make('Photo')
-                                ->schema([
-                                    Forms\Components\FileUpload::make('photo')
-                                        ->label('Student Photo')
-                                        ->avatar()
-                                        ->image()
-                                        ->directory('students/photos')
-                                        ->maxSize(2048)
-                                        ->imageResizeMode('cover')
-                                        ->imageCropAspectRatio('3:4')
-                                        ->imageResizeTargetWidth('300')
-                                        ->imageResizeTargetHeight('400')
-                                        ->helperText('Max 2MB. Recommended: 3×4 passport size.'),
-                                ]),
+                    Forms\Components\TextInput::make('name')
+                        ->label('Full Name')
+                        ->required()
+                        ->minLength(3)
+                        ->maxLength(100)
+                        ->placeholder('e.g. Muhammad Ali')
+                        ->extraAttributes(ValidationHelper::nameAttrs(required: true))
+                        ->validationMessages([
+                            'required' => 'Student name is required.',
+                            'min'      => 'Name must be at least 3 characters.',
                         ]),
 
-                    // ── Tab 2: Contact & Address ───────────────────────────────
-                    Forms\Components\Tabs\Tab::make('Contact & Address')
-                        ->icon('heroicon-o-map-pin')
-                        ->schema([
-
-                            Forms\Components\Section::make('Contact Information')
-                                ->columns(2)
-                                ->schema([
-
-                                    Forms\Components\TextInput::make('email')
-                                        ->label('Email Address')
-                                        ->email()
-                                        ->maxLength(150)
-                                        ->placeholder('student@example.com')
-                                        ->extraAttributes(ValidationHelper::emailAttrs())
-                                        ->unique(table: 'students', column: 'email',
-                                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
-                                                $record ? $rule->ignore($record->id) : $rule
-                                        )
-                                        ->validationMessages(['unique' => 'This email is already registered.']),
-
-                                    Forms\Components\TextInput::make('phone')
-                                        ->label('Mobile Number')
-                                        ->tel()
-                                        ->maxLength(20)
-                                        ->placeholder('03XX-XXXXXXX')
-                                        ->extraAttributes(ValidationHelper::phoneAttrs()),
-
-                                    Forms\Components\TextInput::make('father_phone')
-                                        ->label("Father's Mobile")
-                                        ->tel()
-                                        ->maxLength(20)
-                                        ->placeholder('03XX-XXXXXXX')
-                                        ->extraAttributes(ValidationHelper::phoneAttrs()),
-                                ]),
-
-                            Forms\Components\Section::make('Current Address')
-                                ->columns(2)
-                                ->schema([
-
-                                    Forms\Components\Textarea::make('address')
-                                        ->label('Current Address')
-                                        ->rows(2)
-                                        ->maxLength(500)
-                                        ->columnSpanFull(),
-
-                                    Forms\Components\TextInput::make('city')
-                                        ->label('City')
-                                        ->maxLength(80),
-
-                                    Forms\Components\TextInput::make('district')
-                                        ->label('District')
-                                        ->maxLength(80),
-
-                                    Forms\Components\Select::make('province')
-                                        ->label('Province')
-                                        ->options(fn() => \App\Models\ListItem::getOptions('province'))
-                                        ->searchable()
-                                        ->placeholder('Select Province'),
-
-                                    Forms\Components\TextInput::make('domicile')
-                                        ->label('Domicile District')
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. Lahore'),
-                                ]),
-
-                            Forms\Components\Section::make('Permanent Address')
-                                ->schema([
-                                    Forms\Components\Textarea::make('permanent_address')
-                                        ->label('Permanent Address')
-                                        ->rows(2)
-                                        ->maxLength(500)
-                                        ->helperText('If different from current address.')
-                                        ->columnSpanFull(),
-                                ]),
+                    Forms\Components\TextInput::make('father_name')
+                        ->label("Father's Name")
+                        ->required()
+                        ->minLength(3)
+                        ->maxLength(100)
+                        ->placeholder('e.g. Muhammad Hassan')
+                        ->extraAttributes(ValidationHelper::nameAttrs(required: true))
+                        ->validationMessages([
+                            'required' => "Father's name is required.",
                         ]),
 
-                    // ── Tab 3: Academic Information ────────────────────────────
-                    Forms\Components\Tabs\Tab::make('Academic Info')
-                        ->icon('heroicon-o-academic-cap')
-                        ->schema([
+                    Forms\Components\Select::make('gender')
+                        ->label('Gender')
+                        ->options(GenderEnum::options())
+                        ->required()
+                        ->validationMessages(['required' => 'Gender is required.']),
 
-                            Forms\Components\Section::make('Enrollment Details')
-                                ->columns(2)
-                                ->schema([
+                    Forms\Components\TextInput::make('phone')
+                        ->label('Mobile Number')
+                        ->tel()
+                        ->maxLength(20)
+                        ->placeholder('03XX-XXXXXXX')
+                        ->extraAttributes(ValidationHelper::phoneAttrs()),
 
-                                    Forms\Components\Select::make('department_id')
-                                        ->label('Department')
-                                        ->options(fn() => Department::active()->ordered()->pluck('name', 'id'))
-                                        ->searchable()
-                                        ->preload()
-                                        ->live()
-                                        ->required()
-                                        ->placeholder('Select Department')
-                                        ->validationMessages(['required' => 'Department is required.']),
+                    Forms\Components\TextInput::make('cnic')
+                        ->label('CNIC')
+                        ->maxLength(20)
+                        ->placeholder('35202-1234567-1')
+                        ->extraAttributes(ValidationHelper::cnicAttrs())
+                        ->unique(table: 'students', column: 'cnic',
+                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        ->helperText('Format: 35202-1234567-1')
+                        ->validationMessages(['unique' => 'This CNIC is already registered.']),
 
-                                    Forms\Components\Select::make('academic_program_id')
-                                        ->label('Academic Program')
-                                        ->options(fn(Forms\Get $get) => AcademicProgram::active()
-                                            ->when($get('department_id'), fn($q, $id) => $q->where('department_id', $id))
-                                            ->ordered()
-                                            ->pluck('name', 'id'))
-                                        ->searchable()
-                                        ->preload()
-                                        ->required()
-                                        ->placeholder('Select Program')
-                                        ->validationMessages(['required' => 'Program is required.']),
+                    Forms\Components\Textarea::make('address')
+                        ->label('Address')
+                        ->rows(2)
+                        ->maxLength(500)
+                        ->columnSpanFull(),
 
-                                    Forms\Components\Select::make('academic_year_id')
-                                        ->label('Admission Academic Year')
-                                        ->options(fn() => AcademicYear::selectOptions())
-                                        ->searchable()
-                                        ->preload()
-                                        ->placeholder('Select Year'),
+                    Forms\Components\TextInput::make('city')
+                        ->label('City')
+                        ->maxLength(80),
+                ]),
 
-                                    Forms\Components\TextInput::make('batch_year')
-                                        ->label('Batch Year')
-                                        ->numeric()
-                                        ->minValue(2000)
-                                        ->maxValue(2099)
-                                        ->default(now()->year)
-                                        ->placeholder(now()->year)
-                                        ->extraAttributes(ValidationHelper::numberAttrs(min: 2000, max: 2099))
-                                        ->helperText('Year of admission e.g. 2024'),
+            Forms\Components\Section::make('Academic Enrollment')
+                ->columns(2)
+                ->schema([
 
-                                    Forms\Components\TextInput::make('registration_number')
-                                        ->label('University Reg. No.')
-                                        ->maxLength(50)
-                                        ->unique(table: 'students', column: 'registration_number',
-                                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
-                                                $record ? $rule->ignore($record->id) : $rule
-                                        )
-                                        ->placeholder('e.g. 2024-CS-001')
-                                        ->helperText('Assigned by the university/board.')
-                                        ->validationMessages(['unique' => 'This registration number is already in use.']),
+                    Forms\Components\Select::make('department_id')
+                        ->label('Department')
+                        ->options(fn() => Department::active()->ordered()->pluck('name', 'id'))
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->required()
+                        ->placeholder('Select Department')
+                        ->validationMessages(['required' => 'Department is required.']),
 
-                                    Forms\Components\Select::make('current_semester')
-                                        ->label('Current Semester')
-                                        ->options(collect(range(1, 8))->mapWithKeys(fn($n) => [$n => "Semester $n"])->all())
-                                        ->default(1),
+                    Forms\Components\Select::make('academic_program_id')
+                        ->label('Academic Program')
+                        ->options(fn(Forms\Get $get) => AcademicProgram::active()
+                            ->when($get('department_id'), fn($q, $id) => $q->where('department_id', $id))
+                            ->ordered()
+                            ->pluck('name', 'id'))
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->placeholder('Select Program')
+                        ->validationMessages(['required' => 'Program is required.']),
 
-                                    Forms\Components\TextInput::make('section')
-                                        ->label('Section')
-                                        ->maxLength(10)
-                                        ->placeholder('A, B, or Morning')
-                                        ->helperText('Optional class section.'),
+                    Forms\Components\TextInput::make('roll_number')
+                        ->label('Roll Number')
+                        ->maxLength(50)
+                        ->unique(table: 'students', column: 'roll_number',
+                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        // Auto-generated on create (DEPT-YEAR-0001, via StudentService)
+                        // regardless of what's typed here — so don't invite an admin to
+                        // type a value that would be silently discarded. Editable once the
+                        // student exists, since editing does preserve whatever is typed.
+                        ->disabled(fn (?Student $record) => $record === null)
+                        ->dehydrated(fn (?Student $record) => $record !== null)
+                        ->placeholder(fn (?Student $record) => $record === null ? 'Auto-generated on save (e.g. CS-2026-0001)' : null)
+                        ->helperText('This is also the student\'s portal login ID.')
+                        ->validationMessages(['unique' => 'This roll number is already in use.']),
 
-                                    Forms\Components\DatePicker::make('admission_date')
-                                        ->label('Admission Date')
-                                        ->displayFormat('d M Y')
-                                        ->native(false)
-                                        ->default(now()),
-                                ]),
+                    Forms\Components\TextInput::make('registration_number')
+                        ->label('University Reg. No.')
+                        ->maxLength(50)
+                        ->unique(table: 'students', column: 'registration_number',
+                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        ->placeholder('e.g. 2024-CS-001')
+                        ->helperText('Assigned by the university/board.')
+                        ->validationMessages(['unique' => 'This registration number is already in use.']),
 
-                            Forms\Components\Section::make('Scholarship')
-                                ->description('If this student receives financial aid, set it here — every fee slip generated for them (bulk or individual) automatically applies this discount. Leave both fields empty for no scholarship.')
-                                ->columns(2)
-                                ->schema([
-                                    Forms\Components\Select::make('scholarship_type')
-                                        ->label('Scholarship Type')
-                                        ->options([
-                                            'percentage' => 'Percentage off',
-                                            'fixed'      => 'Fixed amount off',
-                                        ])
-                                        ->placeholder('No scholarship')
-                                        ->live(),
+                    Forms\Components\Select::make('academic_year_id')
+                        ->label('Admission Academic Year')
+                        ->options(fn() => AcademicYear::selectOptions())
+                        ->searchable()
+                        ->preload()
+                        ->placeholder('Select Year'),
 
-                                    Forms\Components\TextInput::make('scholarship_value')
-                                        ->label(fn (Forms\Get $get) => $get('scholarship_type') === 'fixed' ? 'Amount Off (Rs.)' : 'Percentage Off (%)')
-                                        ->numeric()
-                                        ->minValue(0)
-                                        ->maxValue(fn (Forms\Get $get) => $get('scholarship_type') === 'percentage' ? 100 : null)
-                                        ->visible(fn (Forms\Get $get) => filled($get('scholarship_type')))
-                                        ->required(fn (Forms\Get $get) => filled($get('scholarship_type')))
-                                        ->helperText(fn (Forms\Get $get) => $get('scholarship_type') === 'percentage'
-                                            ? 'e.g. 50 for 50% off every fee slip.'
-                                            : 'e.g. 5000 for Rs. 5,000 off every fee slip.'),
-                                ]),
+                    Forms\Components\Select::make('current_semester')
+                        ->label('Current Semester')
+                        ->options(collect(range(1, 8))->mapWithKeys(fn($n) => [$n => "Semester $n"])->all())
+                        ->default(1),
+                ]),
 
-                            Forms\Components\Section::make('Admission Type & Status')
-                                ->columns(2)
-                                ->schema([
+            Forms\Components\Section::make('Scholarship')
+                ->description('If this student receives financial aid, set it here — every fee slip generated for them (bulk or individual) automatically applies this discount. Leave both fields empty for no scholarship.')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Select::make('scholarship_type')
+                        ->label('Scholarship Type')
+                        ->options([
+                            'percentage' => 'Percentage off',
+                            'fixed'      => 'Fixed amount off',
+                        ])
+                        ->placeholder('No scholarship')
+                        ->live(),
 
-                                    Forms\Components\Select::make('admission_type')
-                                        ->label('Admission Type')
-                                        ->options(AdmissionTypeEnum::options())
-                                        ->default(AdmissionTypeEnum::Regular->value)
-                                        ->required(),
+                    Forms\Components\TextInput::make('scholarship_value')
+                        ->label(fn (Forms\Get $get) => $get('scholarship_type') === 'fixed' ? 'Amount Off (Rs.)' : 'Percentage Off (%)')
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(fn (Forms\Get $get) => $get('scholarship_type') === 'percentage' ? 100 : null)
+                        ->visible(fn (Forms\Get $get) => filled($get('scholarship_type')))
+                        ->required(fn (Forms\Get $get) => filled($get('scholarship_type')))
+                        ->helperText(fn (Forms\Get $get) => $get('scholarship_type') === 'percentage'
+                            ? 'e.g. 50 for 50% off every fee slip.'
+                            : 'e.g. 5000 for Rs. 5,000 off every fee slip.'),
+                ]),
 
-                                    Forms\Components\Select::make('status')
-                                        ->label('Student Status')
-                                        ->options(StudentStatusEnum::options())
-                                        ->default(StudentStatusEnum::Active->value)
-                                        ->required(),
+            Forms\Components\Section::make('Status')
+                ->columns(2)
+                ->schema([
 
-                                    Forms\Components\Toggle::make('is_hosteler')
-                                        ->label('Hostel Resident')
-                                        ->default(false)
-                                        ->onColor('info'),
+                    Forms\Components\Select::make('admission_type')
+                        ->label('Admission Type')
+                        ->options(AdmissionTypeEnum::options())
+                        ->default(AdmissionTypeEnum::Regular->value)
+                        ->required(),
 
-                                    Forms\Components\Toggle::make('is_active')
-                                        ->label('Active')
-                                        ->default(true)
-                                        ->onColor('success'),
-                                ]),
-                        ]),
+                    Forms\Components\Select::make('status')
+                        ->label('Student Status')
+                        ->options(StudentStatusEnum::options())
+                        ->default(StudentStatusEnum::Active->value)
+                        ->required(),
 
-                    // ── Tab 4: Previous Education ──────────────────────────────
-                    Forms\Components\Tabs\Tab::make('Previous Education')
-                        ->icon('heroicon-o-book-open')
-                        ->schema([
+                    Forms\Components\Toggle::make('is_active')
+                        ->label('Active')
+                        ->default(true)
+                        ->onColor('success'),
+                ]),
 
-                            Forms\Components\Section::make('Last Qualification')
-                                ->columns(2)
-                                ->schema([
+            // ── Everything else — rarely needed at add-time, collapsed by default ──
+            Forms\Components\Section::make('Additional Details (Optional)')
+                ->description('Fill in only if needed — none of this is required to add a student.')
+                ->collapsed()
+                ->columns(2)
+                ->schema([
 
-                                    Forms\Components\Select::make('previous_qualification')
-                                        ->label('Previous Qualification')
-                                        ->options(fn() => \App\Models\ListItem::getOptions('qualification_level'))
-                                        ->searchable()
-                                        ->placeholder('Select Qualification'),
+                    Forms\Components\TextInput::make('name_urdu')
+                        ->label('Name (Urdu)')
+                        ->maxLength(150)
+                        ->placeholder('محمد علی')
+                        ->extraAttributes(['dir' => 'rtl', 'lang' => 'ur']),
 
-                                    Forms\Components\TextInput::make('previous_marks')
-                                        ->label('Marks / CGPA')
-                                        ->numeric()
-                                        ->minValue(0)
-                                        ->maxValue(1100)
-                                        ->step(0.01)
-                                        ->placeholder('e.g. 850 or 3.50')
-                                        ->helperText('Total marks or CGPA (as applicable).'),
+                    Forms\Components\TextInput::make('father_name_urdu')
+                        ->label("Father's Name (Urdu)")
+                        ->maxLength(150)
+                        ->placeholder('محمد حسن')
+                        ->extraAttributes(['dir' => 'rtl', 'lang' => 'ur']),
 
-                                    Forms\Components\TextInput::make('previous_board')
-                                        ->label('Board / University')
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. BISE Lahore'),
+                    Forms\Components\TextInput::make('mother_name')
+                        ->label("Mother's Name")
+                        ->maxLength(100)
+                        ->placeholder('e.g. Amina Bibi'),
 
-                                    Forms\Components\TextInput::make('previous_year')
-                                        ->label('Passing Year')
-                                        ->numeric()
-                                        ->minValue(1990)
-                                        ->maxValue(now()->year)
-                                        ->placeholder(now()->year - 1)
-                                        ->extraAttributes(ValidationHelper::numberAttrs(min: 1990, max: now()->year)),
-                                ]),
-                        ]),
+                    Forms\Components\DatePicker::make('date_of_birth')
+                        ->label('Date of Birth')
+                        ->maxDate(now()->subYears(14))
+                        ->displayFormat('d M Y')
+                        ->native(false),
 
-                    // ── Tab 5: Guardian & Remarks ──────────────────────────────
-                    Forms\Components\Tabs\Tab::make('Guardian & Remarks')
-                        ->icon('heroicon-o-user-group')
-                        ->schema([
+                    Forms\Components\Select::make('blood_group')
+                        ->label('Blood Group')
+                        ->options(BloodGroupEnum::options())
+                        ->placeholder('Select'),
 
-                            Forms\Components\Section::make('Guardian Information')
-                                ->columns(2)
-                                ->description('Fill only if guardian is different from father.')
-                                ->schema([
+                    Forms\Components\TextInput::make('father_cnic')
+                        ->label("Father's CNIC")
+                        ->maxLength(20)
+                        ->placeholder('35202-1234567-1')
+                        ->extraAttributes(ValidationHelper::cnicAttrs()),
 
-                                    Forms\Components\TextInput::make('guardian_name')
-                                        ->label('Guardian Name')
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. Uncle / Paternal Grandfather'),
+                    Forms\Components\TextInput::make('religion')
+                        ->label('Religion')
+                        ->maxLength(50)
+                        ->placeholder('e.g. Islam'),
 
-                                    Forms\Components\TextInput::make('guardian_phone')
-                                        ->label('Guardian Mobile')
-                                        ->tel()
-                                        ->maxLength(20)
-                                        ->placeholder('03XX-XXXXXXX')
-                                        ->extraAttributes(ValidationHelper::phoneAttrs()),
+                    Forms\Components\TextInput::make('nationality')
+                        ->label('Nationality')
+                        ->maxLength(50)
+                        ->default('Pakistani'),
 
-                                    Forms\Components\TextInput::make('guardian_relation')
-                                        ->label('Relation with Student')
-                                        ->maxLength(50)
-                                        ->placeholder('e.g. Uncle, Grandfather'),
-                                ]),
+                    Forms\Components\TextInput::make('email')
+                        ->label('Email Address')
+                        ->email()
+                        ->maxLength(150)
+                        ->placeholder('student@example.com')
+                        ->extraAttributes(ValidationHelper::emailAttrs())
+                        ->unique(table: 'students', column: 'email',
+                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        ->validationMessages(['unique' => 'This email is already registered.']),
 
-                            Forms\Components\Section::make('Additional Info')
-                                ->columns(2)
-                                ->schema([
+                    Forms\Components\TextInput::make('father_phone')
+                        ->label("Father's Mobile")
+                        ->tel()
+                        ->maxLength(20)
+                        ->placeholder('03XX-XXXXXXX')
+                        ->extraAttributes(ValidationHelper::phoneAttrs()),
 
-                                    Forms\Components\TextInput::make('disability')
-                                        ->label('Disability (if any)')
-                                        ->maxLength(100)
-                                        ->placeholder('e.g. Visual Impairment'),
+                    Forms\Components\TextInput::make('district')
+                        ->label('District')
+                        ->maxLength(80),
 
-                                    Forms\Components\Textarea::make('remarks')
-                                        ->label('Remarks / Notes')
-                                        ->rows(3)
-                                        ->maxLength(1000)
-                                        ->columnSpanFull(),
-                                ]),
-                        ]),
+                    Forms\Components\Select::make('province')
+                        ->label('Province')
+                        ->options(fn() => \App\Models\ListItem::getOptions('province'))
+                        ->searchable()
+                        ->placeholder('Select Province'),
 
-                ])
-                ->columnSpanFull()
-                ->persistTabInQueryString(),
+                    Forms\Components\TextInput::make('domicile')
+                        ->label('Domicile District')
+                        ->maxLength(100)
+                        ->placeholder('e.g. Lahore'),
+
+                    Forms\Components\Textarea::make('permanent_address')
+                        ->label('Permanent Address')
+                        ->rows(2)
+                        ->maxLength(500)
+                        ->helperText('If different from current address.')
+                        ->columnSpanFull(),
+
+                    Forms\Components\TextInput::make('batch_year')
+                        ->label('Batch Year')
+                        ->numeric()
+                        ->minValue(2000)
+                        ->maxValue(2099)
+                        ->default(now()->year)
+                        ->placeholder(now()->year)
+                        ->extraAttributes(ValidationHelper::numberAttrs(min: 2000, max: 2099))
+                        ->helperText('Year of admission e.g. 2024'),
+
+                    Forms\Components\TextInput::make('section')
+                        ->label('Section')
+                        ->maxLength(10)
+                        ->placeholder('A, B, or Morning'),
+
+                    Forms\Components\DatePicker::make('admission_date')
+                        ->label('Admission Date')
+                        ->displayFormat('d M Y')
+                        ->native(false)
+                        ->default(now()),
+
+                    Forms\Components\Toggle::make('is_hosteler')
+                        ->label('Hostel Resident')
+                        ->default(false)
+                        ->onColor('info'),
+
+                    Forms\Components\Select::make('previous_qualification')
+                        ->label('Previous Qualification')
+                        ->options(fn() => \App\Models\ListItem::getOptions('qualification_level'))
+                        ->searchable()
+                        ->placeholder('Select Qualification'),
+
+                    Forms\Components\TextInput::make('previous_marks')
+                        ->label('Marks / CGPA')
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(1100)
+                        ->step(0.01)
+                        ->placeholder('e.g. 850 or 3.50'),
+
+                    Forms\Components\TextInput::make('previous_board')
+                        ->label('Board / University')
+                        ->maxLength(100)
+                        ->placeholder('e.g. BISE Lahore'),
+
+                    Forms\Components\TextInput::make('previous_year')
+                        ->label('Passing Year')
+                        ->numeric()
+                        ->minValue(1990)
+                        ->maxValue(now()->year)
+                        ->placeholder(now()->year - 1)
+                        ->extraAttributes(ValidationHelper::numberAttrs(min: 1990, max: now()->year)),
+
+                    Forms\Components\TextInput::make('guardian_name')
+                        ->label('Guardian Name')
+                        ->maxLength(100)
+                        ->placeholder('e.g. Uncle / Paternal Grandfather')
+                        ->helperText('Fill only if guardian is different from father.'),
+
+                    Forms\Components\TextInput::make('guardian_phone')
+                        ->label('Guardian Mobile')
+                        ->tel()
+                        ->maxLength(20)
+                        ->placeholder('03XX-XXXXXXX')
+                        ->extraAttributes(ValidationHelper::phoneAttrs()),
+
+                    Forms\Components\TextInput::make('guardian_relation')
+                        ->label('Relation with Student')
+                        ->maxLength(50)
+                        ->placeholder('e.g. Uncle, Grandfather'),
+
+                    Forms\Components\TextInput::make('disability')
+                        ->label('Disability (if any)')
+                        ->maxLength(100)
+                        ->placeholder('e.g. Visual Impairment'),
+
+                    Forms\Components\Textarea::make('remarks')
+                        ->label('Remarks / Notes')
+                        ->rows(3)
+                        ->maxLength(1000)
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 

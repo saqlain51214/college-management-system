@@ -22,11 +22,14 @@ class StudentPortalController extends Controller
     {
         $student = $this->student();
 
+        $studentPayments = FeePayment::where('student_id', $student->id)->get();
+
         $feeStats = [
-            'total_due'  => FeePayment::where('student_id', $student->id)->sum('amount_due'),
-            'total_paid' => FeePayment::where('student_id', $student->id)->sum('amount_paid'),
-            'overdue'    => FeePayment::where('student_id', $student->id)
-                ->where('payment_status', 'overdue')->count(),
+            // net_amount already accounts for discount/fine — raw amount_due would
+            // ignore any scholarship/manual discount applied to the challan.
+            'total_due'  => $studentPayments->sum(fn (FeePayment $p) => $p->net_amount),
+            'total_paid' => $studentPayments->sum('amount_paid'),
+            'overdue'    => $studentPayments->where('payment_status', 'overdue')->count(),
         ];
         $feeStats['balance'] = $feeStats['total_due'] - $feeStats['total_paid'];
 
@@ -46,7 +49,9 @@ class StudentPortalController extends Controller
             ->orderByDesc('due_date')->get();
 
         $summary = [
-            'total_due'  => $payments->sum('amount_due'),
+            // net_amount already accounts for discount/fine — raw amount_due would
+            // ignore any scholarship/manual discount applied to the challan.
+            'total_due'  => $payments->sum(fn (FeePayment $p) => $p->net_amount),
             'total_paid' => $payments->sum('amount_paid'),
             'total_fine' => $payments->sum('fine_amount'),
         ];
