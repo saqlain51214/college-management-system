@@ -258,7 +258,12 @@ class PublicController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        $contactMessage = ContactMessage::create($request->only(['name', 'email', 'subject', 'message']));
+        $contactMessage = ContactMessage::create([
+            'name'    => $request->input('name'),
+            'email'   => $request->input('email'),
+            'subject' => \Purifier::clean($request->input('subject'), 'plain_text'),
+            'message' => \Purifier::clean($request->input('message'), 'plain_text'),
+        ]);
 
         Mail::to($contactMessage->email)->queue(new ContactMessageAcknowledgementMail($contactMessage));
 
@@ -376,7 +381,7 @@ class PublicController extends Controller
             'academic_details'  => $academicDetails,
             'documents'         => $storedDocs ?: null,
             'declare_true'      => true,
-            'message'           => $validated['message'] ?? null,
+            'message'           => filled($validated['message'] ?? null) ? \Purifier::clean($validated['message'], 'plain_text') : null,
             'status'            => 'new',
         ]);
 
@@ -776,9 +781,9 @@ class PublicController extends Controller
             'name'       => $data['name'],
             'email'      => $data['email'],
             'phone'      => $data['phone'],
-            'education'  => $data['education'],
-            'experience' => $data['experience'] ?? null,
-            'message'    => $data['message'],
+            'education'  => \Purifier::clean($data['education'], 'plain_text'),
+            'experience' => filled($data['experience'] ?? null) ? \Purifier::clean($data['experience'], 'plain_text') : null,
+            'message'    => \Purifier::clean($data['message'], 'plain_text'),
             'cv_path'    => $cvPath,
             'status'     => 'new',
         ]);
