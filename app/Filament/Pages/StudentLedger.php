@@ -149,6 +149,10 @@ class StudentLedger extends Page
                 'paid_on'     => $p->payment_date ? Carbon::parse($p->payment_date)->format('d M Y') : '—',
                 'days_late'   => $daysLate,
                 'scholarship_applied' => $p->scholarship_applied,
+                'original_fee'         => $p->fee_breakdown['original_fee'],
+                'scholarship_discount' => $p->fee_breakdown['scholarship_discount'],
+                'scholarship_percent'  => $p->fee_breakdown['scholarship_percent'],
+                'manual_discount'      => $p->fee_breakdown['manual_discount'],
             ];
         }
 

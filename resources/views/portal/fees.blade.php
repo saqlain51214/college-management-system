@@ -47,6 +47,35 @@
   @endforeach
 </div>
 
+@if($student->has_scholarship || $breakdown['manual_discount'] > 0)
+<div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5">
+  <h3 class="mb-3 flex items-center gap-1.5 text-sm font-semibold text-emerald-800">
+    🎓 How Your Fee Was Calculated
+    @if($student->has_scholarship)
+      <span class="ml-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700">{{ $student->scholarship_label }}</span>
+    @endif
+  </h3>
+  <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-4">
+    <div>
+      <p class="text-[10px] uppercase tracking-wide text-emerald-600/70">Original Fee</p>
+      <p class="font-semibold text-stone-700">Rs. {{ number_format($breakdown['original_fee'], 0) }}</p>
+    </div>
+    <div>
+      <p class="text-[10px] uppercase tracking-wide text-emerald-600/70">Scholarship</p>
+      <p class="font-semibold text-emerald-700">- Rs. {{ number_format($breakdown['scholarship_discount'], 0) }}</p>
+    </div>
+    <div>
+      <p class="text-[10px] uppercase tracking-wide text-emerald-600/70">Additional Discount</p>
+      <p class="font-semibold text-emerald-700">- Rs. {{ number_format($breakdown['manual_discount'], 0) }}</p>
+    </div>
+    <div>
+      <p class="text-[10px] uppercase tracking-wide text-emerald-600/70">Final Payable</p>
+      <p class="font-semibold text-stone-800">Rs. {{ number_format($summary['total_due'], 0) }}</p>
+    </div>
+  </div>
+</div>
+@endif
+
 {{-- ── Fee challans table ── --}}
 @if($payments->isEmpty())
 <div class="rounded-2xl border border-stone-200 bg-white p-16 text-center">
@@ -91,8 +120,11 @@
           <div>
             <p class="text-[10px] uppercase text-stone-400">Amount</p>
             <p class="font-semibold text-stone-700">{{ number_format($p->net_amount, 0) }}</p>
-            @if(($p->discount_amount ?? 0) > 0)
-              <p class="text-[10px] font-medium text-emerald-600">-{{ number_format($p->discount_amount, 0) }} discount</p>
+            @if($p->fee_breakdown['scholarship_discount'] > 0)
+              <p class="text-[10px] font-medium text-emerald-600">🎓 -{{ number_format($p->fee_breakdown['scholarship_discount'], 0) }}</p>
+            @endif
+            @if($p->fee_breakdown['manual_discount'] > 0)
+              <p class="text-[10px] font-medium text-emerald-600">-{{ number_format($p->fee_breakdown['manual_discount'], 0) }} discount</p>
             @endif
           </div>
           <div><p class="text-[10px] uppercase text-stone-400">Paid</p><p class="font-semibold text-emerald-600">{{ number_format($p->amount_paid ?? 0, 0) }}</p></div>
@@ -151,8 +183,11 @@
           <td class="px-5 py-3.5 text-sm text-stone-500">{{ $p->semester_number ? 'Sem ' . $p->semester_number : '—' }}</td>
           <td class="px-5 py-3.5 text-right font-semibold text-stone-700">
             {{ number_format($p->net_amount, 0) }}
-            @if(($p->discount_amount ?? 0) > 0)
-              <span class="block text-[11px] font-medium text-emerald-600">-{{ number_format($p->discount_amount, 0) }} discount</span>
+            @if($p->fee_breakdown['scholarship_discount'] > 0)
+              <span class="block text-[11px] font-medium text-emerald-600">🎓 -{{ number_format($p->fee_breakdown['scholarship_discount'], 0) }} scholarship</span>
+            @endif
+            @if($p->fee_breakdown['manual_discount'] > 0)
+              <span class="block text-[11px] font-medium text-emerald-600">-{{ number_format($p->fee_breakdown['manual_discount'], 0) }} discount</span>
             @endif
           </td>
           <td class="px-5 py-3.5 text-right font-semibold text-emerald-600">{{ number_format($p->amount_paid ?? 0, 0) }}</td>

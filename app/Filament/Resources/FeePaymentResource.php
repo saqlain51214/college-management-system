@@ -184,7 +184,21 @@ class FeePaymentResource extends Resource
                     ->label('Installment')
                     ->formatStateUsing(fn (FeePayment $r) => 'S' . ($r->semester_number ?? '—') . ' · #' . $r->installment_no)
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('amount_due')->label('Due')->money('PKR')->sortable(),
+                Tables\Columns\TextColumn::make('amount_due')->label('Due')->money('PKR')->sortable()
+                    ->description(function (FeePayment $r) {
+                        $b = $r->fee_breakdown;
+                        if ($b['scholarship_discount'] <= 0 && $b['manual_discount'] <= 0) {
+                            return null;
+                        }
+                        $parts = ['Original: Rs. ' . number_format($b['original_fee'])];
+                        if ($b['scholarship_discount'] > 0) {
+                            $parts[] = '🎓 -Rs. ' . number_format($b['scholarship_discount']) . ($b['scholarship_percent'] ? ' (' . rtrim(rtrim(number_format($b['scholarship_percent'], 2), '0'), '.') . '%)' : '');
+                        }
+                        if ($b['manual_discount'] > 0) {
+                            $parts[] = 'Discount: -Rs. ' . number_format($b['manual_discount']);
+                        }
+                        return implode(' · ', $parts);
+                    }),
                 Tables\Columns\TextColumn::make('amount_paid')->label('Paid')->money('PKR')->sortable(),
                 Tables\Columns\TextColumn::make('balance')
                     ->label('Balance')
@@ -324,24 +338,25 @@ class FeePaymentResource extends Resource
                     ->tooltip('Apply Discount')
                     ->visible(fn (FeePayment $r) => $r->payment_status !== PaymentStatusEnum::Paid)
                     ->form(fn (FeePayment $r) => [
-                        Forms\Components\TextInput::make('discount_amount')
-                            ->label('Discount Amount (PKR)')
+                        Forms\Components\TextInput::make('manual_discount_amount')
+                            ->label('Additional Discount (PKR)')
+                            ->helperText('This is on top of any scholarship discount already applied — Rs. ' . number_format((float) $r->scholarship_discount_amount) . ' scholarship discount is tracked separately and untouched here.')
                             ->numeric()->prefix('Rs.')->required()
-                            ->default(fn () => (float) $r->discount_amount)
-                            ->maxValue(fn () => (float) $r->amount_due),
+                            ->default(fn () => (float) $r->manual_discount_amount)
+                            ->maxValue(fn () => (float) $r->amount_due - (float) $r->scholarship_discount_amount),
                         Forms\Components\Textarea::make('reason')
                             ->label('Reason')->required()->rows(2),
                     ])
                     ->action(function (FeePayment $r, array $data) {
-                        $before = (float) $r->discount_amount;
-                        $after  = (float) $data['discount_amount'];
-                        $r->discount_amount = $after;
+                        $before = (float) $r->manual_discount_amount;
+                        $after  = (float) $data['manual_discount_amount'];
+                        $r->manual_discount_amount = $after;
                         $r->save();
 
                         \App\Support\ActivityLogWriter::activity(
                             'fee.discount_applied',
                             subject: $r,
-                            message: "Set discount to Rs. " . number_format($after) . " on challan {$r->challan_number}. Reason: {$data['reason']}",
+                            message: "Set additional discount to Rs. " . number_format($after) . " on challan {$r->challan_number}. Reason: {$data['reason']}",
                             meta: ['before' => $before, 'after' => $after, 'reason' => $data['reason']],
                         );
 

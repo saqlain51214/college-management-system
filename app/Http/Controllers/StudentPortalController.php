@@ -57,7 +57,13 @@ class StudentPortalController extends Controller
         ];
         $summary['balance'] = $summary['total_due'] - $summary['total_paid'];
 
-        return view('portal.fees', compact('student', 'payments', 'summary'));
+        $breakdown = [
+            'original_fee'         => $payments->sum(fn (FeePayment $p) => $p->fee_breakdown['original_fee']),
+            'scholarship_discount' => $payments->sum(fn (FeePayment $p) => $p->fee_breakdown['scholarship_discount']),
+            'manual_discount'      => $payments->sum(fn (FeePayment $p) => $p->fee_breakdown['manual_discount']),
+        ];
+
+        return view('portal.fees', compact('student', 'payments', 'summary', 'breakdown'));
     }
 
     public function feeChallan(FeePayment $payment)

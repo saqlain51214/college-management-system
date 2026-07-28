@@ -20,27 +20,34 @@ class FeePayment extends Model
         'student_id', 'fee_structure_id', 'academic_year_id', 'challan_number',
         'receipt_number',
         'fee_type', 'semester_number', 'amount_due', 'amount_paid', 'fine_amount',
-        'discount_amount', 'scholarship_applied', 'payment_status', 'payment_method', 'due_date',
+        'discount_amount', 'manual_discount_amount', 'scholarship_discount_amount',
+        'original_fee_amount', 'scholarship_name', 'scholarship_percent', 'scholarship_baked_into_amount_due',
+        'scholarship_applied', 'payment_status', 'payment_method', 'due_date',
         'payment_date', 'transaction_id', 'bank_name', 'remarks', 'collected_by',
         'payment_proof_path', 'proof_uploaded_at',
         'installment_no', 'late_fine_per_day', 'proof_claimed_amount', 'proof_claimed_date',
     ];
 
     protected $casts = [
-        'fee_type'             => FeeTypeEnum::class,
-        'payment_status'       => PaymentStatusEnum::class,
-        'payment_method'       => PaymentMethodEnum::class,
-        'due_date'             => 'date',
-        'payment_date'         => 'date',
-        'amount_due'           => 'decimal:2',
-        'amount_paid'          => 'decimal:2',
-        'fine_amount'          => 'decimal:2',
-        'discount_amount'      => 'decimal:2',
-        'scholarship_applied'  => 'boolean',
-        'late_fine_per_day'    => 'decimal:2',
-        'proof_claimed_amount' => 'decimal:2',
-        'proof_claimed_date'   => 'date',
-        'proof_uploaded_at'    => 'datetime',
+        'fee_type'                     => FeeTypeEnum::class,
+        'payment_status'               => PaymentStatusEnum::class,
+        'payment_method'               => PaymentMethodEnum::class,
+        'due_date'                     => 'date',
+        'payment_date'                 => 'date',
+        'amount_due'                   => 'decimal:2',
+        'amount_paid'                  => 'decimal:2',
+        'fine_amount'                  => 'decimal:2',
+        'discount_amount'              => 'decimal:2',
+        'manual_discount_amount'       => 'decimal:2',
+        'scholarship_discount_amount'  => 'decimal:2',
+        'original_fee_amount'          => 'decimal:2',
+        'scholarship_percent'          => 'decimal:2',
+        'scholarship_applied'          => 'boolean',
+        'scholarship_baked_into_amount_due' => 'boolean',
+        'late_fine_per_day'            => 'decimal:2',
+        'proof_claimed_amount'         => 'decimal:2',
+        'proof_claimed_date'           => 'date',
+        'proof_uploaded_at'            => 'datetime',
     ];
 
     public function student(): BelongsTo      { return $this->belongsTo(Student::class); }
@@ -51,6 +58,74 @@ class FeePayment extends Model
     public function getNetAmountAttribute(): float
     {
         return (float) $this->amount_due + (float) $this->fine_amount - (float) $this->discount_amount;
+    }
+
+    /**
+     * Full "Original Fee → Scholarship → Discount → Final Payable" breakdown
+     * for display (admin table, student portal, PDF). Never used for the
+     * actual net_amount/balance math above — those keep working exactly as
+     * before on amount_due/discount_amount alone, so this is purely additive.
+     *
+     * @return array{original_fee: float, scholarship_name: ?string, scholarship_percent: ?float, scholarship_discount: float, subtotal_after_scholarship: float, manual_discount: float, fine: float, final_payable: float}
+     */
+    public function getFeeBreakdownAttribute(): array
+    {
+        $original            = (float) ($this->original_fee_amount ?? $this->amount_due);
+        $scholarshipDiscount = (float) ($this->scholarship_discount_amount ?? 0);
+        $subtotal            = round($original - $scholarshipDiscount, 2);
+        $manualDiscount      = (float) ($this->manual_discount_amount ?? max(0, (float) $this->discount_amount - $scholarshipDiscount));
+
+        return [
+            'original_fee'                => $original,
+            'scholarship_name'            => $this->scholarship_name,
+            'scholarship_percent'         => $this->scholarship_percent !== null ? (float) $this->scholarship_percent : null,
+            'scholarship_discount'        => $scholarshipDiscount,
+            'subtotal_after_scholarship'  => $subtotal,
+            'manual_discount'             => $manualDiscount,
+            'fine'                        => (float) $this->fine_amount,
+            'final_payable'               => $this->net_amount,
+        ];
+    }
+
+    /**
+     * Reconstructs the pre-scholarship fee and the scholarship's own discount
+     * amount as a point-in-time snapshot, from whatever net amount is about
+     * to be billed. Snapshotted (not live-computed) so that if the student's
+     * scholarship later changes, this challan's history stays accurate.
+     *
+     * @return array{original_fee_amount: float, scholarship_discount_amount: float, scholarship_name: ?string, scholarship_percent: ?float}
+     */
+    protected static function buildScholarshipSnapshot(Student $student, float $netAmount): array
+    {
+        if (! $student->has_scholarship) {
+            return [
+                'original_fee_amount'         => $netAmount,
+                'scholarship_discount_amount' => 0.0,
+                'scholarship_name'            => null,
+                'scholarship_percent'         => null,
+            ];
+        }
+
+        if ($student->scholarship_type === 'percentage') {
+            $percent  = min(99.99, (float) $student->scholarship_value);
+            $original = $percent < 100 ? round($netAmount / (1 - $percent / 100), 2) : $netAmount;
+
+            return [
+                'original_fee_amount'         => $original,
+                'scholarship_discount_amount' => round($original - $netAmount, 2),
+                'scholarship_name'            => $student->scholarship_label,
+                'scholarship_percent'         => $percent,
+            ];
+        }
+
+        $value = (float) $student->scholarship_value;
+
+        return [
+            'original_fee_amount'         => round($netAmount + $value, 2),
+            'scholarship_discount_amount' => $value,
+            'scholarship_name'            => $student->scholarship_label,
+            'scholarship_percent'         => null,
+        ];
     }
 
     /** Outstanding balance on this challan (never negative). */
@@ -181,6 +256,14 @@ class FeePayment extends Model
 
         $structure = static::resolveFeeStructure($student, $feeType, $semester, $academicYearId);
 
+        // The "available" ceiling checked above already deducts the
+        // student's current scholarship (via invoiceSummary() →
+        // resolveFeeStructureTotal() → applyScholarship()), so any slip
+        // generated while a scholarship is active is scholarship-correct
+        // by construction — this snapshot just makes that fact visible/
+        // trackable instead of silently baked into a smaller number.
+        $snapshot = static::buildScholarshipSnapshot($student, $amount);
+
         $slip = static::create([
             'student_id'        => $student->id,
             'fee_structure_id'  => $structure?->id,
@@ -191,13 +274,16 @@ class FeePayment extends Model
             'amount_due'        => $amount,
             'amount_paid'       => 0,
             'fine_amount'       => 0,
-            'discount_amount'   => 0,
-            // The "available" ceiling checked above already deducts the
-            // student's current scholarship (via invoiceSummary() →
-            // resolveFeeStructureTotal() → applyScholarship()), so any slip
-            // generated while a scholarship is active is scholarship-correct
-            // by construction — this just makes that fact visible/trackable
-            // instead of silently baked into a smaller number.
+            'manual_discount_amount'      => 0,
+            'scholarship_discount_amount' => $snapshot['scholarship_discount_amount'],
+            'original_fee_amount'         => $snapshot['original_fee_amount'],
+            'scholarship_name'            => $snapshot['scholarship_name'],
+            'scholarship_percent'         => $snapshot['scholarship_percent'],
+            // amount_due above is already net of scholarship (see comment
+            // above) — the snapshot is for display only and must not also be
+            // subtracted via discount_amount, or the student would be
+            // charged the scholarship discount twice.
+            'scholarship_baked_into_amount_due' => true,
             'scholarship_applied' => $student->has_scholarship,
             'payment_status'    => PaymentStatusEnum::Pending,
             'due_date'          => $data['due_date'] ?? now()->addDays(15)->toDateString(),
@@ -225,7 +311,38 @@ class FeePayment extends Model
             'fee_type'     => $feeType,
             'challan'      => $this->challan_number,
             'due_date'     => optional($this->due_date)->format('d M Y') ?? 'N/A',
+            'challan_id'   => (string) $this->id,
         ]);
+
+        $this->notifyAdminsOfChallanGenerated($feeType);
+    }
+
+    /**
+     * Admin-facing counterpart to the student email/in-app notification —
+     * a bell notification so nobody has to remember to check Fee Payments
+     * after generating challans. Clicking it opens this exact challan.
+     */
+    protected function notifyAdminsOfChallanGenerated(string $feeTypeLabel): void
+    {
+        $roles = \Spatie\Permission\Models\Role::whereIn('name', ['super_admin', 'Developer'])
+            ->where('guard_name', 'web')->pluck('name')->all();
+        $admins = $roles ? \App\Models\User::role($roles)->get() : collect();
+
+        if ($admins->isEmpty()) {
+            return;
+        }
+
+        \Filament\Notifications\Notification::make()
+            ->title('Fee Challan Generated')
+            ->body("{$this->student->name} — {$feeTypeLabel} — Rs. " . number_format((float) $this->amount_due) . " ({$this->challan_number})")
+            ->icon('heroicon-o-document-text')
+            ->actions([
+                \Filament\Notifications\Actions\Action::make('view')
+                    ->label('View Challan')
+                    ->button()
+                    ->url(route('pdf.challan.preview', $this)),
+            ])
+            ->sendToDatabase($admins);
     }
 
     /**
@@ -336,7 +453,14 @@ class FeePayment extends Model
             return 0.0;
         }
 
-        $this->discount_amount = $before + $discount;
+        // amount_due here predates the scholarship and is therefore still the
+        // true original flat amount — unlike a freshly generated slip, no
+        // reconstruction is needed, this is exact.
+        $this->original_fee_amount = $this->original_fee_amount ?? (float) $this->amount_due;
+        $this->scholarship_discount_amount = (float) $this->scholarship_discount_amount + $discount;
+        $this->scholarship_baked_into_amount_due = false;
+        $this->scholarship_name = $this->student->scholarship_label;
+        $this->scholarship_percent = $this->student->scholarship_type === 'percentage' ? (float) $this->student->scholarship_value : null;
         $this->scholarship_applied = true;
         $this->save();
 
@@ -403,6 +527,16 @@ class FeePayment extends Model
                     $payment->payment_date = now()->toDateString();
                 }
             }
+
+            // discount_amount is always the derived total of the manual
+            // discount plus the scholarship discount — UNLESS the scholarship
+            // discount is already baked into amount_due (a freshly generated
+            // slip), in which case adding it again here would double it.
+            // net_amount/balance keep reading discount_amount exactly as
+            // before, so this is the only place that needs to know the split
+            // exists.
+            $payment->discount_amount = (float) $payment->manual_discount_amount
+                + ($payment->scholarship_baked_into_amount_due ? 0.0 : (float) $payment->scholarship_discount_amount);
         });
     }
 }
