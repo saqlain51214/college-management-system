@@ -59,27 +59,6 @@ class AdminPanelProvider extends PanelProvider
                     .fi-ta-table { width: 100%; table-layout: auto; }
                 </style>',
             )
-            ->renderHook(
-                'panels::body.end',
-                fn (): string => '<script>
-                    // A stale session/CSRF token (e.g. the login page was left open
-                    // across a deploy) makes Livewire show a jarring native
-                    // "This page has expired. Refresh?" confirm() popup. Replace it
-                    // with a silent auto-reload — the fresh page load gets a valid
-                    // token, so the user just sees the form reset and can retry
-                    // immediately instead of hitting a confusing dialog.
-                    document.addEventListener("livewire:init", () => {
-                        Livewire.hook("request", ({ fail }) => {
-                            fail(({ status, preventDefault }) => {
-                                if (status === 419) {
-                                    preventDefault();
-                                    window.location.reload();
-                                }
-                            });
-                        });
-                    });
-                </script>',
-            )
             ->plugins([
                 FilamentShieldPlugin::make()
                     ->localizePermissionLabels()
