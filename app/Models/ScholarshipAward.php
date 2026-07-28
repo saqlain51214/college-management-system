@@ -37,26 +37,45 @@ class ScholarshipAward extends Model
     protected static function booted(): void
     {
         static::saved(function (ScholarshipAward $award) {
-            if (! in_array($award->status, [ScholarshipStatusEnum::Approved, ScholarshipStatusEnum::Disbursed], true)) {
-                return;
-            }
-
             $student = $award->student;
             if (! $student) {
                 return;
             }
 
-            $scholarship = $award->scholarship;
-            if ($scholarship && filled($scholarship->coverage_percent)) {
-                $student->update([
-                    'scholarship_type'  => 'percentage',
-                    'scholarship_value' => $scholarship->coverage_percent,
-                ]);
-            } else {
-                $student->update([
-                    'scholarship_type'  => 'fixed',
-                    'scholarship_value' => $award->amount_awarded,
-                ]);
+            if (in_array($award->status, [ScholarshipStatusEnum::Approved, ScholarshipStatusEnum::Disbursed], true)) {
+                $scholarship = $award->scholarship;
+                if ($scholarship && filled($scholarship->coverage_percent)) {
+                    $student->update([
+                        'scholarship_type'  => 'percentage',
+                        'scholarship_value' => $scholarship->coverage_percent,
+                    ]);
+                } else {
+                    $student->update([
+                        'scholarship_type'  => 'fixed',
+                        'scholarship_value' => $award->amount_awarded,
+                    ]);
+                }
+
+                return;
+            }
+
+            // Rejected/expired: if no OTHER currently-active award remains for
+            // this student, clear the flat scholarship fields so future
+            // challans stop getting a discount for an award that no longer
+            // applies. Historical challans already generated keep their own
+            // snapshot (original_fee_amount/scholarship_discount_amount) and
+            // are unaffected either way.
+            if (in_array($award->status, [ScholarshipStatusEnum::Rejected, ScholarshipStatusEnum::Expired], true)) {
+                $stillActive = static::query()
+                    ->where('student_id', $student->id)
+                    ->where('id', '!=', $award->id)
+                    ->whereIn('status', [ScholarshipStatusEnum::Approved, ScholarshipStatusEnum::Disbursed])
+                    ->where(fn ($q) => $q->whereNull('expiry_date')->orWhere('expiry_date', '>=', now()->toDateString()))
+                    ->exists();
+
+                if (! $stillActive) {
+                    $student->update(['scholarship_type' => null, 'scholarship_value' => null]);
+                }
             }
         });
     }

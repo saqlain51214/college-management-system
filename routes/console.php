@@ -11,6 +11,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('fees:check-overdue')->dailyAt('01:00');
 Schedule::command('fees:send-due-reminders')->dailyAt('08:00');
+Schedule::command('scholarships:expire-awards')->dailyAt('01:15');
 Schedule::command('queue:prune-failed --hours=72')->dailyAt('01:30');
 Schedule::command('queue:prune-batches --hours=72')->dailyAt('02:00');
 Schedule::call(function (): void {

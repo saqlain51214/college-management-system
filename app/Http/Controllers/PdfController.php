@@ -190,4 +190,37 @@ class PdfController extends Controller
             ->header('Content-Type', 'text/html');
     }
 
+    public function studentAudit(Student $student): Response
+    {
+        $student->load(['academicProgram', 'department']);
+
+        $paymentIds = FeePayment::where('student_id', $student->id)->pluck('id')->all();
+
+        $logs = \App\Models\ActivityLog::query()
+            ->where(fn ($q) => $q->where('subject_type', 'student')->where('subject_id', $student->id))
+            ->when($paymentIds, fn ($q) => $q->orWhere(
+                fn ($q2) => $q2->where('subject_type', 'fee_payment')->whereIn('subject_id', $paymentIds)
+            ))
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($log) => [
+                'date' => $log->created_at?->format('d M Y, h:i A'),
+                'event' => $log->event,
+                'message' => $log->message,
+                'actor' => $log->actor_summary,
+            ]);
+
+        $collegeName = CollegeSetting::get('college_name', 'Jinnah Degree College Astore');
+
+        $pdf = Pdf::loadView('pdf.student-audit', compact('student', 'logs', 'collegeName'))
+            ->setPaper('a4', 'portrait')
+            ->setOption(['defaultFont' => 'dejavu sans', 'isRemoteEnabled' => false, 'isPhpEnabled' => false]);
+
+        $filename = 'student-audit-' . \Illuminate\Support\Str::slug($student->roll_number ?: $student->name) . '.pdf';
+
+        return response($pdf->output())
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
+    }
+
 }
