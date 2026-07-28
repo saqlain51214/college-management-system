@@ -268,6 +268,12 @@ class PublicController extends Controller
             Mail::to($contactRecipient)->queue(new ContactMessageOfficeNotificationMail($contactMessage));
         }
 
+        $this->notifyAdminsOfNewSubmission(
+            title: 'New Contact Message',
+            body: $contactMessage->name . ': ' . $contactMessage->subject,
+            url: \App\Filament\Resources\ContactMessageResource::getUrl('view', ['record' => $contactMessage]),
+        );
+
         return back()->with('success', 'Thank you! Your message has been received. We will get back to you shortly.');
     }
 
@@ -383,6 +389,12 @@ class PublicController extends Controller
         if (filled($admissionsRecipient)) {
             Mail::to($admissionsRecipient)->queue(new AdmissionInquiryOfficeNotificationMail($admissionInquiry));
         }
+
+        $this->notifyAdminsOfNewSubmission(
+            title: 'New Admission Inquiry',
+            body: $admissionInquiry->name . ' applied for ' . ($admissionInquiry->program?->name ?? $admissionInquiry->program_name ?? 'a programme') . '.',
+            url: \App\Filament\Resources\AdmissionInquiryResource::getUrl('view', ['record' => $admissionInquiry]),
+        );
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -743,30 +755,63 @@ class PublicController extends Controller
             'education'   => ['required', 'string', 'max:200'],
             'experience'  => ['nullable', 'string', 'max:200'],
             'message'     => ['required', 'string', 'max:1000'],
+            'cv'          => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+        ]);
+
+        $cvPath = $request->hasFile('cv')
+            ? $request->file('cv')->store('job-applications/cv', 'public')
+            : null;
+
+        $application = \App\Models\JobApplication::create([
+            'position'   => $data['position'],
+            'name'       => $data['name'],
+            'email'      => $data['email'],
+            'phone'      => $data['phone'],
+            'education'  => $data['education'],
+            'experience' => $data['experience'] ?? null,
+            'message'    => $data['message'],
+            'cv_path'    => $cvPath,
+            'status'     => 'new',
         ]);
 
         $college      = $this->college();
         $officeEmail  = $college->email ?? CollegeSetting::get('college_email', 'jinnahschooldegreecollege@gmail.com');
 
-        try {
-            Mail::raw(
-                "New Job Application Received\n\n"
-                . "Position Applied For: {$data['position']}\n"
-                . "Name: {$data['name']}\n"
-                . "Email: {$data['email']}\n"
-                . "Phone: {$data['phone']}\n"
-                . "Education: {$data['education']}\n"
-                . "Experience: " . ($data['experience'] ?? 'Not specified') . "\n"
-                . "Cover Letter:\n{$data['message']}\n\n"
-                . "Submitted at: " . now()->format('d M Y, h:i A'),
-                fn ($m) => $m->to($officeEmail)
-                             ->replyTo($data['email'], $data['name'])
-                             ->subject("Job Application: {$data['position']} — {$data['name']}")
-            );
-        } catch (\Throwable) {
-            // Mail failure silently — application still acknowledged
-        }
+        Mail::to($officeEmail)->queue(new \App\Mail\JobApplicationOfficeNotificationMail($application));
+
+        $this->notifyAdminsOfNewSubmission(
+            title: 'New Job Application',
+            body: $application->name . ' applied for ' . $application->position . '.',
+            url: \App\Filament\Resources\JobApplicationResource::getUrl('view', ['record' => $application]),
+        );
 
         return back()->with('job_applied', $data['name']);
+    }
+
+    /**
+     * Shared admin-alert pattern (same as CheckOverdueFees/FeeRefund elsewhere in
+     * the app): only queries roles that actually exist for this guard, so a
+     * missing dev-only role never crashes an otherwise-successful public
+     * submission. Used for every public-facing form that admin needs to act on
+     * (job applications, contact messages) — not for admin's own actions, which
+     * would just be notifying admin about something admin already did.
+     */
+    private function notifyAdminsOfNewSubmission(string $title, string $body, string $url): void
+    {
+        $existingRoles = \Spatie\Permission\Models\Role::whereIn('name', ['super_admin', 'Developer'])
+            ->where('guard_name', 'web')->pluck('name')->all();
+        $admins = $existingRoles ? \App\Models\User::role($existingRoles)->get() : collect();
+
+        \Filament\Notifications\Notification::make()
+            ->info()
+            ->title($title)
+            ->body($body)
+            ->actions([
+                \Filament\Notifications\Actions\Action::make('view')
+                    ->label('View')
+                    ->button()
+                    ->url($url),
+            ])
+            ->sendToDatabase($admins);
     }
 }
