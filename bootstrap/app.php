@@ -23,8 +23,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
         // admin/student/teacher each need their own session cookie.
         $middleware->web(prepend: [\App\Http\Middleware\SetGuardSessionCookie::class]);
 
-        // Trust the platform proxy (Railway/Vercel/etc.) so Laravel detects
-        // the original HTTPS scheme and handles secure session/CSRF cookies.
+        // Trust the reverse proxy (LiteSpeed/cPanel) so Laravel detects the
+        // original HTTPS scheme and handles secure session/CSRF cookies.
         $middleware->trustProxies(at: '*', headers:
             Request::HEADER_X_FORWARDED_FOR
             | Request::HEADER_X_FORWARDED_HOST

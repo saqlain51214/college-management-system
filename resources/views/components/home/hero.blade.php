@@ -1,7 +1,7 @@
 @php
     $heroSlides = $pageContent['hero']['slides'] ?? [];
-    // Fallback: if no slides are configured, show a bundled default slide so the
-    // hero is never empty (also survives Railway's ephemeral uploads).
+    // Fallback: if no slides are configured, show a bundled default slide so
+    // the hero is never empty.
     if (empty($heroSlides)) {
         $collegeName = $college->college_name ?? 'Jinnah Degree College Astore';
         $heroSlides = [

@@ -13,7 +13,7 @@ _College ke admin/staff ke liye mukammal reference. Har module ke pages, har dro
 | **Teacher Portal** | `/teacher/login` | Employee ID (JDCA-T-001) ya email | initial `123456` |
 | **Public Website** | `/` | — | — |
 
-> Site: `https://college-management-system-production-7fa1.up.railway.app`
+> Site: `https://jinnahdegreecollegeastore.com`
 > Passwords **initial** hain — user "Forgot password?" (email OTP) se ya admin **🔑 Set Portal Password** button se badal sakte hain.
 
 ## Dropdown options — 3 kism (padhne se pehle samajh lein)
