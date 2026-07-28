@@ -276,7 +276,11 @@
                                 <td class="px-4 py-2 font-mono text-xs text-gray-600 dark:text-gray-300">{{ $row['challan'] }}</td>
                                 <td class="px-4 py-2 text-gray-700 dark:text-gray-200">{{ $row['fee_type'] }}</td>
                                 <td class="px-4 py-2 text-gray-500">{{ $row['semester'] ? 'S' . $row['semester'] : '—' }} · #{{ $row['installment'] }}</td>
-                                <td class="px-4 py-2 text-right text-gray-700 dark:text-gray-200">{{ $rs($row['net']) }}</td>
+                                <td class="px-4 py-2 text-right text-gray-700 dark:text-gray-200"
+                                    @if (($row['scholarship_discount'] ?? 0) > 0 || ($row['manual_discount'] ?? 0) > 0)
+                                        title="Original: {{ $rs($row['original_fee'] ?? $row['net']) }}{{ ($row['scholarship_discount'] ?? 0) > 0 ? ' · Scholarship: -' . $rs($row['scholarship_discount']) . ($row['scholarship_percent'] ? ' (' . rtrim(rtrim(number_format($row['scholarship_percent'], 2), '0'), '.') . '%)' : '') : '' }}{{ ($row['manual_discount'] ?? 0) > 0 ? ' · Discount: -' . $rs($row['manual_discount']) : '' }}"
+                                    @endif
+                                >{{ $rs($row['net']) }}</td>
                                 <td class="px-4 py-2 text-right text-green-700 dark:text-green-400">{{ $rs($row['paid']) }}</td>
                                 <td class="px-4 py-2 text-right font-semibold {{ $row['balance'] > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-gray-400' }}">{{ $rs($row['balance']) }}</td>
                                 <td class="px-4 py-2">

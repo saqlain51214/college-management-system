@@ -72,6 +72,7 @@ class StudentModuleTest extends TestCase
             'name' => 'Test Student',
             'father_name' => 'Test Father',
             'gender' => 'male',
+            'email' => 'student-' . uniqid() . '@example.test',
             'department_id' => $this->department->id,
             'academic_program_id' => $this->program->id,
             'is_active' => true,
@@ -158,7 +159,7 @@ class StudentModuleTest extends TestCase
         Livewire::actingAs($this->admin)
             ->test(\App\Filament\Resources\FeePaymentResource\Pages\ListFeePayments::class)
             ->callTableAction('applyDiscount', $slip, data: [
-                'discount_amount' => 1000,
+                'manual_discount_amount' => 1000,
                 'reason' => '10% scholarship discount',
             ]);
 
@@ -187,8 +188,12 @@ class StudentModuleTest extends TestCase
         ]);
 
         $this->assertEquals($adminNotificationsBefore + 1, $this->admin->notifications()->count());
-        $adminNotification = $this->admin->notifications()->latest()->first();
-        $this->assertStringContainsString('refund', mb_strtolower($adminNotification->data['title'] ?? ''));
+        // Not latest()->first() — the challan-generated notification from
+        // generateSlip() above can share the same timestamp resolution as
+        // this one, making created_at ordering ambiguous between the two.
+        $adminNotification = $this->admin->notifications()->get()
+            ->first(fn ($n) => str_contains(mb_strtolower($n->data['title'] ?? ''), 'refund'));
+        $this->assertNotNull($adminNotification);
 
         $studentNotificationsBefore = $student->notifications()->count();
         $refund->approve($this->admin->id);

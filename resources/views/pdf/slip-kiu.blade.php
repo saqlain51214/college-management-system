@@ -99,6 +99,12 @@ if ($payment !== null) {
     $fine     = (float)($payment->fine_amount ?? 0);
     $disc     = (float)($payment->discount_amount ?? 0);
     $net      = $due + $fine - $disc;
+    $breakdown       = $payment->fee_breakdown;
+    $originalFee     = $breakdown['original_fee'];
+    $scholarshipDisc = $breakdown['scholarship_discount'];
+    $scholarshipName = $breakdown['scholarship_name'];
+    $scholarshipPct  = $breakdown['scholarship_percent'];
+    $manualDisc      = $breakdown['manual_discount'];
     $stVal    = $payment->payment_status instanceof \BackedEnum ? $payment->payment_status->value : (string)$payment->payment_status;
     $isPaid   = strtolower($stVal) === 'paid';
     $paidDate = $isPaid && $payment->payment_date ? Carbon::parse($payment->payment_date)->format('d-m-Y') : '';
@@ -119,6 +125,11 @@ if ($payment !== null) {
     $fine     = (float)($d['fine_amount']     ?? 4200);
     $disc     = (float)($d['discount_amount'] ?? 0);
     $net      = $due + $fine - $disc;
+    $originalFee     = $due;
+    $scholarshipDisc = 0.0;
+    $scholarshipName = null;
+    $scholarshipPct  = null;
+    $manualDisc      = $disc;
     $isPaid   = false;
     $paidDate = '';
     $dueDate  = $d['due_date']        ?? '11-04-2026';
@@ -321,23 +332,31 @@ $paymentQrSrc = \App\Support\PaymentQr::forSlip($college, $net, $sn, $bankAcct);
         </tr>
         @endforeach
       @else
+        @php $rowNo = 1; @endphp
         <tr>
-          <td class="n" style="color:{{ $primaryColor }};">1.</td>
+          <td class="n" style="color:{{ $primaryColor }};">{{ $rowNo++ }}.</td>
           <td>{{ $feeLabel }}</td>
-          <td class="r">{{ number_format($due, 0) }}</td>
+          <td class="r">{{ number_format($originalFee, 0) }}</td>
         </tr>
+        @if($scholarshipDisc > 0)
+        <tr>
+          <td class="n" style="color:{{ $primaryColor }};">{{ $rowNo++ }}.</td>
+          <td>Scholarship{{ $scholarshipName ? ' — ' . $scholarshipName : '' }}{{ $scholarshipPct ? ' (' . rtrim(rtrim(number_format($scholarshipPct, 2), '0'), '.') . '%)' : '' }}</td>
+          <td class="r">- {{ number_format($scholarshipDisc, 0) }}</td>
+        </tr>
+        @endif
         @if($fine > 0)
         <tr>
-          <td class="n" style="color:{{ $primaryColor }};">2.</td>
+          <td class="n" style="color:{{ $primaryColor }};">{{ $rowNo++ }}.</td>
           <td>Late Surcharge{{ $dueDate ? ' After ('.$dueDate.')' : '' }}</td>
           <td class="r">{{ number_format($fine, 2) }}</td>
         </tr>
         @endif
-        @if($disc > 0)
+        @if($manualDisc > 0)
         <tr>
-          <td class="n" style="color:{{ $primaryColor }};">{{ $fine > 0 ? '3.' : '2.' }}</td>
+          <td class="n" style="color:{{ $primaryColor }};">{{ $rowNo++ }}.</td>
           <td>Discount / Concession</td>
-          <td class="r">- {{ number_format($disc, 0) }}</td>
+          <td class="r">- {{ number_format($manualDisc, 0) }}</td>
         </tr>
         @endif
       @endif

@@ -16,6 +16,25 @@ class EditStudent extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        $scholarshipId = $data['scholarship_id'] ?? null;
+        unset($data['scholarship_id']);
+
+        if ($scholarshipId) {
+            $scholarship = \App\Models\Scholarship::find($scholarshipId);
+            if ($scholarship) {
+                \App\Models\ScholarshipAward::create([
+                    'scholarship_id'   => $scholarship->id,
+                    'student_id'       => $record->id,
+                    'status'           => \App\Enums\ScholarshipStatusEnum::Approved,
+                    'amount_awarded'   => filled($scholarship->coverage_percent) ? $scholarship->coverage_percent : $scholarship->amount,
+                    'application_date' => now()->toDateString(),
+                    'approval_date'    => now()->toDateString(),
+                    'approved_by'      => auth()->id(),
+                    'reason'           => 'Assigned from Student edit form.',
+                ]);
+            }
+        }
+
         try {
             return app(StudentService::class)->updateStudent($record, $data);
         } catch (UniqueConstraintViolationException $e) {

@@ -62,15 +62,37 @@ class CreateStudent extends CreateRecord
             ->info()->send();
     }
 
+    /** Captured from the form's scholarship-catalog picker (not a students-table column). */
+    protected ?int $scholarshipId = null;
+
     protected function afterCreate(): void
     {
         if ($this->fromInquiryId) {
             AdmissionInquiry::where('id', $this->fromInquiryId)->update(['status' => 'enrolled']);
         }
+
+        if ($this->scholarshipId) {
+            $scholarship = \App\Models\Scholarship::find($this->scholarshipId);
+            if ($scholarship) {
+                \App\Models\ScholarshipAward::create([
+                    'scholarship_id'  => $scholarship->id,
+                    'student_id'      => $this->record->id,
+                    'status'          => \App\Enums\ScholarshipStatusEnum::Approved,
+                    'amount_awarded'  => filled($scholarship->coverage_percent) ? $scholarship->coverage_percent : $scholarship->amount,
+                    'application_date'=> now()->toDateString(),
+                    'approval_date'   => now()->toDateString(),
+                    'approved_by'     => auth()->id(),
+                    'reason'          => 'Assigned during student creation.',
+                ]);
+            }
+        }
     }
 
     protected function handleRecordCreation(array $data): Model
     {
+        $this->scholarshipId = $data['scholarship_id'] ?? null;
+        unset($data['scholarship_id']);
+
         try {
             return app(StudentService::class)->createStudent($data);
         } catch (UniqueConstraintViolationException $e) {

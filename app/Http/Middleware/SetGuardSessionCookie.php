@@ -42,7 +42,12 @@ class SetGuardSessionCookie
         }
 
         $cookie = match (true) {
-            str_starts_with($path, 'admin')  => 'jdca_admin_session',
+            // /pdf/challan/* is only ever linked to from the admin panel
+            // (FeePaymentResource's View/Download actions) — without this it
+            // fell to the default cookie name, which the admin's browser
+            // never received, so the request looked logged-out and bounced
+            // to /admin/login instead of opening the challan.
+            str_starts_with($path, 'admin'), str_starts_with($path, 'pdf') => 'jdca_admin_session',
             str_starts_with($path, 'portal') => 'jdca_student_session',
             str_starts_with($path, 'teacher') => 'jdca_teacher_session',
             default => config('session.cookie'),

@@ -60,9 +60,9 @@ class NotificationTemplateSeeder extends Seeder
                 'subject'      => 'New Fee Challan Generated — PKR {{amount}} — JDCA',
                 'body'         => "Dear {{student_name}},\n\nA new fee challan has been generated for you.\n\n**Fee Type:** {{fee_type}}\n**Amount:** PKR {{amount}}\n**Challan No:** {{challan}}\n**Due Date:** {{due_date}}\n\nPlease log in to your student portal to download and pay this challan before the due date.",
                 'action_label' => 'View Fee Challan',
-                'action_url'   => '/portal/fees',
+                'action_url'   => '/portal/fees/{{challan_id}}/challan/preview',
                 'in_app_icon'  => 'document-text',
-                'variables'    => ['student_name', 'amount', 'fee_type', 'challan', 'due_date'],
+                'variables'    => ['student_name', 'amount', 'fee_type', 'challan', 'due_date', 'challan_id'],
             ],
 
             [

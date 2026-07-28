@@ -97,6 +97,22 @@ class StudentResource extends Resource
                         ->placeholder('03XX-XXXXXXX')
                         ->extraAttributes(ValidationHelper::phoneAttrs()),
 
+                    Forms\Components\TextInput::make('email')
+                        ->label('Email Address')
+                        ->email()
+                        ->required()
+                        ->maxLength(150)
+                        ->placeholder('student@example.com')
+                        ->extraAttributes(ValidationHelper::emailAttrs())
+                        ->unique(table: 'students', column: 'email',
+                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
+                                $record ? $rule->ignore($record->id) : $rule
+                        )
+                        ->validationMessages([
+                            'required' => 'Email is required.',
+                            'unique'   => 'This email is already registered.',
+                        ]),
+
                     Forms\Components\TextInput::make('cnic')
                         ->label('CNIC')
                         ->maxLength(20)
@@ -191,6 +207,28 @@ class StudentResource extends Resource
                 ->description('If this student receives financial aid, set it here — every fee slip generated for them (bulk or individual) automatically applies this discount. Leave both fields empty for no scholarship.')
                 ->columns(2)
                 ->schema([
+                    Forms\Components\Select::make('scholarship_id')
+                        ->label('Pick From Scholarship Catalog (Optional)')
+                        ->options(fn () => \App\Models\Scholarship::active()->orderBy('name')->pluck('name', 'id'))
+                        ->searchable()
+                        ->live()
+                        ->dehydrated()
+                        ->helperText('Selecting one from the catalog fills in the type/value below and records a scholarship award for this student. You can still set a one-off type/value manually instead.')
+                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                            $scholarship = $state ? \App\Models\Scholarship::find($state) : null;
+                            if (! $scholarship) {
+                                return;
+                            }
+                            if (filled($scholarship->coverage_percent)) {
+                                $set('scholarship_type', 'percentage');
+                                $set('scholarship_value', (float) $scholarship->coverage_percent);
+                            } else {
+                                $set('scholarship_type', 'fixed');
+                                $set('scholarship_value', (float) $scholarship->amount);
+                            }
+                        })
+                        ->columnSpanFull(),
+
                     Forms\Components\Select::make('scholarship_type')
                         ->label('Scholarship Type')
                         ->options([
@@ -284,18 +322,6 @@ class StudentResource extends Resource
                         ->label('Nationality')
                         ->maxLength(50)
                         ->default('Pakistani'),
-
-                    Forms\Components\TextInput::make('email')
-                        ->label('Email Address')
-                        ->email()
-                        ->maxLength(150)
-                        ->placeholder('student@example.com')
-                        ->extraAttributes(ValidationHelper::emailAttrs())
-                        ->unique(table: 'students', column: 'email',
-                            modifyRuleUsing: fn(\Illuminate\Validation\Rules\Unique $rule, ?Student $record) =>
-                                $record ? $rule->ignore($record->id) : $rule
-                        )
-                        ->validationMessages(['unique' => 'This email is already registered.']),
 
                     Forms\Components\TextInput::make('father_phone')
                         ->label("Father's Mobile")
