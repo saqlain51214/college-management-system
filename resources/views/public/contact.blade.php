@@ -117,7 +117,17 @@
           </div>
           @endif
 
-          <form action="{{ route('contact.send') }}" method="POST" class="space-y-5">
+          <div id="contactSubmitOverlay" class="fixed inset-0 z-[100] hidden items-center justify-center bg-white/70 backdrop-blur-sm">
+            <div class="flex flex-col items-center gap-4 rounded-2xl bg-white px-10 py-8 shadow-xl ring-1 ring-stone-200">
+              <svg class="h-10 w-10 animate-spin" style="color:#6b2d39" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              <p class="text-sm font-semibold text-ink">Sending your message…</p>
+            </div>
+          </div>
+
+          <form action="{{ route('contact.send') }}" method="POST" class="space-y-5" data-submit-overlay="contactSubmitOverlay">
             @csrf
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -174,8 +184,8 @@
               @error('message')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
 
-            <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 rounded-md text-white text-sm font-semibold transition hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2" style="background:#6b2d39">
-              Send Message
+            <button type="submit" data-submit-label="Sending…" class="inline-flex items-center gap-2 px-8 py-3 rounded-md text-white text-sm font-semibold transition hover:bg-brand-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2" style="background:#6b2d39">
+              <span>Send Message</span>
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
             </button>
           </form>
