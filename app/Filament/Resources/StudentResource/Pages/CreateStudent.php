@@ -48,6 +48,9 @@ class CreateStudent extends CreateRecord
             'address'               => $inquiry->address,
             'city'                  => $inquiry->city,
             'district'              => $inquiry->district,
+            // department_id is required on Student but not stored on the inquiry —
+            // derive it from the chosen programme so admin isn't left to guess it.
+            'department_id'         => $inquiry->program?->department_id,
             'academic_program_id'   => $inquiry->program_id,
             'previous_qualification'=> $inquiry->qualification,
             'is_active'             => true,

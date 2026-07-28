@@ -252,8 +252,34 @@ class AdmissionInquiryResource extends Resource
                     ->icon('heroicon-o-user-plus')
                     ->color('success')
                     ->tooltip('Create a student record pre-filled from this application')
-                    ->visible(fn ($record) => $record->status !== 'enrolled')
+                    ->visible(fn ($record) => ! in_array($record->status, ['enrolled', 'rejected'], true))
                     ->url(fn ($record) => \App\Filament\Resources\StudentResource::getUrl('create', ['from_inquiry' => $record->id])),
+                Tables\Actions\Action::make('reject')
+                    ->label('Reject')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn ($record) => ! in_array($record->status, ['enrolled', 'rejected'], true))
+                    ->requiresConfirmation()
+                    ->modalHeading('Reject Application')
+                    ->modalDescription('This emails the applicant that their application was not successful.')
+                    ->form([
+                        Forms\Components\Textarea::make('admin_notes')
+                            ->label('Reason (optional — included in the email if provided)')
+                            ->rows(2),
+                    ])
+                    ->action(function (AdmissionInquiry $record, array $data) {
+                        $record->update([
+                            'status' => 'rejected',
+                            'admin_notes' => $data['admin_notes'] ?: $record->admin_notes,
+                        ]);
+
+                        if (filled($record->email)) {
+                            \Illuminate\Support\Facades\Mail::to($record->email)
+                                ->queue(new \App\Mail\AdmissionInquiryRejectedMail($record));
+                        }
+
+                        \Filament\Notifications\Notification::make()->title('Application rejected')->success()->send();
+                    }),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

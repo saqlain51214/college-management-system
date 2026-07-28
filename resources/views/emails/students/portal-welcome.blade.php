@@ -6,7 +6,7 @@
 
 <p><strong>Portal URL:</strong> {{ route('portal.login') }}</p>
 <p><strong>Roll Number:</strong> {{ $student->roll_number }}</p>
-<p><strong>Default Password:</strong> Your roll number, unless the administration has shared a different temporary password with you.</p>
+<p><strong>Default Password:</strong> 123456 (unless the administration has shared a different temporary password with you)</p>
 
 <p>For security, please log in and change your password as soon as possible.</p>
 
