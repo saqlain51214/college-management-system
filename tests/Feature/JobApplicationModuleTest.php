@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\JobApplicationOfficeNotificationMail;
+use App\Mail\JobApplicationStatusMail;
 use App\Models\JobApplication;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -106,6 +107,25 @@ class JobApplicationModuleTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertEquals('shortlisted', $application->fresh()->status);
+        Mail::assertQueued(JobApplicationStatusMail::class, fn ($mail) => $mail->jobApplication->id === $application->id);
+    }
+
+    public function test_saving_without_changing_status_does_not_send_a_duplicate_email(): void
+    {
+        Mail::fake();
+
+        $application = JobApplication::create([
+            'position' => 'Lecturer', 'name' => 'Applicant Four', 'email' => 'a4@example.test',
+            'phone' => '03001234567', 'education' => 'MSc', 'message' => 'Hi', 'status' => 'new',
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(\App\Filament\Resources\JobApplicationResource\Pages\EditJobApplication::class, ['record' => $application->getRouteKey()])
+            ->fillForm(['status' => 'new', 'admin_notes' => 'Reviewed CV, looks good.'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        Mail::assertNotQueued(JobApplicationStatusMail::class);
     }
 
     public function test_contact_message_and_admission_inquiry_also_notify_admin_via_bell(): void
