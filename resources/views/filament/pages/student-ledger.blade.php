@@ -291,8 +291,10 @@
                                     @endphp
                                     <span class="rounded-full px-2 py-0.5 text-xs font-medium {{ $badge }}">{{ ucfirst($row['status']) }}</span>
                                     @if ($student['scholarship'])
-                                        <span class="ml-1 rounded-full px-2 py-0.5 text-[11px] font-medium {{ $row['scholarship_applied'] ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
-                                            🎓 {{ $row['scholarship_applied'] ? 'Applied' : 'Not Applied' }}
+                                        {{-- ?? false guards against a stale Livewire snapshot from before this
+                                             column existed (browser tab left open across a deploy) --}}
+                                        <span class="ml-1 rounded-full px-2 py-0.5 text-[11px] font-medium {{ ($row['scholarship_applied'] ?? false) ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
+                                            🎓 {{ ($row['scholarship_applied'] ?? false) ? 'Applied' : 'Not Applied' }}
                                         </span>
                                     @endif
                                 </td>
