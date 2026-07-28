@@ -261,8 +261,8 @@ class PublicController extends Controller
         $contactMessage = ContactMessage::create([
             'name'    => $request->input('name'),
             'email'   => $request->input('email'),
-            'subject' => \Purifier::clean($request->input('subject'), 'plain_text'),
-            'message' => \Purifier::clean($request->input('message'), 'plain_text'),
+            'subject' => \App\Support\PlainTextSanitizer::clean($request->input('subject')),
+            'message' => \App\Support\PlainTextSanitizer::clean($request->input('message')),
         ]);
 
         Mail::to($contactMessage->email)->queue(new ContactMessageAcknowledgementMail($contactMessage));
@@ -381,7 +381,7 @@ class PublicController extends Controller
             'academic_details'  => $academicDetails,
             'documents'         => $storedDocs ?: null,
             'declare_true'      => true,
-            'message'           => filled($validated['message'] ?? null) ? \Purifier::clean($validated['message'], 'plain_text') : null,
+            'message'           => \App\Support\PlainTextSanitizer::clean($validated['message'] ?? null),
             'status'            => 'new',
         ]);
 
@@ -781,9 +781,9 @@ class PublicController extends Controller
             'name'       => $data['name'],
             'email'      => $data['email'],
             'phone'      => $data['phone'],
-            'education'  => \Purifier::clean($data['education'], 'plain_text'),
-            'experience' => filled($data['experience'] ?? null) ? \Purifier::clean($data['experience'], 'plain_text') : null,
-            'message'    => \Purifier::clean($data['message'], 'plain_text'),
+            'education'  => \App\Support\PlainTextSanitizer::clean($data['education']),
+            'experience' => \App\Support\PlainTextSanitizer::clean($data['experience'] ?? null),
+            'message'    => \App\Support\PlainTextSanitizer::clean($data['message']),
             'cv_path'    => $cvPath,
             'status'     => 'new',
         ]);
