@@ -36,7 +36,7 @@ class AdmissionInquiryResource extends Resource
                 Forms\Components\TextInput::make('student_phone')->label('Student Mobile'),
                 Forms\Components\TextInput::make('email')->email()->nullable(),
                 Forms\Components\TextInput::make('cnic')->label('CNIC / B-Form'),
-                Forms\Components\DatePicker::make('dob'),
+                Forms\Components\DatePicker::make('dob')->maxDate(now())->native(false),
                 Forms\Components\TextInput::make('entry_path')->label('Applying For'),
                 Forms\Components\TextInput::make('gender'),
                 Forms\Components\TextInput::make('campus'),

@@ -143,7 +143,17 @@
 
       {{-- Form --}}
       <div class="overflow-y-auto flex-1">
-        <form method="POST" action="{{ route('jobs.apply') }}" enctype="multipart/form-data" class="px-6 py-5 space-y-4">
+        <div id="jobApplyOverlay" class="fixed inset-0 z-[10000] hidden items-center justify-center bg-white/70 backdrop-blur-sm">
+          <div class="flex flex-col items-center gap-4 rounded-2xl bg-white px-10 py-8 shadow-xl ring-1 ring-stone-200">
+            <svg class="h-10 w-10 animate-spin" style="color:var(--site-brand)" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            <p class="text-sm font-semibold text-ink">Submitting your application…</p>
+          </div>
+        </div>
+
+        <form method="POST" action="{{ route('jobs.apply') }}" enctype="multipart/form-data" class="px-6 py-5 space-y-4" data-submit-overlay="jobApplyOverlay">
           @csrf
           <input type="hidden" name="position" :value="position">
 
@@ -156,9 +166,9 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">Phone <span class="text-red-500">*</span></label>
-              <input type="tel" name="phone" required
+              <input type="tel" name="phone" required maxlength="12" data-format="phone"
                      class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-                     placeholder="+92 300 0000000">
+                     placeholder="03xx-xxxxxxx">
             </div>
           </div>
 

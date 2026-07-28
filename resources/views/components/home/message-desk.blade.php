@@ -33,22 +33,22 @@
                 <a href="{{ route('leadership.message', $L) }}" data-reveal data-reveal-delay="{{ $loop->index % 3 + 1 }}"
                    class="group relative flex flex-col overflow-hidden rounded-[26px] bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.15)] ring-1 ring-stone-100 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.28)]">
                     {{-- gradient banner + avatar --}}
-                    <div class="relative h-24 site-brand-gradient">
+                    <div class="relative h-28 sm:h-32 md:h-36 site-brand-gradient">
                         <div class="pointer-events-none absolute inset-0 opacity-20" style="background:radial-gradient(circle at 30% 20%, var(--site-gold), transparent 60%)"></div>
-                        <div class="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                            <div class="h-20 w-20 rounded-full p-[3px]" style="background:linear-gradient(135deg,var(--site-gold),#ffffff)">
+                        <div class="absolute -bottom-14 left-1/2 -translate-x-1/2 sm:-bottom-16 md:-bottom-[4.5rem]">
+                            <div class="h-28 w-28 rounded-full p-[3px] shadow-lg sm:h-32 sm:w-32 md:h-36 md:w-36" style="background:linear-gradient(135deg,var(--site-gold),#ffffff)">
                                 <div class="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white ring-1 ring-black/5">
                                     @if($L->photo_url)
-                                        <img src="{{ $L->photo_url }}" alt="{{ $L->name }}" class="h-full w-full object-cover">
+                                        <img src="{{ $L->photo_url }}" alt="{{ $L->name }}" class="h-full w-full object-cover" loading="lazy">
                                     @else
-                                        <span class="font-display text-xl font-bold" style="color:var(--site-brand)">{{ $initials ?: 'JD' }}</span>
+                                        <span class="font-display text-2xl font-bold sm:text-3xl md:text-4xl" style="color:var(--site-brand)">{{ $initials ?: 'JD' }}</span>
                                     @endif
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-1 flex-col px-6 pb-6 pt-12 text-center">
+                    <div class="flex flex-1 flex-col px-6 pb-6 pt-16 text-center sm:pt-[4.5rem] md:pt-20">
                         <h3 class="font-display text-lg font-bold text-stone-900">{{ $L->name }}</h3>
                         <p class="text-sm font-semibold" style="color:var(--site-gold)">{{ $L->designation }}</p>
                         @if($L->organization)

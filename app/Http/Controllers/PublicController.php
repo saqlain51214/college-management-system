@@ -747,16 +747,25 @@ class PublicController extends Controller
 
     public function jobApply(Request $request)
     {
+        // Same phone pattern used by the admission form's own reusable
+        // validation config — one shared source of truth for what a valid
+        // Pakistani mobile number looks like, instead of a second regex.
+        $phoneRule = 'regex:/' . \App\Support\AdmissionValidation::config()['patterns']['phone_pk'] . '/';
+
         $data = $request->validate([
             'position'    => ['required', 'string', 'max:120'],
             'name'        => ['required', 'string', 'max:100'],
             'email'       => ['required', 'email', 'max:120'],
-            'phone'       => ['required', 'string', 'max:30'],
+            'phone'       => ['required', 'string', $phoneRule],
             'education'   => ['required', 'string', 'max:200'],
             'experience'  => ['nullable', 'string', 'max:200'],
             'message'     => ['required', 'string', 'max:1000'],
             'cv'          => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+        ], [
+            'phone.regex' => 'Please enter a valid Pakistani mobile number, e.g. 03xx-xxxxxxx.',
         ]);
+
+        $data['phone'] = \App\Support\AdmissionValidation::normalizePhone($data['phone']);
 
         $cvPath = $request->hasFile('cv')
             ? $request->file('cv')->store('job-applications/cv', 'public')

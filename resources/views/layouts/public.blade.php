@@ -476,6 +476,80 @@
         }
     })();
 </script>
+<script>
+    // Shared across every public form: a submit-time loading overlay with a
+    // double-submit guard, and as-you-type CNIC/phone formatting — so each
+    // form doesn't need to hand-roll its own copy of this logic.
+    (function () {
+        document.querySelectorAll('form[data-submit-overlay]').forEach(function (form) {
+            var overlay = document.getElementById(form.getAttribute('data-submit-overlay'));
+            if (!overlay) return;
+
+            form.addEventListener('submit', function (e) {
+                if (!form.checkValidity()) return; // let the browser show validation errors first
+
+                if (form.dataset.submitting === '1') {
+                    e.preventDefault();
+                    return;
+                }
+                form.dataset.submitting = '1';
+
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+
+                form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach(function (btn) {
+                    btn.disabled = true;
+                    var label = btn.getAttribute('data-submit-label');
+                    if (label) {
+                        var textEl = btn.querySelector('span') || btn;
+                        textEl.textContent = label;
+                    }
+                });
+            });
+        });
+
+        function digitsOnly(value) {
+            return (value || '').replace(/\D+/g, '');
+        }
+
+        function formatCnic(digits) {
+            digits = digits.slice(0, 13);
+            var out = digits.slice(0, 5);
+            if (digits.length > 5) out += '-' + digits.slice(5, 12);
+            if (digits.length > 12) out += '-' + digits.slice(12, 13);
+            return out;
+        }
+
+        function formatPakPhone(digits) {
+            // Normalize a leading 92 (with or without +) down to a local 0-prefixed number for display.
+            if (digits.startsWith('92')) digits = '0' + digits.slice(2);
+            digits = digits.slice(0, 11);
+            var out = digits.slice(0, 4);
+            if (digits.length > 4) out += '-' + digits.slice(4, 11);
+            return out;
+        }
+
+        document.querySelectorAll('input[data-format="cnic"]').forEach(function (input) {
+            input.addEventListener('input', function () {
+                var pos = input.selectionStart;
+                var before = input.value.length;
+                input.value = formatCnic(digitsOnly(input.value));
+                var after = input.value.length;
+                input.setSelectionRange(pos + (after - before), pos + (after - before));
+            });
+        });
+
+        document.querySelectorAll('input[data-format="phone"]').forEach(function (input) {
+            input.addEventListener('input', function () {
+                var pos = input.selectionStart;
+                var before = input.value.length;
+                input.value = formatPakPhone(digitsOnly(input.value));
+                var after = input.value.length;
+                input.setSelectionRange(pos + (after - before), pos + (after - before));
+            });
+        });
+    })();
+</script>
 @stack('scripts')
 <script>
     (function () {
