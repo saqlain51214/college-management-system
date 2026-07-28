@@ -121,6 +121,7 @@ Route::prefix('teacher')->name('teacher.')->group(function () {
 Route::middleware(['auth'])->prefix('pdf')->name('pdf.')->group(function () {
     Route::get('/challan/{payment}',         [PdfController::class, 'feeChallan'])->name('challan');
     Route::get('/challan/{payment}/preview', [PdfController::class, 'feeChallanPreview'])->name('challan.preview');
+    Route::get('/student-audit/{student}',   [PdfController::class, 'studentAudit'])->name('student-audit');
 });
 
 // ── Admin: Fee Slip Template Preview ────────────────────────────────────
