@@ -20,7 +20,7 @@ class FeePayment extends Model
         'student_id', 'fee_structure_id', 'academic_year_id', 'challan_number',
         'receipt_number',
         'fee_type', 'semester_number', 'amount_due', 'amount_paid', 'fine_amount',
-        'discount_amount', 'payment_status', 'payment_method', 'due_date',
+        'discount_amount', 'scholarship_applied', 'payment_status', 'payment_method', 'due_date',
         'payment_date', 'transaction_id', 'bank_name', 'remarks', 'collected_by',
         'payment_proof_path', 'proof_uploaded_at',
         'installment_no', 'late_fine_per_day', 'proof_claimed_amount', 'proof_claimed_date',
@@ -36,6 +36,7 @@ class FeePayment extends Model
         'amount_paid'          => 'decimal:2',
         'fine_amount'          => 'decimal:2',
         'discount_amount'      => 'decimal:2',
+        'scholarship_applied'  => 'boolean',
         'late_fine_per_day'    => 'decimal:2',
         'proof_claimed_amount' => 'decimal:2',
         'proof_claimed_date'   => 'date',
@@ -191,6 +192,13 @@ class FeePayment extends Model
             'amount_paid'       => 0,
             'fine_amount'       => 0,
             'discount_amount'   => 0,
+            // The "available" ceiling checked above already deducts the
+            // student's current scholarship (via invoiceSummary() →
+            // resolveFeeStructureTotal() → applyScholarship()), so any slip
+            // generated while a scholarship is active is scholarship-correct
+            // by construction — this just makes that fact visible/trackable
+            // instead of silently baked into a smaller number.
+            'scholarship_applied' => $student->has_scholarship,
             'payment_status'    => PaymentStatusEnum::Pending,
             'due_date'          => $data['due_date'] ?? now()->addDays(15)->toDateString(),
             'installment_no'    => $installmentNo,
@@ -301,6 +309,76 @@ class FeePayment extends Model
             ->where(fn ($q) => $q->whereNull('semester_number')->orWhere('semester_number', $semester))
             ->orderByRaw('academic_program_id IS NULL')
             ->first();
+    }
+
+    /**
+     * Fix a single challan that predates the student's current scholarship
+     * (or never had it applied for any other reason) — treats the challan's
+     * current amount_due as the un-discounted flat amount, calculates what
+     * the scholarship discount would be on that amount, and applies it via
+     * discount_amount (never mutates amount_due, so this is always visible
+     * and reversible, same as a manual "Apply Discount").
+     *
+     * @return float the discount amount applied (0 if nothing to reconcile)
+     */
+    public function reconcileScholarship(?int $actorId = null): float
+    {
+        if (! $this->student || ! $this->student->has_scholarship || $this->scholarship_applied) {
+            return 0.0;
+        }
+
+        $before = (float) $this->discount_amount;
+        $discount = round((float) $this->amount_due - $this->student->applyScholarship((float) $this->amount_due), 2);
+
+        if ($discount <= 0) {
+            $this->scholarship_applied = true;
+            $this->save();
+            return 0.0;
+        }
+
+        $this->discount_amount = $before + $discount;
+        $this->scholarship_applied = true;
+        $this->save();
+
+        \App\Support\ActivityLogWriter::activity(
+            'fee.scholarship_reconciled',
+            subject: $this,
+            message: "Applied Rs. " . number_format($discount) . " scholarship discount on challan {$this->challan_number} ({$this->student->scholarship_label}).",
+            meta: ['before' => $before, 'after' => (float) $this->discount_amount, 'discount' => $discount],
+            actor: $actorId ? \App\Models\User::find($actorId) : null,
+        );
+
+        return $discount;
+    }
+
+    /**
+     * Reconcile every unpaid challan across all scholarship students that
+     * hasn't had its scholarship applied yet — the bulk version of the
+     * action above, for the "Reconcile Scholarships" admin action.
+     *
+     * @return array{count: int, total_discount: float}
+     */
+    public static function reconcilePendingScholarships(?int $actorId = null): array
+    {
+        $candidates = static::query()
+            ->where('scholarship_applied', false)
+            ->where('payment_status', '!=', PaymentStatusEnum::Paid->value)
+            ->whereHas('student', fn ($q) => $q->whereNotNull('scholarship_type')->whereNotNull('scholarship_value'))
+            ->with('student')
+            ->get();
+
+        $count = 0;
+        $totalDiscount = 0.0;
+
+        foreach ($candidates as $payment) {
+            $discount = $payment->reconcileScholarship($actorId);
+            if ($discount > 0) {
+                $count++;
+                $totalDiscount += $discount;
+            }
+        }
+
+        return ['count' => $count, 'total_discount' => round($totalDiscount, 2)];
     }
 
     public static function generateReceiptNumber(): string

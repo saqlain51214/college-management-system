@@ -153,6 +153,25 @@ class ListFeePayments extends ListRecords
                     Notification::make()->title($summary)->success()->send();
                 }),
 
+            Actions\Action::make('reconcileScholarships')
+                ->label('Reconcile Scholarships')
+                ->icon('heroicon-o-academic-cap')
+                ->color('warning')
+                ->requiresConfirmation()
+                ->modalHeading('Reconcile Scholarships')
+                ->modalDescription('Finds every unpaid challan for a scholarship student where the discount was never applied (usually because the scholarship was added after the challan already existed) and applies it now — same as using "Apply Discount" manually, but for every affected challan at once.')
+                ->modalSubmitActionLabel('Reconcile Now')
+                ->action(function () {
+                    $result = FeePayment::reconcilePendingScholarships(auth()->id());
+
+                    Notification::make()
+                        ->title($result['count'] > 0
+                            ? "Reconciled {$result['count']} challan(s) — Rs. " . number_format($result['total_discount']) . ' total discount applied'
+                            : 'Nothing to reconcile — every scholarship is already reflected')
+                        ->success()
+                        ->send();
+                }),
+
             ExportAction::make()->exports([
                 ExcelExport::make('fee-payments')
                     ->fromTable()

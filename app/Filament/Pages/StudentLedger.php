@@ -148,6 +148,7 @@ class StudentLedger extends Page
                 'due'         => $p->due_date ? Carbon::parse($p->due_date)->format('d M Y') : '—',
                 'paid_on'     => $p->payment_date ? Carbon::parse($p->payment_date)->format('d M Y') : '—',
                 'days_late'   => $daysLate,
+                'scholarship_applied' => $p->scholarship_applied,
             ];
         }
 
@@ -280,6 +281,35 @@ class StudentLedger extends Page
             $this->slipError = $e->getMessage();
             return;
         }
+
+        $this->loadStudent($student->fresh(['academicProgram', 'department']));
+    }
+
+    /** Reconcile every unpaid challan for just this loaded student. */
+    public function reconcileScholarship(): void
+    {
+        $this->slipSuccess = null;
+        $this->slipError   = null;
+
+        $student = $this->studentId ? Student::find($this->studentId) : null;
+        if (! $student || ! $student->has_scholarship) {
+            return;
+        }
+
+        $applied = 0;
+        $totalDiscount = 0.0;
+
+        foreach ($student->feePayments()->where('payment_status', '!=', PaymentStatusEnum::Paid->value)->where('scholarship_applied', false)->get() as $payment) {
+            $discount = $payment->reconcileScholarship(auth()->id());
+            if ($discount > 0) {
+                $applied++;
+                $totalDiscount += $discount;
+            }
+        }
+
+        $this->slipSuccess = $applied > 0
+            ? "Reconciled {$applied} challan(s) — Rs. " . number_format($totalDiscount) . ' total discount applied.'
+            : 'Every challan already reflects this scholarship.';
 
         $this->loadStudent($student->fresh(['academicProgram', 'department']));
     }

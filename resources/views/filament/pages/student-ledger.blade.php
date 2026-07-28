@@ -42,6 +42,11 @@
                         <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
                             🎓 {{ $student['scholarship'] }}
                         </span>
+                        <button type="button" wire:click="reconcileScholarship"
+                                class="rounded-full border border-amber-300 px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-50"
+                                title="Apply this scholarship to any unpaid challan that doesn't reflect it yet">
+                            Reconcile Scholarship
+                        </button>
                     @endif
                     <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $student['active'] ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600' }}">
                         {{ $student['active'] ? 'Active' : 'Inactive' }}
@@ -285,6 +290,11 @@
                                         };
                                     @endphp
                                     <span class="rounded-full px-2 py-0.5 text-xs font-medium {{ $badge }}">{{ ucfirst($row['status']) }}</span>
+                                    @if ($student['scholarship'])
+                                        <span class="ml-1 rounded-full px-2 py-0.5 text-[11px] font-medium {{ $row['scholarship_applied'] ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
+                                            🎓 {{ $row['scholarship_applied'] ? 'Applied' : 'Not Applied' }}
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-2 text-gray-500">
                                     {{ $row['due'] }}
