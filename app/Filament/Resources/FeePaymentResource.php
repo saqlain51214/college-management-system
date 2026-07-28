@@ -161,6 +161,20 @@ class FeePaymentResource extends Resource
                     ->searchable()
                     ->wrap()
                     ->description(fn (FeePayment $r) => $r->student?->scholarship_label ? '🎓 ' . $r->student->scholarship_label : null),
+                Tables\Columns\TextColumn::make('scholarship_applied')
+                    ->label('Scholarship')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state, FeePayment $r) => match (true) {
+                        ! $r->student?->has_scholarship => '—',
+                        $state => 'Applied',
+                        default => 'Not Applied',
+                    })
+                    ->color(fn (bool $state, FeePayment $r) => match (true) {
+                        ! $r->student?->has_scholarship => 'gray',
+                        $state => 'success',
+                        default => 'warning',
+                    })
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('fee_type')
                     ->badge()
                     ->formatStateUsing(fn($state) => $state instanceof FeeTypeEnum ? $state->label() : $state)
