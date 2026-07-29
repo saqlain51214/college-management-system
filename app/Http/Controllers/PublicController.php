@@ -284,11 +284,11 @@ class PublicController extends Controller
 
     public function admissionInquiry(Request $request)
     {
-        // Phone/CNIC patterns are deliberately lenient (dashes optional, +92 or
-        // leading 0 both accepted) — matched by the same `pattern` attribute on
-        // the client-side inputs so a value the browser accepts never bounces
-        // back from the server.
-        $phoneRule = ['regex:/^(?:\+92|0)?3[0-9]{2}-?[0-9]{3}-?[0-9]{4}$/'];
+        // Same canonical phone pattern used by the Job Application form and
+        // the shared JS phone formatter (03xx-xxxxxxx) — matched exactly by
+        // the client-side `pattern` attribute on these inputs, so a value the
+        // browser accepts can never bounce back from the server as invalid.
+        $phoneRule = ['regex:/' . \App\Support\AdmissionValidation::config()['patterns']['phone_pk'] . '/'];
         $cnicRule  = ['regex:/^[0-9]{5}-?[0-9]{7}-?[0-9]{1}$/'];
 
         $validated = $request->validate([

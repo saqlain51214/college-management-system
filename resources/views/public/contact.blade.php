@@ -136,7 +136,7 @@
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                     <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                   </span>
-                  <input type="text" name="name" value="{{ old('name') }}" required placeholder="Full name"
+                  <input type="text" name="name" value="{{ old('name') }}" required maxlength="100" placeholder="Full name"
                     class="w-full pl-9 pr-4 py-3 rounded-md border text-sm focus:outline-none focus:ring-2 transition-all {{ $errors->has('name') ? 'border-red-400 ring-red-200' : 'border-stone-300 focus:ring-brand/20 focus:border-brand' }}">
                 </div>
                 @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
@@ -163,7 +163,7 @@
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                   <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
                 </span>
-                <input type="text" name="subject" value="{{ old('subject') }}" required placeholder="What is your message about?"
+                <input type="text" name="subject" value="{{ old('subject') }}" required maxlength="200" placeholder="What is your message about?"
                   class="w-full pl-9 pr-4 py-3 rounded-md border text-sm focus:outline-none focus:ring-2 transition-all {{ $errors->has('subject') ? 'border-red-400 ring-red-200' : 'border-stone-300 focus:ring-brand/20 focus:border-brand' }}">
               </div>
               @error('subject')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
@@ -176,7 +176,7 @@
                 <span class="absolute left-3 top-4 pointer-events-none">
                   <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 </span>
-                <textarea name="message" rows="5" required placeholder="Write your message here..."
+                <textarea name="message" rows="5" required maxlength="2000" placeholder="Write your message here..."
                   class="w-full pl-9 pr-4 py-3 rounded-md border text-sm focus:outline-none focus:ring-2 transition-all resize-none {{ $errors->has('message') ? 'border-red-400 ring-red-200' : 'border-stone-300 focus:ring-brand/20 focus:border-brand' }}">{{ old('message') }}</textarea>
               </div>
               @error('message')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
