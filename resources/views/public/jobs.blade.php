@@ -201,8 +201,8 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">CV / Resume (optional)</label>
-            <input type="file" name="cv" accept=".pdf,.doc,.docx"
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">CV / Resume <span class="text-red-500">*</span></label>
+            <input type="file" name="cv" accept=".pdf,.doc,.docx" required
                    class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-stone-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-stone-700">
             <p class="mt-1 text-[11px] text-stone-400">PDF or Word document, max 5MB.</p>
           </div>

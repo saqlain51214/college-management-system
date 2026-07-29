@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leadership Message Desk — Design Mockups</title>
+<style>
+  :root{
+    --navy:#0F1B2E; --navy-mid:#16273F; --navy-light:#1F3654;
+    --gold:#C9A227; --gold-soft:#E7C878; --gold-pale:#F4E6B8;
+    --cream:#F7F4EC; --paper:#FFFFFF; --ink:#1C2430; --muted:#6B7280; --line:#E7E2D6;
+    --page-bg:#FBFAF7; --page-ink:#1C2430; --page-muted:#6B7280; --panel:#FFFFFF; --panel-line:#E9E5DA;
+    --font-display: Georgia, 'Times New Roman', 'Noto Serif', serif;
+    --font-body: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--page-bg); color:var(--page-ink); font-family:var(--font-body); line-height:1.5; -webkit-font-smoothing:antialiased; }
+  img,svg{max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;}
+
+  /* ── Page chrome ───────────────────────────────────────────── */
+  .page-head{ padding:64px 24px 40px; text-align:center; border-bottom:1px solid var(--panel-line); }
+  .page-head .eyebrow{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); background:color-mix(in srgb, var(--gold) 14%, transparent); padding:6px 14px; border-radius:999px; }
+  .page-head h1{ font-family:var(--font-display); font-size:clamp(28px,4vw,40px); margin:16px 0 8px; text-wrap:balance; }
+  .page-head p{ color:var(--page-muted); max-width:620px; margin:0 auto; font-size:15px; }
+
+  .section-intro{ padding:56px 24px 28px; }
+  .section-intro .tag{ font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--gold); }
+  .section-intro h2{ font-family:var(--font-display); font-size:clamp(22px,3vw,28px); margin:8px 0 6px; color:var(--page-ink); }
+  .section-intro p{ color:var(--page-muted); font-size:14px; max-width:640px; margin:0; }
+  .section-intro .badge{ display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle; }
+  .badge-current{ background:#EDEBE3; color:#57534E; }
+  .badge-new{ background:color-mix(in srgb, var(--gold) 20%, transparent); color:#9A6B00; }
+
+  .mock-frame{ margin:0 24px 8px; border-radius:20px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  @media (min-width:1220px){ .mock-frame{ margin-left:auto; margin-right:auto; max-width:1180px; } }
+  .divider{ height:1px; background:var(--panel-line); margin:0 24px; }
+
+  /* ══════════════════════════════════════════════════════════
+     SHARED helpers used inside every mockup
+     ══════════════════════════════════════════════════════════ */
+  .avatar{ display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; color:#fff; }
+  .quote-mark{ opacity:.18; }
+  .cta{ display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; }
+  .cta svg{ width:15px; height:15px; transition:transform .25s; }
+  .card-link:hover .cta svg{ transform:translateX(3px); }
+
+  /* ══════════════════════════════════════════════════════════
+     CURRENT — Template 1: Modern Leadership Cards
+     ══════════════════════════════════════════════════════════ */
+  .t1-section{ background:var(--cream); padding:56px 24px; }
+  .t1-head{ text-align:center; margin-bottom:40px; }
+  .t1-head .eyebrow{ font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); background:color-mix(in srgb, var(--gold) 15%, transparent); padding:6px 16px; border-radius:999px; }
+  .t1-head h3{ font-family:var(--font-display); font-size:clamp(24px,3vw,32px); margin:14px 0 8px; color:var(--ink); }
+  .t1-head p{ color:var(--muted); font-size:14px; max-width:480px; margin:0 auto; }
+  .t1-grid{ display:grid; gap:26px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); max-width:980px; margin:0 auto; }
+  .t1-card{ background:var(--paper); border-radius:22px; overflow:hidden; box-shadow:0 10px 34px -18px rgba(15,27,46,.22); border:1px solid #EFEAE0; display:flex; flex-direction:column; transition:transform .3s, box-shadow .3s; }
+  .t1-card:hover{ transform:translateY(-6px); box-shadow:0 20px 45px -18px rgba(15,27,46,.3); }
+  .t1-photo{ position:relative; aspect-ratio:4/3; overflow:hidden; }
+  .t1-photo .avatar{ width:100%; height:100%; font-size:34px; background:linear-gradient(135deg,var(--navy),var(--navy-light)); }
+  .t1-rule{ position:absolute; left:0; bottom:0; height:4px; width:100%; background:linear-gradient(90deg,var(--navy),var(--gold)); }
+  .t1-body{ padding:22px 22px 24px; text-align:center; }
+  .t1-body h4{ font-family:var(--font-display); font-size:18px; margin:0 0 2px; color:var(--ink); }
+  .t1-role{ color:var(--gold); font-weight:700; font-size:13px; }
+  .t1-org{ color:var(--muted); font-size:12px; margin-top:1px; }
+  .t1-msg{ color:#4B5259; font-size:13.5px; line-height:1.6; margin:14px 0 18px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .t1-cta{ border:1.5px solid var(--navy); color:var(--navy); border-radius:999px; padding:8px 20px; transition:all .25s; }
+  .t1-card:hover .t1-cta{ background:var(--navy); color:#fff; }
+
+  /* ══════════════════════════════════════════════════════════
+     CURRENT — Template 2: Leadership Spotlight
+     ══════════════════════════════════════════════════════════ */
+  .t2-section{ background:radial-gradient(120% 120% at 15% 0%, #16273F 0%, #0F1B2E 55%, #0B1420 100%); padding:60px 24px; }
+  .t2-head{ text-align:center; margin-bottom:44px; }
+  .t2-head .eyebrow{ font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--gold-soft); border:1px solid color-mix(in srgb, var(--gold) 45%, transparent); padding:6px 16px; border-radius:999px; }
+  .t2-head h3{ font-family:var(--font-display); color:#fff; font-size:clamp(24px,3vw,32px); margin:16px 0 8px; }
+  .t2-head p{ color:rgba(255,255,255,.55); font-size:14px; max-width:480px; margin:0 auto; }
+  .t2-featured{ display:grid; grid-template-columns:1fr; gap:36px; max-width:980px; margin:0 auto; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:28px; padding:36px; }
+  @media(min-width:860px){ .t2-featured{ grid-template-columns:300px 1fr; align-items:center; padding:44px; } }
+  .t2-imgwrap{ position:relative; max-width:260px; margin:0 auto; }
+  @media(min-width:860px){ .t2-imgwrap{ max-width:none; } }
+  .t2-frame{ position:absolute; inset:-10px; border:1px solid color-mix(in srgb, var(--gold) 40%, transparent); border-radius:24px; }
+  .t2-photo{ position:relative; aspect-ratio:4/5; border-radius:20px; overflow:hidden; box-shadow:0 20px 50px -14px rgba(0,0,0,.55); }
+  .t2-photo .avatar{ width:100%; height:100%; font-size:44px; background:linear-gradient(135deg,var(--navy-light),#0B1420); }
+  .t2-content{ text-align:center; }
+  @media(min-width:860px){ .t2-content{ text-align:left; } }
+  .t2-quote-icon{ color:var(--gold); width:34px; height:34px; }
+  .t2-quote{ font-family:var(--font-display); font-style:italic; color:rgba(255,255,255,.92); font-size:19px; line-height:1.55; margin:14px 0 26px; }
+  .t2-name{ font-family:var(--font-display); color:#fff; font-size:22px; font-weight:700; margin:0; }
+  .t2-role{ color:var(--gold-soft); font-weight:700; font-size:12.5px; letter-spacing:.1em; text-transform:uppercase; margin:4px 0 0; }
+  .t2-org{ color:rgba(255,255,255,.45); font-size:13px; margin:2px 0 0; }
+  .t2-cta{ display:inline-flex; align-items:center; gap:8px; margin-top:22px; border:1px solid color-mix(in srgb, var(--gold) 55%, transparent); color:#fff; padding:10px 22px; border-radius:999px; font-size:13.5px; }
+  .t2-rest{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); max-width:980px; margin:28px auto 0; }
+  .t2-mini{ display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.09); border-radius:16px; padding:14px 16px; transition:.25s; }
+  .t2-mini:hover{ background:rgba(255,255,255,.06); transform:translateY(-2px); }
+  .t2-mini .avatar{ width:68px; height:68px; border-radius:999px; flex:none; font-size:17px; background:linear-gradient(135deg,var(--navy-light),#0B1420); border:2px solid color-mix(in srgb, var(--gold) 40%, transparent); }
+  .t2-mini-name{ color:#fff; font-weight:700; font-size:13.5px; margin:0; }
+  .t2-mini-role{ color:var(--gold-soft); font-size:11.5px; margin:1px 0 0; }
+
+  /* ══════════════════════════════════════════════════════════
+     NEW SUGGESTION 1 — Diploma Frame (ornamental, academic seal feel)
+     ══════════════════════════════════════════════════════════ */
+  .s1-section{ background:var(--cream); padding:60px 24px; }
+  .s1-grid{ display:grid; gap:28px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); max-width:1000px; margin:0 auto; }
+  .s1-card{ background:var(--paper); border-radius:6px; padding:34px 26px 28px; text-align:center; position:relative; transition:transform .3s, box-shadow .3s; box-shadow:0 8px 28px -16px rgba(15,27,46,.18); }
+  .s1-card:hover{ transform:translateY(-5px); box-shadow:0 18px 40px -16px rgba(15,27,46,.26); }
+  .s1-card::before{ content:""; position:absolute; inset:10px; border:1px solid var(--gold); border-radius:3px; pointer-events:none; }
+  .s1-card::after{ content:""; position:absolute; inset:14px; border:1px solid var(--navy); opacity:.15; border-radius:2px; pointer-events:none; }
+  .s1-photo{ width:124px; height:124px; margin:0 auto 18px; border-radius:8px; overflow:hidden; border:2px solid var(--navy); box-shadow:0 0 0 4px var(--paper), 0 0 0 5px var(--gold); }
+  .s1-photo .avatar{ width:100%; height:100%; font-size:30px; background:linear-gradient(150deg,var(--navy),var(--navy-light)); }
+  .s1-seal{ width:22px; height:22px; margin:6px auto 10px; color:var(--gold); }
+  .s1-name{ font-family:var(--font-display); font-size:17px; letter-spacing:.03em; margin:0 0 2px; color:var(--ink); }
+  .s1-role{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); }
+  .s1-org{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .s1-rule{ width:34px; height:2px; background:var(--gold); margin:14px auto; }
+  .s1-msg{ font-family:var(--font-display); font-style:italic; color:#4B5259; font-size:13.5px; line-height:1.65; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .s1-cta{ display:inline-block; margin-top:16px; font-size:12.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--navy); border-bottom:1px solid var(--gold); padding-bottom:2px; }
+
+  /* ══════════════════════════════════════════════════════════
+     NEW SUGGESTION 2 — Split Ribbon (editorial, horizontal)
+     ══════════════════════════════════════════════════════════ */
+  .s2-section{ background:var(--cream); padding:60px 24px; }
+  .s2-list{ display:flex; flex-direction:column; gap:20px; max-width:920px; margin:0 auto; }
+  .s2-card{ display:grid; grid-template-columns:120px 1fr; background:var(--paper); border-radius:18px; overflow:hidden; box-shadow:0 10px 30px -18px rgba(15,27,46,.2); transition:transform .3s, box-shadow .3s; }
+  .s2-card:hover{ transform:translateY(-4px); box-shadow:0 20px 42px -16px rgba(15,27,46,.28); }
+  @media(min-width:600px){ .s2-card{ grid-template-columns:180px 1fr; } }
+  .s2-photo{ position:relative; background:linear-gradient(160deg,var(--navy),#0B1420); }
+  .s2-photo .avatar{ width:100%; height:100%; font-size:26px; }
+  .s2-photo::after{ content:""; position:absolute; top:0; right:0; bottom:0; width:3px; background:var(--gold); }
+  .s2-content{ padding:20px 22px; display:flex; flex-direction:column; justify-content:center; }
+  .s2-role-pill{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--navy); background:color-mix(in srgb, var(--gold) 22%, transparent); padding:3px 10px; border-radius:999px; width:fit-content; }
+  .s2-name{ font-family:var(--font-display); font-size:16.5px; margin:8px 0 0; color:var(--ink); }
+  .s2-org{ font-size:11.5px; color:var(--muted); margin:1px 0 0; }
+  .s2-msg{ font-size:13px; color:#4B5259; line-height:1.55; margin:8px 0 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .s2-cta{ margin-top:10px; color:var(--navy); font-weight:700; font-size:12.5px; }
+
+  /* ══════════════════════════════════════════════════════════
+     NEW SUGGESTION 3 — Glass Halo (modern, soft glow)
+     ══════════════════════════════════════════════════════════ */
+  .s3-section{ background:linear-gradient(160deg,#EFE9DC,#F7F4EC 45%,#EAF0EF); padding:64px 24px; }
+  .s3-grid{ display:grid; gap:30px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); max-width:980px; margin:0 auto; }
+  .s3-card{ position:relative; text-align:center; padding:36px 22px 26px; border-radius:24px; background:rgba(255,255,255,.55); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,.7); box-shadow:0 12px 34px -18px rgba(15,27,46,.16); transition:transform .3s; }
+  .s3-card:hover{ transform:translateY(-6px); }
+  .s3-halo{ position:relative; width:132px; height:132px; margin:0 auto 18px; }
+  .s3-halo::before{ content:""; position:absolute; inset:-14px; border-radius:999px; background:radial-gradient(circle, color-mix(in srgb, var(--gold) 55%, transparent), transparent 70%); filter:blur(6px); }
+  .s3-photo{ position:relative; width:100%; height:100%; border-radius:999px; overflow:hidden; border:3px solid #fff; box-shadow:0 6px 20px -6px rgba(15,27,46,.3); }
+  .s3-photo .avatar{ width:100%; height:100%; font-size:30px; background:linear-gradient(135deg,var(--navy),var(--navy-light)); }
+  .s3-name{ font-family:var(--font-display); font-size:17px; margin:0 0 2px; color:var(--ink); }
+  .s3-role{ font-size:12.5px; font-weight:700; color:var(--gold); }
+  .s3-org{ font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .s3-msg{ font-size:13.5px; color:#4B5259; line-height:1.6; margin:14px 0 16px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .s3-cta{ font-size:12.5px; font-weight:700; color:var(--navy); }
+
+  /* ══════════════════════════════════════════════════════════
+     NEW SUGGESTION 4 — Minimal Editorial (no card box, numbered)
+     ══════════════════════════════════════════════════════════ */
+  .s4-section{ background:var(--paper); padding:70px 24px; }
+  .s4-grid{ display:grid; gap:48px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); max-width:1000px; margin:0 auto; }
+  .s4-item{ text-align:center; position:relative; }
+  .s4-index{ font-family:var(--font-display); font-size:13px; color:var(--gold); letter-spacing:.1em; margin-bottom:10px; }
+  .s4-photo{ width:128px; height:128px; margin:0 auto 16px; border-radius:999px; overflow:hidden; }
+  .s4-photo .avatar{ width:100%; height:100%; font-size:34px; background:linear-gradient(135deg,var(--navy),var(--navy-light)); }
+  .s4-name{ font-family:var(--font-display); font-size:18px; margin:0 0 3px; color:var(--ink); }
+  .s4-role{ font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .s4-rule{ width:24px; height:1px; background:var(--gold); margin:16px auto; }
+  .s4-msg{ font-size:13.5px; color:#4B5259; line-height:1.7; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+  .s4-cta{ display:inline-block; margin-top:14px; font-size:12px; font-weight:700; letter-spacing:.06em; color:var(--navy); }
+
+  /* ══════════════════════════════════════════════════════════
+     READ-MORE detail page — CURRENT (small side circle)
+     ══════════════════════════════════════════════════════════ */
+  .rm-old{ background:var(--cream); padding:50px 24px; }
+  .rm-old-hero{ background:linear-gradient(120deg,var(--navy),var(--navy-light)); border-radius:16px; padding:26px 28px; margin-bottom:0; }
+  .rm-old-hero p{ color:rgba(255,255,255,.6); font-size:11.5px; margin:0 0 6px; }
+  .rm-old-hero h4{ color:#fff; font-family:var(--font-display); font-size:22px; margin:0; }
+  .rm-old-body{ display:grid; grid-template-columns:1fr; gap:28px; background:var(--paper); border-radius:0 0 16px 16px; padding:32px 28px; }
+  @media(min-width:760px){ .rm-old-body{ grid-template-columns:180px 1fr; } }
+  .rm-old-card{ text-align:center; }
+  .rm-old-photo{ width:118px; height:118px; margin:0 auto 10px; border-radius:999px; overflow:hidden; border:3px solid var(--gold); }
+  .rm-old-photo .avatar{ width:100%; height:100%; font-size:30px; background:linear-gradient(135deg,var(--navy),var(--navy-light)); }
+  .rm-old-name{ font-weight:700; font-size:14px; margin:0; }
+  .rm-old-role{ color:var(--gold); font-size:12px; font-weight:700; }
+  .rm-old-msg p{ font-size:13.5px; color:#4B5259; line-height:1.7; margin:0 0 10px; }
+  .rm-old-label{ text-align:center; font-size:11px; color:var(--muted); margin-top:14px; }
+
+  /* ══════════════════════════════════════════════════════════
+     READ-MORE detail page — REDESIGNED (large portrait panel)
+     ══════════════════════════════════════════════════════════ */
+  .rm-new{ background:var(--cream); padding:50px 24px 56px; }
+  .rm-new-crumb{ font-size:11.5px; color:var(--muted); margin-bottom:16px; }
+  .rm-new-crumb b{ color:var(--ink); }
+  .rm-new-grid{ display:grid; grid-template-columns:1fr; gap:0; background:var(--paper); border-radius:24px; overflow:hidden; box-shadow:0 16px 44px -20px rgba(15,27,46,.24); }
+  @media(min-width:820px){ .rm-new-grid{ grid-template-columns:340px 1fr; } }
+  .rm-new-photo-col{ position:relative; background:linear-gradient(160deg,var(--navy),#0B1420); }
+  .rm-new-photo{ position:relative; aspect-ratio:3/4; }
+  @media(min-width:820px){ .rm-new-photo{ aspect-ratio:auto; height:100%; min-height:420px; } }
+  .rm-new-photo .avatar{ width:100%; height:100%; font-size:48px; }
+  .rm-new-photo-overlay{ position:absolute; inset-inline:0; bottom:0; padding:24px 26px; background:linear-gradient(to top, rgba(0,0,0,.55), transparent); }
+  .rm-new-photo-overlay h2{ color:#fff; font-family:var(--font-display); font-size:22px; margin:0; }
+  .rm-new-photo-overlay p{ color:var(--gold-soft); font-size:12.5px; font-weight:700; letter-spacing:.06em; margin:3px 0 0; }
+  .rm-new-content{ padding:34px 32px; }
+  .rm-new-quote-icon{ color:var(--gold); width:36px; height:36px; opacity:.5; }
+  .rm-new-lead{ font-family:var(--font-display); font-style:italic; font-size:18px; color:var(--ink); line-height:1.55; margin:12px 0 18px; }
+  .rm-new-body p{ font-size:14.5px; color:#4B5259; line-height:1.75; margin:0 0 12px; }
+  .rm-new-sign{ margin-top:22px; padding-top:16px; border-top:1px solid var(--line); text-align:right; }
+  .rm-new-sign b{ font-family:var(--font-display); font-size:15px; display:block; color:var(--ink); }
+  .rm-new-sign span{ color:var(--gold); font-size:12.5px; font-weight:700; }
+  .rm-new-org-label{ display:inline-block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--navy); background:color-mix(in srgb, var(--gold) 18%, transparent); padding:4px 12px; border-radius:999px; margin-top:12px; }
+  .rm-new-others{ max-width:1180px; margin:30px auto 0; }
+  .rm-new-others-label{ text-align:center; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--gold); margin-bottom:16px; }
+  .rm-new-mini-grid{ display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+  .rm-new-mini{ display:flex; align-items:center; gap:12px; background:var(--paper); border-radius:16px; padding:12px 16px; box-shadow:0 6px 18px -12px rgba(15,27,46,.18); }
+  .rm-new-mini .avatar{ width:60px; height:60px; border-radius:999px; flex:none; font-size:16px; background:linear-gradient(135deg,var(--navy),var(--navy-light)); }
+  .rm-new-mini-name{ font-size:13px; font-weight:700; margin:0; color:var(--ink); }
+  .rm-new-mini-role{ font-size:11px; color:var(--gold); margin:1px 0 0; }
+
+  .footnote{ text-align:center; padding:40px 24px 64px; color:var(--page-muted); font-size:12.5px; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <span class="eyebrow">Design Review</span>
+  <h1>Leadership Message Desk — Mockups</h1>
+  <p>Side-by-side reference of the two currently-live templates, four new style directions, and the leader detail ("Read Full Message") page — current vs. redesigned. Same sample leaders and colour system throughout so every option compares fairly.</p>
+</div>
+
+<!-- ══════════════════ CURRENT TEMPLATE 1 ══════════════════ -->
+<div class="section-intro wrap">
+  <span class="tag">Currently Live</span>
+  <h2>Template 1 — Modern Leadership Cards <span class="badge badge-current">Current</span></h2>
+  <p>Equal-height white cards in a responsive grid, large photo block, navy/gold accent.</p>
+</div>
+<section class="t1-section">
+  <div class="t1-head">
+    <span class="eyebrow">Leadership</span>
+    <h3>Leadership Message Desk</h3>
+    <p>A warm welcome from the leadership guiding our institution.</p>
+  </div>
+  <div class="t1-grid">
+    <a class="t1-card card-link" href="#">
+      <div class="t1-photo"><div class="avatar">AR</div><span class="t1-rule"></span></div>
+      <div class="t1-body">
+        <h4>Prof. Dr. Abdul Razzaq</h4>
+        <div class="t1-role">Vice Chancellor</div>
+        <div class="t1-org">Karakoram International University</div>
+        <p class="t1-msg">Quality education is a fundamental need for our students, as it helps promote and strengthen society by developing an educated youth in the region.</p>
+        <span class="t1-cta cta">Read Full Message
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </span>
+      </div>
+    </a>
+    <a class="t1-card card-link" href="#">
+      <div class="t1-photo"><div class="avatar">MA</div><span class="t1-rule"></span></div>
+      <div class="t1-body">
+        <h4>Prof. Muhammad Alam</h4>
+        <div class="t1-role">Director Higher Education, GB</div>
+        <div class="t1-org">Government of Gilgit-Baltistan</div>
+        <p class="t1-msg">Education develops a sense of understanding, a sense of direction and most importantly a sense of attainment of sustainable and quality lives.</p>
+        <span class="t1-cta cta">Read Full Message
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </span>
+      </div>
+    </a>
+    <a class="t1-card card-link" href="#">
+      <div class="t1-photo"><div class="avatar">AA</div><span class="t1-rule"></span></div>
+      <div class="t1-body">
+        <h4>Arif Ali</h4>
+        <div class="t1-role">Principal</div>
+        <div class="t1-org">Jinnah Degree College Astore</div>
+        <p class="t1-msg">It gives me immense pleasure to welcome you to the official website. Education is the cornerstone of national progress and individual empowerment.</p>
+        <span class="t1-cta cta">Read Full Message
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════ CURRENT TEMPLATE 2 ══════════════════ -->
+<div class="section-intro wrap">
+  <span class="tag">Currently Live</span>
+  <h2>Template 2 — Leadership Spotlight <span class="badge badge-current">Current</span></h2>
+  <p>Dark, editorial layout — one featured leader (image + pull-quote) plus the rest in a compact row.</p>
+</div>
+<section class="t2-section">
+  <div class="t2-head">
+    <span class="eyebrow">Leadership</span>
+    <h3>Leadership Message Desk</h3>
+    <p>A warm welcome from the leadership guiding our institution.</p>
+  </div>
+  <a class="t2-featured card-link" href="#">
+    <div class="t2-imgwrap">
+      <div class="t2-frame"></div>
+      <div class="t2-photo"><div class="avatar">AR</div></div>
+    </div>
+    <div class="t2-content">
+      <svg class="t2-quote-icon" fill="currentColor" viewBox="0 0 32 32"><path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-1.1.9-2 2-2V8zm16 0c-3.3 0-6 2.7-6 6v10h10V14h-6c0-1.1.9-2 2-2V8z"/></svg>
+      <p class="t2-quote">&ldquo;Quality education is a fundamental need for our students, as it helps promote and strengthen society by developing an educated youth in the region.&rdquo;</p>
+      <p class="t2-name">Prof. Dr. Abdul Razzaq</p>
+      <p class="t2-role">Vice Chancellor</p>
+      <p class="t2-org">Karakoram International University</p>
+      <span class="t2-cta cta">Read Full Message
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </span>
+    </div>
+  </a>
+  <div class="t2-rest">
+    <a class="t2-mini card-link" href="#">
+      <div class="avatar">MA</div>
+      <div><p class="t2-mini-name">Prof. Muhammad Alam</p><p class="t2-mini-role">Director Higher Education, GB</p></div>
+    </a>
+    <a class="t2-mini card-link" href="#">
+      <div class="avatar">AA</div>
+      <div><p class="t2-mini-name">Arif Ali</p><p class="t2-mini-role">Principal</p></div>
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════ NEW SUGGESTION 1 ══════════════════ -->
+<div class="section-intro wrap">
+  <span class="tag">New Suggestion 1</span>
+  <h2>Diploma Frame <span class="badge badge-new">New</span></h2>
+  <p>Ornamental double-border frame (echoes a diploma/seal) — square photo, small-caps serif name, a thin gold rule, italic message. Feels ceremonial and institutional.</p>
+</div>
+<section class="s1-section">
+  <div class="s1-grid">
+    <a class="s1-card card-link" href="#">
+      <div class="s1-photo"><div class="avatar">AR</div></div>
+      <svg class="s1-seal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M8.5 11.5L7 21l5-3 5 3-1.5-9.5"/></svg>
+      <div class="s1-name">Prof. Dr. Abdul Razzaq</div>
+      <div class="s1-role">Vice Chancellor</div>
+      <div class="s1-org">Karakoram International University</div>
+      <div class="s1-rule"></div>
+      <p class="s1-msg">Quality education is a fundamental need for our students, as it helps promote and strengthen society by developing an educated youth in the region.</p>
+      <span class="s1-cta">Read Full Message →</span>
+    </a>
+    <a class="s1-card card-link" href="#">
+      <div class="s1-photo"><div class="avatar">MA</div></div>
+      <svg class="s1-seal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M8.5 11.5L7 21l5-3 5 3-1.5-9.5"/></svg>
+      <div class="s1-name">Prof. Muhammad Alam</div>
+      <div class="s1-role">Director Higher Education, GB</div>
+      <div class="s1-org">Government of Gilgit-Baltistan</div>
+      <div class="s1-rule"></div>
+      <p class="s1-msg">Education develops a sense of understanding, a sense of direction and most importantly a sense of attainment of sustainable lives.</p>
+      <span class="s1-cta">Read Full Message →</span>
+    </a>
+    <a class="s1-card card-link" href="#">
+      <div class="s1-photo"><div class="avatar">AA</div></div>
+      <svg class="s1-seal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M8.5 11.5L7 21l5-3 5 3-1.5-9.5"/></svg>
+      <div class="s1-name">Arif Ali</div>
+      <div class="s1-role">Principal</div>
+      <div class="s1-org">Jinnah Degree College Astore</div>
+      <div class="s1-rule"></div>
+      <p class="s1-msg">It gives me immense pleasure to welcome you to the official website. Education is the cornerstone of national progress.</p>
+      <span class="s1-cta">Read Full Message →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════ NEW SUGGESTION 2 ══════════════════ -->
+<div class="section-intro wrap">
+  <span class="tag">New Suggestion 2</span>
+  <h2>Split Ribbon <span class="badge badge-new">New</span></h2>
+  <p>Compact horizontal rows — navy photo panel with a gold edge, content beside it. Scans fast, works well for a long leadership list, no scroll-heavy grid.</p>
+</div>
+<section class="s2-section">
+  <div class="s2-list">
+    <a class="s2-card card-link" href="#">
+      <div class="s2-photo"><div class="avatar">AR</div></div>
+      <div class="s2-content">
+        <span class="s2-role-pill">Vice Chancellor</span>
+        <div class="s2-name">Prof. Dr. Abdul Razzaq</div>
+        <div class="s2-org">Karakoram International University</div>
+        <p class="s2-msg">Quality education is a fundamental need for our students, as it helps promote and strengthen society by developing an educated youth.</p>
+        <span class="s2-cta cta">Read Full Message →</span>
+      </div>
+    </a>
+    <a class="s2-card card-link" href="#">
+      <div class="s2-photo"><div class="avatar">MA</div></div>
+      <div class="s2-content">
+        <span class="s2-role-pill">Director Higher Education, GB</span>
+        <div class="s2-name">Prof. Muhammad Alam</div>
+        <div class="s2-org">Government of Gilgit-Baltistan</div>
+        <p class="s2-msg">Education develops a sense of understanding, a sense of direction and most importantly a sense of attainment of sustainable lives.</p>
+        <span class="s2-cta cta">Read Full Message →</span>
+      </div>
+    </a>
+    <a class="s2-card card-link" href="#">
+      <div class="s2-photo"><div class="avatar">AA</div></div>
+      <div class="s2-content">
+        <span class="s2-role-pill">Principal</span>
+        <div class="s2-name">Arif Ali</div>
+        <div class="s2-org">Jinnah Degree College Astore</div>
+        <p class="s2-msg">It gives me immense pleasure to welcome you to the official website of Jinnah Degree College Astore.</p>
+        <span class="s2-cta cta">Read Full Message →</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════ NEW SUGGESTION 3 ══════════════════ -->
+<div class="section-intro wrap">
+  <span class="tag">New Suggestion 3</span>
+  <h2>Glass Halo <span class="badge badge-new">New</span></h2>
+  <p>Frosted-glass panels over a soft cream gradient, circular photo with a warm gold glow. The most contemporary/trendy of the four options.</p>
+</div>
+<section class="s3-section">
+  <div class="s3-grid">
+    <a class="s3-card card-link" href="#">
+      <div class="s3-halo"><div class="s3-photo"><div class="avatar">AR</div></div></div>
+      <div class="s3-name">Prof. Dr. Abdul Razzaq</div>
+      <div class="s3-role">Vice Chancellor</div>
+      <div class="s3-org">Karakoram International University</div>
+      <p class="s3-msg">Quality education is a fundamental need for our students, as it helps promote and strengthen society by developing an educated youth in the region.</p>
+      <span class="s3-cta cta">Read Full Message →</span>
+    </a>
+    <a class="s3-card card-link" href="#">
+      <div class="s3-halo"><div class="s3-photo"><div class="avatar">MA</div></div></div>
+      <div class="s3-name">Prof. Muhammad Alam</div>
+      <div class="s3-role">Director Higher Education, GB</div>
+      <div class="s3-org">Government of Gilgit-Baltistan</div>
+      <p class="s3-msg">Education develops a sense of understanding, a sense of direction and most importantly a sense of attainment of sustainable lives.</p>
+      <span class="s3-cta cta">Read Full Message →</span>
+    </a>
+    <a class="s3-card card-link" href="#">
+      <div class="s3-halo"><div class="s3-photo"><div class="avatar">AA</div></div></div>
+      <div class="s3-name">Arif Ali</div>
+      <div class="s3-role">Principal</div>
+      <div class="s3-org">Jinnah Degree College Astore</div>
+      <p class="s3-msg">It gives me immense pleasure to welcome you to the official website. Education is the cornerstone of national progress.</p>
+      <span class="s3-cta cta">Read Full Message →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════ NEW SUGGESTION 4 ══════════════════ -->
+<div class="section-intro wrap">
+  <span class="tag">New Suggestion 4</span>
+  <h2>Minimal Editorial <span class="badge badge-new">New</span></h2>
+  <p>No card box at all — just generous whitespace, a small numbered index (these are genuinely sequential leadership positions), circular photo and a hairline rule. The quietest, most premium-feeling option.</p>
+</div>
+<section class="s4-section">
+  <div class="s4-grid">
+    <div class="s4-item">
+      <div class="s4-index">01</div>
+      <div class="s4-photo"><div class="avatar">AR</div></div>
+      <div class="s4-name">Prof. Dr. Abdul Razzaq</div>
+      <div class="s4-role">Vice Chancellor · KIU</div>
+      <div class="s4-rule"></div>
+      <p class="s4-msg">Quality education is a fundamental need for our students, as it helps promote and strengthen society by developing an educated youth in the region.</p>
+      <a class="s4-cta" href="#">READ FULL MESSAGE →</a>
+    </div>
+    <div class="s4-item">
+      <div class="s4-index">02</div>
+      <div class="s4-photo"><div class="avatar">MA</div></div>
+      <div class="s4-name">Prof. Muhammad Alam</div>
+      <div class="s4-role">Director Higher Education, GB</div>
+      <div class="s4-rule"></div>
+      <p class="s4-msg">Education develops a sense of understanding, a sense of direction and most importantly a sense of attainment of sustainable and quality lives.</p>
+      <a class="s4-cta" href="#">READ FULL MESSAGE →</a>
+    </div>
+    <div class="s4-item">
+      <div class="s4-index">03</div>
+      <div class="s4-photo"><div class="avatar">AA</div></div>
+      <div class="s4-name">Arif Ali</div>
+      <div class="s4-role">Principal · JDCA</div>
+      <div class="s4-rule"></div>
+      <p class="s4-msg">It gives me immense pleasure to welcome you to the official website of Jinnah Degree College Astore. Education is the cornerstone of progress.</p>
+      <a class="s4-cta" href="#">READ FULL MESSAGE →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ READ MORE — CURRENT ══════════════════ -->
+<div class="section-intro wrap">
+  <span class="tag">Currently Live</span>
+  <h2>"Read Full Message" Page — Current <span class="badge badge-current">Current</span></h2>
+  <p>The full-message detail page. Photo is a small 90–112px circle in a narrow sidebar — the exact thing you flagged as too small.</p>
+</div>
+<div class="wrap">
+<section class="rm-old mock-frame">
+  <div class="rm-old-hero">
+    <p>Home › Message from the Vice Chancellor</p>
+    <h4>Message from the Vice Chancellor</h4>
+  </div>
+  <div class="rm-old-body">
+    <div class="rm-old-card">
+      <div class="rm-old-photo"><div class="avatar">AR</div></div>
+      <p class="rm-old-name">Prof. Dr. Abdul Razzaq</p>
+      <p class="rm-old-role">Vice Chancellor</p>
+    </div>
+    <div class="rm-old-msg">
+      <p>Quality education is a fundamental need for our students, as it helps promote and strengthen society by developing an educated youth in the region. At Karakoram International University, we remain committed to academic excellence.</p>
+      <p>We continue to invest in our faculty, facilities, and student support systems so every graduate leaves prepared to lead.</p>
+    </div>
+  </div>
+  <p class="rm-old-label">↑ Photo is small and easy to miss next to a long message column.</p>
+</section>
+</div>
+
+<!-- ══════════════════ READ MORE — REDESIGNED ══════════════════ -->
+<div class="section-intro wrap">
+  <span class="tag">Redesigned</span>
+  <h2>"Read Full Message" Page — Redesigned <span class="badge badge-new">New</span></h2>
+  <p>Large portrait panel (not a small circle) with the name/title on its own gradient strip at the bottom of the photo — a proper editorial feel that matches the Modern Leadership Cards style.</p>
+</div>
+<div class="wrap">
+<section class="rm-new mock-frame">
+  <p class="rm-new-crumb">Home › <b>Message from the Vice Chancellor</b></p>
+  <div class="rm-new-grid">
+    <div class="rm-new-photo-col">
+      <div class="rm-new-photo">
+        <div class="avatar">AR</div>
+        <div class="rm-new-photo-overlay">
+          <h2>Prof. Dr. Abdul Razzaq</h2>
+          <p>VICE CHANCELLOR</p>
+        </div>
+      </div>
+    </div>
+    <div class="rm-new-content">
+      <svg class="rm-new-quote-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/></svg>
+      <p class="rm-new-lead">Quality education is a fundamental need for our students, as it helps promote and strengthen society by developing an educated youth in the region.</p>
+      <div class="rm-new-body">
+        <p>At Karakoram International University, we remain committed to academic excellence and holistic student development. Our faculty and staff work tirelessly to ensure every student receives an education that prepares them for the challenges of tomorrow.</p>
+        <p>We continue to invest in our facilities, research capacity, and student support systems so that every graduate leaves prepared to lead with confidence and integrity.</p>
+      </div>
+      <span class="rm-new-org-label">Karakoram International University</span>
+      <div class="rm-new-sign">
+        <b>Prof. Dr. Abdul Razzaq</b>
+        <span>Vice Chancellor</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rm-new-others">
+  <p class="rm-new-others-label">More From Leadership</p>
+  <div class="rm-new-mini-grid">
+    <a class="rm-new-mini card-link" href="#">
+      <div class="avatar">MA</div>
+      <div><p class="rm-new-mini-name">Prof. Muhammad Alam</p><p class="rm-new-mini-role">Director Higher Education, GB</p></div>
+    </a>
+    <a class="rm-new-mini card-link" href="#">
+      <div class="avatar">AA</div>
+      <div><p class="rm-new-mini-name">Arif Ali</p><p class="rm-new-mini-role">Principal</p></div>
+    </a>
+  </div>
+</div>
+</div>
+
+<p class="footnote">Mockup only — sample names/messages shown for layout comparison. Tell me which template + which detail-page version to build live, and I'll wire it up with your real data and the admin template switcher.</p>
+
+</body>
+</html>

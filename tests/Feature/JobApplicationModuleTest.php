@@ -65,7 +65,7 @@ class JobApplicationModuleTest extends TestCase
         $this->assertStringContainsString('Job Application', $this->admin->notifications()->first()->data['title'] ?? '');
     }
 
-    public function test_submitting_without_a_cv_still_works(): void
+    public function test_submitting_without_a_cv_fails_validation(): void
     {
         Mail::fake();
 
@@ -76,10 +76,9 @@ class JobApplicationModuleTest extends TestCase
             'phone' => '03001234567',
             'education' => 'MSc Mathematics',
             'message' => 'Interested in the role.',
-        ])->assertSessionHas('job_applied');
+        ])->assertSessionHasErrors('cv');
 
-        $application = JobApplication::where('email', 'applicant2@example.test')->firstOrFail();
-        $this->assertNull($application->cv_path);
+        $this->assertDatabaseMissing('job_applications', ['email' => 'applicant2@example.test']);
     }
 
     public function test_admin_can_view_and_download_cv_and_update_application_status(): void

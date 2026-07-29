@@ -1,7 +1,34 @@
 @php
-    $heroSlides = $pageContent['hero']['slides'] ?? [];
-    // Fallback: if no slides are configured, show a bundled default slide so
-    // the hero is never empty.
+    // Priority: dedicated HeroSlide records (Website Management → Homepage
+    // Slider) → legacy JSON blob on WebsitePage → bundled hardcoded default,
+    // so existing setups keep working exactly as before until an admin adds
+    // slides through the new dedicated page.
+    $heroSlideModels = collect();
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('hero_slides')) {
+            $heroSlideModels = \App\Models\HeroSlide::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
+        }
+    } catch (\Throwable) {
+        $heroSlideModels = collect();
+    }
+
+    if ($heroSlideModels->isNotEmpty()) {
+        $heroSlides = $heroSlideModels->map(fn ($s) => [
+            'image'               => $s->image_url,
+            'title'               => $s->title,
+            'description'         => $s->description,
+            'primary_btn_text'    => $s->primary_btn_text,
+            'primary_btn_link'    => $s->primary_btn_link,
+            'secondary_btn_text'  => $s->secondary_btn_text,
+            'secondary_btn_link'  => $s->secondary_btn_link,
+            'is_stored_url'       => true,
+        ])->all();
+    } else {
+        $heroSlides = $pageContent['hero']['slides'] ?? [];
+    }
+
+    // Fallback: if no slides are configured anywhere, show a bundled default
+    // slide so the hero is never empty.
     if (empty($heroSlides)) {
         $collegeName = $college->college_name ?? 'Jinnah Degree College Astore';
         $heroSlides = [
@@ -207,7 +234,7 @@ document.addEventListener('alpine:init',()=>{
         slides:[
             @foreach($heroSlides as $slide)
             {
-                image:"{{ str_starts_with($slide['image']??'','assets/') ? asset($slide['image']) : \Illuminate\Support\Facades\Storage::url($slide['image']??'') }}",
+                image:"{{ !empty($slide['is_stored_url']) ? $slide['image'] : (str_starts_with($slide['image']??'','assets/') ? asset($slide['image']) : \Illuminate\Support\Facades\Storage::url($slide['image']??'')) }}",
                 alt:"{{ strip_tags($slide['title']??'JDCA') }}",
                 title:"{!! addslashes($slide['title']??'') !!}",
                 description:"{{ addslashes($slide['description']??'') }}",
