@@ -30,8 +30,8 @@
 {{-- ── Main content ────────────────────────────────────────────────────── --}}
 <section class="py-12 md:py-16" style="background:var(--site-body-bg)"
          x-data="{
-           open: false,
-           position: '',
+           open: {{ $errors->any() ? 'true' : 'false' }},
+           position: '{{ addslashes(old('position', '')) }}',
            submitted: false,
            openFor(pos) { this.position = pos; this.open = true; this.submitted = false; }
          }">
@@ -158,51 +158,59 @@
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">Full Name <span class="text-red-500">*</span></label>
-              <input type="text" name="name" required
-                     class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+              <input type="text" name="name" required maxlength="100" value="{{ old('name') }}"
+                     class="w-full rounded-lg border px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 {{ $errors->has('name') ? 'border-red-400' : 'border-stone-300' }}"
                      placeholder="Your full name">
+              @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <div>
               <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">Phone <span class="text-red-500">*</span></label>
-              <input type="tel" name="phone" required maxlength="12" data-format="phone"
-                     class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+              <input type="tel" name="phone" required maxlength="12" data-format="phone" value="{{ old('phone') }}"
+                     pattern="^(?:\+92|0)?3[0-9]{2}-?[0-9]{7}$"
+                     title="Pakistani mobile number, e.g. 03xx-xxxxxxx"
+                     class="w-full rounded-lg border px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 {{ $errors->has('phone') ? 'border-red-400' : 'border-stone-300' }}"
                      placeholder="03xx-xxxxxxx">
+              @error('phone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">Email Address <span class="text-red-500">*</span></label>
-            <input type="email" name="email" required
-                   class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            <input type="email" name="email" required value="{{ old('email') }}"
+                   class="w-full rounded-lg border px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 {{ $errors->has('email') ? 'border-red-400' : 'border-stone-300' }}"
                    placeholder="your@email.com">
+            @error('email')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">Highest Education / Degree <span class="text-red-500">*</span></label>
-            <input type="text" name="education" required
-                   class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            <input type="text" name="education" required maxlength="200" value="{{ old('education') }}"
+                   class="w-full rounded-lg border px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 {{ $errors->has('education') ? 'border-red-400' : 'border-stone-300' }}"
                    placeholder="e.g. MS Computer Science, NUCES Islamabad">
+            @error('education')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">Relevant Experience</label>
-            <input type="text" name="experience"
+            <input type="text" name="experience" maxlength="200" value="{{ old('experience') }}"
                    class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                    placeholder="e.g. 2 years teaching at XYZ College (optional)">
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">Cover Letter / Why You? <span class="text-red-500">*</span></label>
-            <textarea name="message" required rows="4"
-                      class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 resize-none"
-                      placeholder="Briefly describe your qualifications, motivation, and why you'd be a great fit..."></textarea>
+            <textarea name="message" required rows="4" maxlength="1000"
+                      class="w-full rounded-lg border px-3.5 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 resize-none {{ $errors->has('message') ? 'border-red-400' : 'border-stone-300' }}"
+                      placeholder="Briefly describe your qualifications, motivation, and why you'd be a great fit...">{{ old('message') }}</textarea>
+            @error('message')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1.5 uppercase tracking-wide">CV / Resume <span class="text-red-500">*</span></label>
             <input type="file" name="cv" accept=".pdf,.doc,.docx" required
-                   class="w-full rounded-lg border border-stone-300 px-3.5 py-2.5 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-stone-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-stone-700">
+                   class="w-full rounded-lg border px-3.5 py-2.5 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-stone-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-stone-700 {{ $errors->has('cv') ? 'border-red-400' : 'border-stone-300' }}">
             <p class="mt-1 text-[11px] text-stone-400">PDF or Word document, max 5MB.</p>
+            @error('cv')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
           </div>
 
           <p class="text-xs text-stone-400">After submitting, the college administration will contact you by email or phone if shortlisted. You may also bring attested copies of your documents to the office.</p>
