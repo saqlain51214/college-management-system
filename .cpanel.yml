@@ -15,3 +15,17 @@ deployment:
     # newly added or removed admin modules don't show up until the next unrelated
     # cache bust, which is confusing after every deploy.
     - /bin/rm -rf $DEPLOYPATH/bootstrap/cache/filament
+    # Best-effort front-end asset rebuild — only runs if Node/npm is available
+    # on this hosting plan. Fully guarded: if npm is missing, or "npm ci"/
+    # "npm run build" fails partway, this silently does nothing and never
+    # touches the existing public_html/build — the manual FTP upload of
+    # public/build after each style change keeps working exactly as before.
+    - >
+      (command -v npm >/dev/null 2>&1 &&
+      cd $DEPLOYPATH &&
+      npm ci &&
+      npm run build &&
+      /bin/rm -rf $PUBLICPATH/build &&
+      /bin/cp -r $DEPLOYPATH/public/build $PUBLICPATH/build &&
+      echo "Front-end assets rebuilt and deployed automatically.") ||
+      echo "Skipped auto asset build (npm unavailable or build failed) — upload public/build via FTP manually as before."
