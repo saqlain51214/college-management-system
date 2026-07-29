@@ -308,6 +308,16 @@ class Settings extends Page implements HasForms
                             ->options($this->withCurrentOption($this->displayFontOptions(), CollegeSetting::get('website_font_display', 'playfair-display')))
                             ->searchable()
                             ->native(false),
+                        Select::make('message_desk_layout')
+                            ->label('Message Desk Layout (Home Page)')
+                            ->helperText('How the leadership "Message Desk" cards are displayed on the home page.')
+                            ->options([
+                                'card'         => 'Card — photo on banner (compact grid)',
+                                'side_by_side' => 'Side-by-Side — photo next to the message',
+                            ])
+                            ->default('card')
+                            ->native(false)
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Library Settings')
@@ -485,6 +495,7 @@ class Settings extends Page implements HasForms
             'website_theme_surface'      => 'website',
             'website_font_sans'          => 'website',
             'website_font_display'       => 'website',
+            'message_desk_layout'        => 'website',
             'library_issue_days_student' => 'library',
             'library_issue_days_teacher' => 'library',
             'library_fine_per_day'       => 'library',
