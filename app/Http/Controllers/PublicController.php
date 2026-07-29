@@ -765,9 +765,10 @@ class PublicController extends Controller
             'education'   => ['required', 'string', 'max:200'],
             'experience'  => ['nullable', 'string', 'max:200'],
             'message'     => ['required', 'string', 'max:1000'],
-            'cv'          => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+            'cv'          => ['required', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
         ], [
             'phone.regex' => 'Please enter a valid Pakistani mobile number, e.g. 03xx-xxxxxxx.',
+            'cv.required' => 'Please attach your CV / Resume.',
         ]);
 
         $data['phone'] = \App\Support\AdmissionValidation::normalizePhone($data['phone']);
