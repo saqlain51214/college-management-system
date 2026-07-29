@@ -17,7 +17,7 @@
             @foreach($leaders as $L)
                 <a href="{{ route('leadership.message', $L) }}" data-reveal data-reveal-delay="{{ $loop->index % 3 + 1 }}"
                    class="group flex h-full flex-col overflow-hidden rounded-[24px] bg-white shadow-[0_10px_40px_-18px_rgba(0,0,0,0.16)] ring-1 ring-stone-100 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.26)]">
-                    <div class="relative aspect-[4/3] w-full overflow-hidden">
+                    <div class="relative aspect-[4/5] w-full overflow-hidden">
                         @if($L->photo_url)
                             <img src="{{ $L->photo_url }}" alt="{{ $L->name }}" loading="lazy"
                                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
