@@ -486,7 +486,15 @@
             if (!overlay) return;
 
             form.addEventListener('submit', function (e) {
-                if (!form.checkValidity()) return; // let the browser show validation errors first
+                if (!form.checkValidity()) {
+                    // Native constraint validation normally intercepts an
+                    // invalid submit before this listener even runs — but a
+                    // file input's "required" state can behave inconsistently
+                    // across browsers, so force the native validation UI to
+                    // show explicitly rather than silently doing nothing.
+                    form.reportValidity();
+                    return;
+                }
 
                 if (form.dataset.submitting === '1') {
                     e.preventDefault();

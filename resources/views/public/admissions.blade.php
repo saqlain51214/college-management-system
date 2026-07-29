@@ -604,7 +604,10 @@
         var submitBtn = document.getElementById('admissionSubmitBtn');
         if (form && overlay && submitBtn) {
             form.addEventListener('submit', function () {
-                if (!form.checkValidity()) return; // let the browser show validation errors first
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
                 overlay.classList.remove('hidden');
                 overlay.classList.add('flex');
                 submitBtn.disabled = true;
