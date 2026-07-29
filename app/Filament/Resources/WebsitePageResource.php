@@ -62,7 +62,7 @@ class WebsitePageResource extends Resource
                         ->label('Home Page Sections Guide')
                         ->content(fn (?WebsitePage $record): HtmlString => new HtmlString(
                             '<div class="space-y-2 text-sm leading-6">'
-                            . '<div><strong>1. Hero Slider</strong> - update below in <strong>Hero Slides</strong></div>'
+                            . '<div><strong>1. Hero Slider</strong> - update at <a class="text-primary-600 underline" href="' . e(\App\Filament\Resources\HeroSlideResource::getUrl('index')) . '">Website Management &rarr; Homepage Slider</a></div>'
                             . '<div><strong>2. Quick Access tiles</strong> - fixed links (Admissions, Fee Challan, etc.)</div>'
                             . '<div><strong>3. Statistics band</strong> - numbers update automatically from live data</div>'
                             . '<div><strong>4. Featured Programmes</strong> - headings below, cards from Academic Programs module</div>'
@@ -71,40 +71,6 @@ class WebsitePageResource extends Resource
                             . '</div>'
                         ))
                         ->columnSpanFull(),
-                    Placeholder::make('home_image_preview')
-                        ->label('Current Home Images')
-                        ->content(fn (?WebsitePage $record): HtmlString => new HtmlString(collect(data_get($record?->content, 'hero.slides', []))
-                            ->pluck('image')
-                            ->filter()
-                            ->map(function (string $path): string {
-                                $url = str_starts_with($path, 'assets/')
-                                    ? asset($path)
-                                    : \Illuminate\Support\Facades\Storage::url($path);
-
-                                return '<img src="' . e($url) . '" alt="Home image" style="height: 84px; width: 120px; object-fit: cover; border-radius: 10px; border: 1px solid #e5e7eb;" />';
-                            })
-                            ->implode(' ')))
-                        ->columnSpanFull(),
-                    Forms\Components\Repeater::make('content.hero.slides')
-                        ->label('Hero Slides')
-                        ->minItems(1)
-                        ->maxItems(5)
-                        ->collapsed()
-                        ->schema([
-                            Forms\Components\TextInput::make('title')->required(),
-                            Forms\Components\Textarea::make('description')->rows(3),
-                            Forms\Components\FileUpload::make('image')
-                                ->image()
-                                ->disk('public')
-                                ->directory('website/pages'),
-                            Placeholder::make('image_preview')
-                                ->label('Current Slide Image')
-                                ->content(fn (Get $get): HtmlString => static::imagePreviewHtml($get('image'), 'Slide image')),
-                            Forms\Components\TextInput::make('primary_btn_text')->label('Primary Button Text'),
-                            Forms\Components\TextInput::make('primary_btn_link')->label('Primary Route Name'),
-                            Forms\Components\TextInput::make('secondary_btn_text')->label('Secondary Button Text'),
-                            Forms\Components\TextInput::make('secondary_btn_link')->label('Secondary Route Name'),
-                        ]),
                     Forms\Components\Section::make('Featured Programs, News & Events Section')
                         ->columns(2)
                         ->schema([

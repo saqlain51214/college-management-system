@@ -26,6 +26,14 @@ class HeroSlide extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? Storage::url($this->image) : null;
+        if (! $this->image) {
+            return null;
+        }
+
+        // Slides migrated from the old WebsitePage JSON blob may still carry
+        // a plain public-asset path (e.g. "assets/images/...") rather than a
+        // storage-disk path — same convention already used by hero.blade.php
+        // and WebsitePageResource for the legacy data.
+        return str_starts_with($this->image, 'assets/') ? asset($this->image) : Storage::url($this->image);
     }
 }
