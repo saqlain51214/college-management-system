@@ -117,14 +117,12 @@
           </div>
           @endif
 
-          <div id="contactSubmitOverlay" class="fixed inset-0 z-[100] hidden items-center justify-center bg-white/20 backdrop-blur-xl backdrop-saturate-150">
-            <div class="flex flex-col items-center gap-4 rounded-2xl border border-white/50 bg-white/50 px-10 py-8 shadow-2xl backdrop-blur-md">
-              <svg class="h-10 w-10 animate-spin" style="color:#6b2d39" viewBox="0 0 24 24" fill="none">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-              </svg>
-              <p class="text-sm font-semibold text-ink">Sending your message…</p>
-            </div>
+          <div id="contactSubmitOverlay" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center gap-3 bg-white/40 backdrop-blur-[4px]">
+            <svg class="h-9 w-9 animate-spin" style="color:#6b2d39" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            <p class="text-sm font-semibold text-ink">Sending your message…</p>
           </div>
 
           <form action="{{ route('contact.send') }}" method="POST" class="space-y-5" data-submit-overlay="contactSubmitOverlay">
