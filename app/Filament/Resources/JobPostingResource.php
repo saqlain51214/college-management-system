@@ -150,6 +150,7 @@ class JobPostingResource extends Resource
                     ->label('Extend')
                     ->icon('heroicon-o-calendar-days')
                     ->color('warning')
+                    ->authorize('update')
                     ->visible(fn (JobPosting $record) => filled($record->closing_date))
                     ->form([
                         Forms\Components\DatePicker::make('closing_date')

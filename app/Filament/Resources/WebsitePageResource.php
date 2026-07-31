@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Resources\WebsitePageResource\Pages;
 use App\Models\WebsitePage;
 use Filament\Forms\Components\Placeholder;
@@ -19,7 +18,7 @@ class WebsitePageResource extends Resource
 {
     protected static ?string $model = WebsitePage::class;
 
-    protected static ?string $cluster = WebsitePagesCluster::class;
+    protected static ?string $navigationGroup = 'Website Pages';
 
     protected static ?string $navigationIcon  = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Other Pages';

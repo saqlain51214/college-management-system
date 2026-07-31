@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Resources\AnnouncementResource\Pages;
 use App\Models\Announcement;
 use App\Models\Department;
@@ -16,7 +15,7 @@ class AnnouncementResource extends Resource
 {
     protected static ?string $model = Announcement::class;
 
-    protected static ?string $cluster = WebsitePagesCluster::class;
+    protected static ?string $navigationGroup = 'Website Pages';
 
     protected static ?string $navigationIcon  = 'heroicon-o-megaphone';
     protected static ?string $navigationLabel = 'Notices';

@@ -78,6 +78,20 @@ class PageSectionsManagerTest extends TestCase
             ->assertSee('Managed under About Us');
     }
 
+    public function test_a_role_without_website_page_permission_cannot_rename_or_toggle_a_section(): void
+    {
+        Role::create(['name' => 'panel_user', 'guard_name' => 'web']);
+        $staff = User::factory()->create();
+        $staff->assignRole('panel_user'); // allowed to open the page (canAccess), but granted no permissions at all
+
+        Livewire::actingAs($staff)
+            ->test(AboutUsSections::class)
+            ->call('renameSection', 'about-mission', 'Hacked Name')
+            ->assertForbidden();
+
+        $this->assertNull(WebsitePage::where('slug', 'about-mission')->first()->menu_label);
+    }
+
     public function test_academics_sections_shows_department_and_program_counts(): void
     {
         \App\Models\Department::create(['name' => 'Dept A', 'slug' => 'dept-a', 'type' => 'academic']);

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Resources\WebsiteEventResource\Pages;
 use App\Models\WebsiteEvent;
 use Filament\Forms;
@@ -16,7 +15,7 @@ class WebsiteEventResource extends Resource
 {
     protected static ?string $model = WebsiteEvent::class;
 
-    protected static ?string $cluster = WebsitePagesCluster::class;
+    protected static ?string $navigationGroup = 'Website Pages';
 
     protected static ?string $navigationIcon  = 'heroicon-o-calendar-days';
     protected static ?string $navigationLabel = 'Events';

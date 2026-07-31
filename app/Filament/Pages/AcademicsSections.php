@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Concerns\ManagesPageSections;
 use App\Filament\Resources\AcademicProgramResource;
 use App\Filament\Resources\CourseOutlineResource;
@@ -18,7 +17,7 @@ class AcademicsSections extends Page
 {
     use ManagesPageSections;
 
-    protected static ?string $cluster = WebsitePagesCluster::class;
+    protected static ?string $navigationGroup = 'Website Pages';
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Resources\NewsArticleResource\Pages;
 use App\Models\NewsArticle;
 use Filament\Forms;
@@ -16,7 +15,7 @@ class NewsArticleResource extends Resource
 {
     protected static ?string $model = NewsArticle::class;
 
-    protected static ?string $cluster = WebsitePagesCluster::class;
+    protected static ?string $navigationGroup = 'Website Pages';
 
     protected static ?string $navigationIcon  = 'heroicon-o-newspaper';
     protected static ?string $navigationLabel = 'News';

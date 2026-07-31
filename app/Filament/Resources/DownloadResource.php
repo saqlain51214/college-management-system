@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Resources\DownloadResource\Pages;
 use App\Models\Download;
 use Filament\Forms;
@@ -15,7 +14,7 @@ class DownloadResource extends Resource
 {
     protected static ?string $model = Download::class;
 
-    protected static ?string $cluster = WebsitePagesCluster::class;
+    protected static ?string $navigationGroup = 'Website Pages';
 
     protected static ?string $navigationIcon = 'heroicon-o-arrow-down-tray';
 
