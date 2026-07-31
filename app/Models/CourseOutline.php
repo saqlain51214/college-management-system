@@ -38,11 +38,31 @@ class CourseOutline extends Model
     public function getFilesAttribute(): array
     {
         return collect($this->file_paths ?? [])
-            ->map(fn ($path) => [
-                'name' => basename($path),
+            ->values()
+            ->map(fn ($path, $i) => [
+                'name' => $this->displayNameFor($path, $i + 1),
                 'url'  => asset('storage/' . $path),
             ])
             ->all();
+    }
+
+    /**
+     * Files uploaded before ->preserveFilenames() was enabled were saved under a
+     * random storage name (e.g. "01KYPNV8NE...pdf") — show a friendly ordinal
+     * label instead of that random string. Filenames preserved from here on
+     * (real names, no spaces-to-underscore-only pattern) are shown as-is.
+     */
+    protected function displayNameFor(string $path, int $position): string
+    {
+        $name = basename($path);
+
+        if (preg_match('/^[0-9A-Z]{25,26}\.\w+$/i', $name)) {
+            $ext = pathinfo($name, PATHINFO_EXTENSION);
+
+            return 'PDF ' . $position . ($ext ? '.' . $ext : '');
+        }
+
+        return $name;
     }
 
     /** Public URL to download/open the outline — first uploaded file, or the external link. */

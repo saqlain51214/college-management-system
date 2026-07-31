@@ -52,6 +52,7 @@ class CourseOutlineResource extends Resource
                         ->label('Upload PDF(s)')->disk('public')->directory('course-outlines')
                         ->acceptedFileTypes(['application/pdf'])->maxSize(20480)
                         ->multiple()->reorderable()->maxFiles(10)
+                        ->preserveFilenames()
                         ->helperText('Upload one or more PDFs (up to 20 MB each) — use the + button to add more. Or use a link below instead.')
                         ->columnSpanFull(),
                     Forms\Components\TextInput::make('external_url')

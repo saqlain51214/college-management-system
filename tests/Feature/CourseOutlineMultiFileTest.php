@@ -42,6 +42,33 @@ class CourseOutlineMultiFileTest extends TestCase
         $response->assertSee(asset('storage/course-outlines/c.pdf'), false);
     }
 
+    public function test_random_storage_names_display_as_friendly_ordinal_labels_not_raw_ulids(): void
+    {
+        $department = Department::create([
+            'name' => 'Department of Arts',
+            'slug' => 'department-of-arts',
+            'is_active' => true,
+            'show_on_website' => true,
+        ]);
+
+        CourseOutline::create([
+            'department_id' => $department->id,
+            'semester_number' => 1,
+            'title' => 'Semester 1 Course Outline',
+            'file_paths' => [
+                'course-outlines/01KYPNV8NE5SZX94NFZ85YH8V0.pdf',
+                'course-outlines/01KYPNV8NGFQM5757XBW3A6AZ2.pdf',
+            ],
+            'is_active' => true,
+        ]);
+
+        $response = $this->get(route('departments.show', 'department-of-arts'));
+
+        $response->assertOk();
+        $response->assertSee('PDF 1.pdf');
+        $response->assertSee('PDF 2.pdf');
+    }
+
     public function test_a_single_file_course_outline_still_links_directly(): void
     {
         $department = Department::create([
