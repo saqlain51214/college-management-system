@@ -14,6 +14,7 @@ class WebsitePageSeeder extends Seeder
                 ['slug' => $slug],
                 [
                     'title'        => $definition['title'],
+                    'section'      => $definition['section'],
                     'content'      => WebsitePage::defaultContentFor($slug),
                     'sort_order'   => $definition['sort'],
                     'in_menu'      => $definition['in_menu'],

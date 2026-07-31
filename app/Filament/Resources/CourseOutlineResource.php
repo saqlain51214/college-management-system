@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\AcademicsCluster;
 use App\Filament\Resources\CourseOutlineResource\Pages;
 use App\Models\AcademicProgram;
 use App\Models\CourseOutline;
@@ -16,9 +17,9 @@ class CourseOutlineResource extends Resource
 {
     protected static ?string $model = CourseOutline::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $cluster = AcademicsCluster::class;
 
-    protected static ?string $navigationGroup = 'College Setup';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationLabel = 'Course Outlines';
 

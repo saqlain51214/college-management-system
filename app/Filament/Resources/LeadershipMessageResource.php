@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\AboutUsCluster;
 use App\Filament\Resources\LeadershipMessageResource\Pages;
 use App\Models\LeadershipMessage;
 use Filament\Forms;
@@ -14,9 +15,9 @@ class LeadershipMessageResource extends Resource
 {
     protected static ?string $model = LeadershipMessage::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static ?string $cluster = AboutUsCluster::class;
 
-    protected static ?string $navigationGroup = 'Website Management';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     protected static ?string $navigationLabel = 'Message Desk';
 

@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JDCA Admin — Website Management Overhaul (Preview)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --primary: #6B2D39;
+    --primary-light: #A8586A;
+    --primary-tint: rgba(107,45,57,0.16);
+    --sidebar-bg: #18181b;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --content-bg: #09090b;
+    --panel-bg: #18181b;
+    --panel-border: rgba(255,255,255,0.08);
+    --text: #e4e4e7;
+    --text-soft: #a1a1aa;
+    --text-faint: #71717a;
+    --good: #34d399;
+    --good-bg: rgba(52,211,153,0.12);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--content-bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .app { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ─────────────────────────────────────────────────────── */
+  .sidebar {
+    width: 15rem;
+    flex: none;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+  .brand-logo {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: #fff; flex: none;
+  }
+  .brand-name { font-weight: 600; font-size: 14px; line-height: 1.3; }
+  .brand-name small { display: block; color: var(--text-faint); font-size: 11px; font-weight: 400; }
+
+  nav.nav { padding: 12px 10px 24px; flex: 1; }
+  .nav-group { margin-bottom: 4px; }
+  .nav-group-label {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--text-faint);
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .nav-group-label:hover { background: rgba(255,255,255,0.03); }
+  .nav-group-label .chev { transition: transform .15s ease; color: var(--text-faint); }
+  .nav-group.collapsed .chev { transform: rotate(-90deg); }
+  .nav-group.collapsed .nav-items { display: none; }
+
+  .nav-items { display: flex; flex-direction: column; gap: 1px; padding: 2px 0 8px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 10px 7px 20px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: var(--text-soft);
+  }
+  .nav-item svg { width: 16px; height: 16px; flex: none; color: var(--text-faint); }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active {
+    background: var(--primary-tint);
+    color: #fff;
+    font-weight: 600;
+  }
+  .nav-item.active svg { color: var(--primary-light); }
+
+  /* Cluster = same visual language as a group, but marked NEW so the diff is obvious in this preview only */
+  .nav-group.is-cluster .nav-group-label { color: var(--text); }
+  .new-badge {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.03em;
+    padding: 1px 6px; border-radius: 999px;
+    background: var(--primary); color: #fff;
+    margin-left: 6px;
+  }
+
+  /* ── Topbar ──────────────────────────────────────────────────────── */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar {
+    height: 56px; flex: none;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--panel-border);
+    background: var(--sidebar-bg);
+  }
+  .breadcrumb { font-size: 13px; color: var(--text-soft); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb b { color: var(--text); font-weight: 600; }
+  .topbar-right { display: flex; align-items: center; gap: 14px; color: var(--text-soft); }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; }
+
+  .content { padding: 24px 28px 60px; overflow-y: auto; }
+  .page-head { margin-bottom: 20px; }
+  .page-head h1 { margin: 0 0 4px; font-size: 20px; font-weight: 600; }
+  .page-head p { margin: 0; color: var(--text-soft); font-size: 13.5px; max-width: 70ch; }
+
+  /* ── Tabs (to switch between the 3 preview screens) ─────────────── */
+  .preview-tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .preview-tab {
+    padding: 9px 14px; font-size: 13px; font-weight: 600; color: var(--text-soft);
+    border-bottom: 2px solid transparent; cursor: pointer;
+  }
+  .preview-tab.active { color: #fff; border-color: var(--primary); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Table (Filament-style) ──────────────────────────────────────── */
+  .panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .group-header {
+    padding: 10px 18px;
+    font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--text-faint);
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--panel-border);
+    border-top: 1px solid var(--panel-border);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    text-align: left; padding: 9px 18px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+    color: var(--text-faint);
+    border-bottom: 1px solid var(--panel-border);
+  }
+  tbody td { padding: 11px 18px; border-bottom: 1px solid var(--panel-border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .cell-title { font-weight: 600; color: var(--text); }
+  .cell-muted { color: var(--text-faint); font-size: 12.5px; }
+  .menu-label-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; color: var(--text-soft);
+  }
+  .menu-label-pill.custom { color: #fff; }
+  .menu-label-pill.custom::before {
+    content: "✎"; color: var(--primary-light); font-size: 11px;
+  }
+  .placeholder-text { color: var(--text-faint); font-style: italic; }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; }
+  .toggle .dot {
+    width: 34px; height: 18px; border-radius: 999px; background: var(--good-bg);
+    position: relative; flex: none;
+  }
+  .toggle .dot::after {
+    content: ""; position: absolute; top: 2px; right: 2px; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--good);
+  }
+  .toggle.off .dot { background: rgba(255,255,255,0.08); }
+  .toggle.off .dot::after { background: var(--text-faint); left: 2px; right: auto; }
+  .row-actions { display: flex; gap: 8px; color: var(--text-faint); }
+  .row-actions svg { width: 16px; height: 16px; }
+
+  /* ── Form screen (Edit Page) ─────────────────────────────────────── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { margin-bottom: 4px; }
+  .field label {
+    display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text);
+  }
+  .field input, .field textarea {
+    width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border);
+    border-radius: 8px; padding: 9px 11px; color: var(--text); font-size: 13.5px; font-family: var(--font);
+  }
+  .field input:disabled { color: var(--text-faint); cursor: not-allowed; }
+  .field .help { margin-top: 6px; font-size: 12px; color: var(--text-faint); line-height: 1.5; }
+  .field .help.highlight { color: var(--primary-light); }
+  .section-title {
+    font-size: 13px; font-weight: 700; color: var(--text-soft); text-transform: uppercase;
+    letter-spacing: 0.03em; margin: 28px 0 14px; padding-top: 20px; border-top: 1px solid var(--panel-border);
+  }
+  .section-title:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .repeater-item {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .repeater-item .rep-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .repeater-item .rep-head span { font-weight: 600; font-size: 13.5px; }
+  .repeater-item .rep-head .drag { color: var(--text-faint); font-size: 12px; }
+  .add-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 8px; border: 1px dashed var(--panel-border);
+    color: var(--text-soft); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+
+  .callout {
+    display: flex; gap: 10px; padding: 12px 14px; border-radius: 10px;
+    background: var(--primary-tint); border: 1px solid rgba(107,45,57,0.35);
+    font-size: 13px; color: var(--text); margin-bottom: 20px;
+  }
+  .callout b { color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ══════════════════════════ SIDEBAR ══════════════════════════ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">JD</div>
+      <div class="brand-name">Jinnah Degree College Astore<small>Admin Panel</small></div>
+    </div>
+
+    <nav class="nav">
+
+      <div class="nav-items" style="padding-top:8px;">
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Dashboard
+        </a>
+      </div>
+
+      <!-- Academics — NEW CLUSTER -->
+      <div class="nav-group is-cluster">
+        <div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')">
+          <span>Academics <span class="new-badge">NEW</span></span>
+          <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="nav-items">
+          <a class="nav-item active" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg>
+            Departments
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/></svg>
+            Academic Programs
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Course Outlines
+          </a>
+        </div>
+      </div>
+
+      <!-- Home Page — NEW CLUSTER -->
+      <div class="nav-group is-cluster">
+        <div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')">
+          <span>Home Page <span class="new-badge">NEW</span></span>
+          <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="nav-items">
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 8h16M4 4h16v16H4V4z"/></svg>
+            Homepage Slider
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+            Home Sections
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            Message Desk Design
+          </a>
+        </div>
+      </div>
+
+      <!-- About Us — NEW CLUSTER -->
+      <div class="nav-group is-cluster">
+        <div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')">
+          <span>About Us <span class="new-badge">NEW</span></span>
+          <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="nav-items">
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            Message Desk <span style="margin-left:auto;color:var(--text-faint);font-size:11px;">(VC / Director / Principal)</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Website Management — existing group, now lighter -->
+      <div class="nav-group">
+        <div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')">
+          <span>Website Management</span>
+          <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="nav-items">
+          <a class="nav-item" href="#" onclick="showScreen('pages');return false;" style="cursor:pointer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m6 10v-4M4 21h16a1 1 0 001-1V4a1 1 0 00-1-1H4a1 1 0 00-1 1v16a1 1 0 001 1z"/></svg>
+            Website Pages
+          </a>
+          <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Announcements</a>
+          <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"/></svg>Downloads</a>
+          <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1"/></svg>News Articles</a>
+          <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Website Events</a>
+        </div>
+      </div>
+
+      <div class="nav-group collapsed"><div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')"><span>Students &amp; Admissions</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div>
+      <div class="nav-group collapsed"><div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')"><span>Faculty &amp; Staff</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div>
+      <div class="nav-group collapsed"><div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')"><span>Fees &amp; Billing</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div>
+      <div class="nav-group collapsed"><div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')"><span>Scholarships</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div>
+      <div class="nav-group collapsed"><div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')"><span>Payroll</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div>
+      <div class="nav-group collapsed"><div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')"><span>Communications</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div>
+      <div class="nav-group collapsed"><div class="nav-group-label" onclick="this.parentElement.classList.toggle('collapsed')"><span>System</span><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></div></div>
+
+    </nav>
+  </aside>
+
+  <!-- ══════════════════════════ MAIN ══════════════════════════ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb">Website Management <span style="color:var(--text-faint)">/</span> <b>Website Pages</b></div>
+      <div class="topbar-right">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <div class="avatar">SR</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="page-head">
+        <h1>Website Management — Preview</h1>
+        <p>Working preview only — not the live app, and no real data. Click through the three tabs below to see the new sidebar structure, the regrouped Website Pages list, and the "Menu Label" field in action.</p>
+      </div>
+
+      <div class="preview-tabs">
+        <div class="preview-tab active" onclick="showScreen('pages', this)">Website Pages list</div>
+        <div class="preview-tab" onclick="showScreen('edit', this)">Edit Page — Menu Label</div>
+        <div class="preview-tab" onclick="showScreen('facilities', this)">Campus Facilities — Repeater</div>
+      </div>
+
+      <!-- ── SCREEN 1: Website Pages grouped list ─────────────────── -->
+      <div class="screen active" id="screen-pages">
+        <div class="callout">
+          <span>ℹ️</span>
+          <span>Rows are now grouped by <b>Page Area</b> instead of one long flat list — matching the public site's own menu tree (Home / About Us / Academics / Admission / Other).</span>
+        </div>
+
+        <div class="panel">
+          <table>
+            <thead>
+              <tr><th>Title</th><th>Menu Label</th><th>Slug</th><th>Published</th><th>Last Updated</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="6" class="group-header">Home</td></tr>
+              <tr>
+                <td class="cell-title">Home</td>
+                <td><span class="menu-label-pill placeholder-text">(same as Title)</span></td>
+                <td class="cell-muted">home</td>
+                <td><span class="toggle"><span class="dot"></span></span></td>
+                <td class="cell-muted">28 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+
+              <tr><td colspan="6" class="group-header">About Us</td></tr>
+              <tr>
+                <td class="cell-title">Contact Us</td>
+                <td><span class="menu-label-pill custom">Get In Touch</span></td>
+                <td class="cell-muted">contact</td>
+                <td><span class="toggle"><span class="dot"></span></span></td>
+                <td class="cell-muted">31 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+              <tr>
+                <td class="cell-title">Campus Facilities</td>
+                <td><span class="menu-label-pill placeholder-text">(same as Title)</span></td>
+                <td class="cell-muted">campus-facilities</td>
+                <td><span class="toggle"><span class="dot"></span></span></td>
+                <td class="cell-muted">18 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+              <tr>
+                <td class="cell-title">College Gallery</td>
+                <td><span class="menu-label-pill placeholder-text">(same as Title)</span></td>
+                <td class="cell-muted">gallery</td>
+                <td><span class="toggle"><span class="dot"></span></span></td>
+                <td class="cell-muted">18 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+
+              <tr><td colspan="6" class="group-header">Academics</td></tr>
+              <tr>
+                <td class="cell-title">Academic Programmes</td>
+                <td><span class="menu-label-pill custom">Explore Our Programs</span></td>
+                <td class="cell-muted">programs</td>
+                <td><span class="toggle"><span class="dot"></span></span></td>
+                <td class="cell-muted">30 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+              <tr>
+                <td class="cell-title">Semester Rules</td>
+                <td><span class="menu-label-pill placeholder-text">(same as Title)</span></td>
+                <td class="cell-muted">semester-rules</td>
+                <td><span class="toggle off"><span class="dot"></span></span></td>
+                <td class="cell-muted">18 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+
+              <tr><td colspan="6" class="group-header">Admission</td></tr>
+              <tr>
+                <td class="cell-title">Online Admission Form</td>
+                <td><span class="menu-label-pill custom">Apply Online</span></td>
+                <td class="cell-muted">admissions</td>
+                <td><span class="toggle"><span class="dot"></span></span></td>
+                <td class="cell-muted">18 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+              <tr>
+                <td class="cell-title">Scholarships</td>
+                <td><span class="menu-label-pill placeholder-text">(same as Title)</span></td>
+                <td class="cell-muted">scholarships</td>
+                <td><span class="toggle"><span class="dot"></span></span></td>
+                <td class="cell-muted">18 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+
+              <tr><td colspan="6" class="group-header">Other</td></tr>
+              <tr>
+                <td class="cell-title">Downloads</td>
+                <td><span class="menu-label-pill placeholder-text">(same as Title)</span></td>
+                <td class="cell-muted">downloads</td>
+                <td><span class="toggle"><span class="dot"></span></span></td>
+                <td class="cell-muted">18 Jul 2026</td>
+                <td class="row-actions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 2: Edit Page form — Menu Label ────────────────── -->
+      <div class="screen" id="screen-edit">
+        <div class="callout">
+          <span>ℹ️</span>
+          <span>Editing <b>Contact Us</b>. Renaming the Menu Label changes what visitors see in the nav — the page's web address (<code>/contact</code>) never changes.</span>
+        </div>
+
+        <div class="panel" style="padding:22px 24px;">
+          <div class="section-title">Page Information</div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Title</label>
+              <input type="text" value="Contact Us">
+              <p class="help">The page's own heading. Does not change its web address.</p>
+            </div>
+            <div class="field">
+              <label>Menu Label (Optional)</label>
+              <input type="text" value="Get In Touch">
+              <p class="help highlight">What visitors see in the navigation menu. Changing this does NOT change the page's web address — safe to rename anytime.</p>
+            </div>
+            <div class="field">
+              <label>Slug</label>
+              <input type="text" value="contact" disabled>
+              <p class="help">The page's web address — fixed, cannot be changed here.</p>
+            </div>
+            <div class="field">
+              <label>Published (show on website)</label>
+              <span class="toggle"><span class="dot"></span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCREEN 3: Campus Facilities repeater ─────────────────── -->
+      <div class="screen" id="screen-facilities">
+        <div class="callout">
+          <span>ℹ️</span>
+          <span>Editing <b>Campus Facilities</b>. Previously this list was hardcoded in the code and could not be changed from here at all — now every card on the live page comes straight from this list.</span>
+        </div>
+
+        <div class="panel" style="padding:22px 24px;">
+          <div class="section-title">Facilities</div>
+
+          <div class="repeater-item">
+            <div class="rep-head"><span>Classrooms</span><span class="drag">⠿ drag to reorder</span></div>
+            <div class="field" style="margin-bottom:10px;">
+              <label>Title</label>
+              <input type="text" value="Classrooms">
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <textarea rows="2">Modern, well-ventilated classrooms equipped for effective teaching with proper seating and boards.</textarea>
+            </div>
+          </div>
+
+          <div class="repeater-item">
+            <div class="rep-head"><span>Computer Lab</span><span class="drag">⠿ drag to reorder</span></div>
+            <div class="field" style="margin-bottom:10px;">
+              <label>Title</label>
+              <input type="text" value="Computer Lab">
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <textarea rows="2">ICT-equipped computer laboratory to support digital learning and technology education.</textarea>
+            </div>
+          </div>
+
+          <div class="add-btn">+ Add Facility</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function showScreen(name, tabEl) {
+    document.querySelectorAll('.screen').forEach(function (el) { el.classList.remove('active'); });
+    document.getElementById('screen-' + name).classList.add('active');
+    if (tabEl) {
+      document.querySelectorAll('.preview-tab').forEach(function (el) { el.classList.remove('active'); });
+      tabEl.classList.add('active');
+    } else {
+      document.querySelectorAll('.preview-tab').forEach(function (el, i) {
+        el.classList.toggle('active', i === 0);
+      });
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Clusters\HomePageCluster;
 use App\Models\CollegeSetting;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -10,14 +11,14 @@ use Illuminate\Support\Facades\Cache;
 /**
  * A dedicated page (rather than a dropdown buried in the general Settings
  * page) for picking which of the 6 Leadership Message Desk designs is shown
- * on the home page — sits next to the leader records themselves under
- * Website Management, since that's where an admin naturally looks for it.
+ * on the home page — grouped with the other Home Page pieces since it
+ * controls one of the home page's own sections.
  */
 class MessageDeskSettings extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static ?string $cluster = HomePageCluster::class;
 
-    protected static ?string $navigationGroup = 'Website Management';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     protected static ?string $navigationLabel = 'Message Desk Design';
 

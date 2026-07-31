@@ -12,40 +12,37 @@ class WebsitePage extends Model
 
     public const STATIC_PAGES = [
         // ── Home ──────────────────────────────────────────────────────
-        'home'                => ['title' => 'Home',                    'route_name' => 'home',                    'sort' =>  1, 'in_menu' => true],
+        'home'                => ['title' => 'Home',                    'route_name' => 'home',                    'sort' =>  1, 'in_menu' => true,  'section' => 'Home'],
 
         // ── About Us ──────────────────────────────────────────────────
-        'about'               => ['title' => 'About JDCA',              'route_name' => 'about',                   'sort' =>  2, 'in_menu' => true],
-        'about-history'       => ['title' => 'History & Geography',     'route_name' => 'about.history',           'sort' =>  3, 'in_menu' => false],
-        'about-mission'       => ['title' => 'Mission & Vision',        'route_name' => 'about.mission',           'sort' =>  4, 'in_menu' => false],
-        'about-message'       => ['title' => 'Message from Principal',  'route_name' => 'about.message',           'sort' =>  5, 'in_menu' => false],
+        'about'               => ['title' => 'About JDCA',              'route_name' => 'about',                   'sort' =>  2, 'in_menu' => true,  'section' => 'About Us'],
+        'about-history'       => ['title' => 'History & Geography',     'route_name' => 'about.history',           'sort' =>  3, 'in_menu' => false, 'section' => 'About Us'],
+        'about-mission'       => ['title' => 'Mission & Vision',        'route_name' => 'about.mission',           'sort' =>  4, 'in_menu' => false, 'section' => 'About Us'],
+        'campus-facilities'   => ['title' => 'Campus Facilities',       'route_name' => 'campus-facilities',       'sort' =>  5, 'in_menu' => false, 'section' => 'About Us'],
+        'gallery'             => ['title' => 'College Gallery',         'route_name' => 'gallery',                 'sort' =>  6, 'in_menu' => true,  'section' => 'About Us'],
 
         // ── Academics ─────────────────────────────────────────────────
-        'programs'            => ['title' => 'Academic Programmes',     'route_name' => 'programs',                'sort' =>  6, 'in_menu' => true],
-        'departments'         => ['title' => 'Departments',             'route_name' => 'departments',             'sort' =>  7, 'in_menu' => false],
-        'faculty'             => ['title' => 'Faculty Profile',         'route_name' => 'faculty',                 'sort' =>  8, 'in_menu' => false],
-        'campus-facilities'   => ['title' => 'Campus Facilities',       'route_name' => 'campus-facilities',       'sort' =>  9, 'in_menu' => false],
-        'downloads'           => ['title' => 'Downloads',               'route_name' => 'downloads',               'sort' => 10, 'in_menu' => false],
-        'gallery'             => ['title' => 'College Gallery',         'route_name' => 'gallery',                 'sort' => 11, 'in_menu' => true],
+        'programs'            => ['title' => 'Academic Programmes',     'route_name' => 'programs',                'sort' =>  7, 'in_menu' => true,  'section' => 'Academics'],
+        'departments'         => ['title' => 'Departments',             'route_name' => 'departments',             'sort' =>  8, 'in_menu' => false, 'section' => 'Academics'],
+        'faculty'             => ['title' => 'Faculty Profile',         'route_name' => 'faculty',                 'sort' =>  9, 'in_menu' => false, 'section' => 'Academics'],
+        'semester-rules'      => ['title' => 'Semester Rules',          'route_name' => 'admissions.semester-rules','sort'=> 10, 'in_menu' => false, 'section' => 'Academics'],
 
         // ── Admission ─────────────────────────────────────────────────
-        'admissions'          => ['title' => 'Online Admission Form',   'route_name' => 'admissions',              'sort' => 12, 'in_menu' => true],
-        'admission-procedure' => ['title' => 'Admission Procedure',     'route_name' => 'admissions.procedure',    'sort' => 13, 'in_menu' => false],
-        'fee-structure'       => ['title' => 'Fee Structure',           'route_name' => 'admissions.fee-structure','sort' => 14, 'in_menu' => false],
-        'semester-rules'      => ['title' => 'Semester Rules',          'route_name' => 'admissions.semester-rules','sort'=> 15, 'in_menu' => false],
-
-        // ── Scholarships ──────────────────────────────────────────────
-        'scholarships'        => ['title' => 'Scholarships',            'route_name' => 'scholarships',            'sort' => 16, 'in_menu' => true],
+        'admissions'          => ['title' => 'Online Admission Form',   'route_name' => 'admissions',              'sort' => 11, 'in_menu' => true,  'section' => 'Admission'],
+        'admission-procedure' => ['title' => 'Admission Procedure',     'route_name' => 'admissions.procedure',    'sort' => 12, 'in_menu' => false, 'section' => 'Admission'],
+        'fee-structure'       => ['title' => 'Fee Structure',           'route_name' => 'admissions.fee-structure','sort' => 13, 'in_menu' => false, 'section' => 'Admission'],
+        'scholarships'        => ['title' => 'Scholarships',            'route_name' => 'scholarships',            'sort' => 14, 'in_menu' => true,  'section' => 'Admission'],
 
         // ── Other public pages ────────────────────────────────────────
-        'news'                => ['title' => 'News',                    'route_name' => 'news',                    'sort' => 18, 'in_menu' => false],
-        'events'              => ['title' => 'Events',                  'route_name' => 'events',                  'sort' => 19, 'in_menu' => false],
-        'notices'             => ['title' => 'Notices',                 'route_name' => 'notices',                 'sort' => 20, 'in_menu' => false],
-        'contact'             => ['title' => 'Contact Us',              'route_name' => 'contact',                 'sort' => 21, 'in_menu' => true],
+        'downloads'           => ['title' => 'Downloads',               'route_name' => 'downloads',               'sort' => 15, 'in_menu' => false, 'section' => 'Other'],
+        'news'                => ['title' => 'News',                    'route_name' => 'news',                    'sort' => 16, 'in_menu' => false, 'section' => 'Other'],
+        'events'              => ['title' => 'Events',                  'route_name' => 'events',                  'sort' => 17, 'in_menu' => false, 'section' => 'Other'],
+        'notices'             => ['title' => 'Notices',                 'route_name' => 'notices',                 'sort' => 18, 'in_menu' => false, 'section' => 'Other'],
+        'contact'             => ['title' => 'Contact Us',              'route_name' => 'contact',                 'sort' => 19, 'in_menu' => true,  'section' => 'Other'],
     ];
 
     protected $fillable = [
-        'title', 'slug', 'content', 'meta_title', 'meta_description',
+        'title', 'menu_label', 'slug', 'section', 'content', 'meta_title', 'meta_description',
         'featured_image', 'sort_order', 'in_menu', 'is_published',
     ];
 
@@ -58,6 +55,24 @@ class WebsitePage extends Model
     public function scopePublished($q) { return $q->where('is_published', true); }
     public function scopeInMenu($q)    { return $q->where('in_menu', true)->orderBy('sort_order'); }
     public function scopeStaticPages($q) { return $q->whereIn('slug', array_keys(self::STATIC_PAGES)); }
+
+    /** What the nav actually shows — an admin-set nickname if given, otherwise the page Title. */
+    public function getMenuLabelDisplayAttribute(): string
+    {
+        return filled($this->menu_label) ? $this->menu_label : $this->title;
+    }
+
+    /** Menu label for a given static-page slug, straight from the DB, falling back to the seed default. */
+    public static function menuLabelFor(string $slug): string
+    {
+        $page = static::where('slug', $slug)->first();
+
+        if ($page) {
+            return $page->menu_label_display;
+        }
+
+        return self::STATIC_PAGES[$slug]['title'] ?? $slug;
+    }
 
     protected static function booted(): void
     {
@@ -202,14 +217,11 @@ class WebsitePage extends Model
                 'intro_title' => 'College gallery',
                 'intro_text' => 'Campus, labs, student life, and events-explore our college through photography.',
                 'body_html' => '<p>Use this section for a short gallery introduction or photography note.</p>',
-                'gallery_items' => [
-                    ['image' => 'assets/images/photo-1562774053-701939374585.jpg', 'title' => 'Main Building', 'caption' => 'Historic college campus facade with trees', 'category' => 'campus'],
-                    ['image' => 'assets/images/photo-1576495199011-eb94736d05d6.jpg', 'title' => 'Learning', 'caption' => 'Students in a lecture hall', 'category' => 'labs'],
-                    ['image' => 'assets/images/photo-1519389950473-47ba0277781c.jpg', 'title' => 'Labs', 'caption' => 'Group study and digital projects', 'category' => 'labs'],
-                    ['image' => 'assets/images/photo-1541339907198-e08756dedf3f.jpg', 'title' => 'Campus', 'caption' => 'Courtyard and walkways', 'category' => 'campus'],
-                    ['image' => 'assets/images/photo-1588072432836-e10032774350.jpg', 'title' => 'Events', 'caption' => 'Seminar and guest sessions', 'category' => 'events'],
-                    ['image' => 'assets/images/photo-1529156069898-49953e39b3ac.jpg', 'title' => 'Life', 'caption' => 'Student life and outdoor activities', 'category' => 'sports'],
-                ],
+                // Intentionally empty — add real campus photos from the admin panel
+                // (Website Pages → Gallery → Gallery Items). Previously seeded with
+                // stock placeholder photos, which is what actually showed on the
+                // live site until an admin replaced every item by hand.
+                'gallery_items' => [],
             ],
             'news' => [
                 'intro_title' => 'News',
@@ -241,13 +253,6 @@ class WebsitePage extends Model
                 'intro_text' => "Reach out to the JDCA team — we're happy to answer your questions about admissions, programmes, or anything else.",
                 'body_html' => '<p>Use this section for contact instructions, reception details, or visitor notes.</p>',
             ],
-            'about-message' => [
-                'intro_title' => 'Message from the Principal',
-                'intro_text' => 'A personal message from the Principal of Jinnah Degree College Astore.',
-                'principal_name' => 'Arif Ali',
-                'principal_title' => 'Principal, JDCA',
-                'message_html' => '<p>On behalf of the faculty and staff of Jinnah Degree College Astore, I warmly welcome you to our institution. We are committed to providing quality education and nurturing every student to realise their full potential. Our aim is to create a supportive learning environment that prepares students for success in higher education and professional life.</p><p>We believe that education is not only about academic achievement, but also about character, service, and contribution to society. I invite you to explore our programmes and join the JDCA family.</p>',
-            ],
             'departments' => [
                 'intro_title' => 'Our Departments',
                 'intro_text' => 'Jinnah Degree College Astore offers a range of academic departments covering arts, sciences, computer science, and professional education.',
@@ -258,12 +263,15 @@ class WebsitePage extends Model
                 'intro_text' => 'Modern facilities supporting academic, co-curricular, and student welfare activities at JDCA.',
                 'body_html' => '<p>Update this section with the latest campus facilities information.</p>',
                 'facilities' => [
-                    ['title' => 'Computer Lab', 'description' => 'Modern computers with internet access for student research and coursework.', 'icon' => 'computer'],
-                    ['title' => 'Science Labs', 'description' => 'Fully equipped physics, chemistry, and biology laboratories for practical sessions.', 'icon' => 'flask'],
-                    ['title' => 'Library', 'description' => 'A comprehensive collection of academic texts, reference books, and digital resources.', 'icon' => 'book'],
-                    ['title' => 'Sports Ground', 'description' => 'Outdoor sports facilities including cricket, football, and athletics.', 'icon' => 'sports'],
-                    ['title' => 'Prayer Area', 'description' => 'Dedicated prayer spaces for students and staff.', 'icon' => 'mosque'],
-                    ['title' => 'Canteen', 'description' => 'On-campus canteen providing meals and refreshments during college hours.', 'icon' => 'food'],
+                    ['title' => 'Classrooms', 'description' => 'Modern, well-ventilated classrooms equipped for effective teaching with proper seating and boards.', 'icon' => 'classrooms'],
+                    ['title' => 'Library', 'description' => 'A growing collection of academic books, journals, and reference materials for students and faculty.', 'icon' => 'library'],
+                    ['title' => 'Computer Lab', 'description' => 'ICT-equipped computer laboratory to support digital learning and technology education.', 'icon' => 'computer'],
+                    ['title' => 'Administrative Block', 'description' => 'Dedicated administrative offices for student services, registration, and college management.', 'icon' => 'admin'],
+                    ['title' => 'Sports Area', 'description' => 'Open sports grounds supporting physical education and extracurricular activities.', 'icon' => 'sports'],
+                    ['title' => 'Prayer Area', 'description' => 'A dedicated space for daily prayers, supporting the spiritual well-being of our community.', 'icon' => 'prayer'],
+                    ['title' => 'Canteen', 'description' => 'Student canteen providing affordable meals and refreshments during college hours.', 'icon' => 'canteen'],
+                    ['title' => 'Safe Environment', 'description' => 'A safe, inclusive campus environment with security measures for student welfare.', 'icon' => 'security'],
+                    ['title' => 'Wi-Fi Campus', 'description' => 'Internet connectivity available on campus to support research and online learning.', 'icon' => 'wifi'],
                 ],
             ],
             'downloads' => [
@@ -276,12 +284,13 @@ class WebsitePage extends Model
                 'intro_text' => 'Step-by-step guide to applying for admission at JDCA for Intermediate and Degree programmes.',
                 'body_html' => '<p>Update this section with the latest admission procedure and eligibility requirements.</p>',
                 'steps' => [
-                    ['step' => '01', 'title' => 'Eligibility Check', 'description' => 'Confirm you meet the minimum qualification requirements for your chosen programme (Matric for Intermediate, FA/FSc for Degree).'],
-                    ['step' => '02', 'title' => 'Collect Form', 'description' => 'Collect the admission form from the college office or download it from this website.'],
-                    ['step' => '03', 'title' => 'Submit Documents', 'description' => 'Submit the completed form along with attested copies of your academic certificates, CNIC/B-Form, and passport photos.'],
-                    ['step' => '04', 'title' => 'Fee Deposit', 'description' => 'Deposit the admission fee at the designated bank and attach the original bank receipt.'],
-                    ['step' => '05', 'title' => 'Verification', 'description' => 'Attend the college for document verification and interview if required.'],
-                    ['step' => '06', 'title' => 'Enrolment', 'description' => 'Collect your student ID and timetable from the college office. You are now officially enrolled.'],
+                    ['title' => 'Check Eligibility', 'description' => 'Review the eligibility criteria for your desired program. Ensure you meet the minimum qualification requirements before applying.'],
+                    ['title' => 'Obtain Admission Form', 'description' => 'Download the admission form from our Downloads page or collect a printed copy from the college administration office.'],
+                    ['title' => 'Fill & Submit Form', 'description' => 'Complete the form with accurate personal and academic information. Submit it along with all required documents to the admissions office.'],
+                    ['title' => 'Pay Admission Fee', 'description' => 'Deposit the admission fee at the designated bank and attach the bank receipt with your application.'],
+                    ['title' => 'Document Verification', 'description' => 'Our admissions team will verify your submitted documents. You may be called for an interview or additional verification if required.'],
+                    ['title' => 'Merit List & Confirmation', 'description' => 'Admission is granted on merit. Check the merit list on the college notice board or website. Confirm your admission within the specified deadline.'],
+                    ['title' => 'Enrollment', 'description' => 'Complete the enrollment process by paying the semester fee and obtaining your college ID and roll number.'],
                 ],
             ],
             'fee-structure' => [

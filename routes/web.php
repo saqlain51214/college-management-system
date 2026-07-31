@@ -28,9 +28,6 @@ Route::get('/sitemap.xml',   [PublicController::class, 'sitemap'])->name('sitema
 Route::get('/about',               [PublicController::class, 'about'])->name('about');
 Route::get('/about/history',       [PublicController::class, 'aboutHistory'])->name('about.history');
 Route::get('/about/mission',       [PublicController::class, 'aboutMission'])->name('about.mission');
-Route::get('/about/message',       [PublicController::class, 'aboutMessage'])->name('about.message');
-Route::get('/about/director',      [PublicController::class, 'aboutDirector'])->name('about.director');
-Route::get('/about/principal',     [PublicController::class, 'aboutPrincipal'])->name('about.principal');
 
 // Academics
 Route::get('/programs',            [PublicController::class, 'programs'])->name('programs');
