@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Enums\DepartmentTypeEnum;
-use App\Filament\Clusters\AcademicsCluster;
 use App\Filament\Resources\DepartmentResource\Pages;
 use App\Helpers\ValidationHelper;
 use App\Models\Department;
@@ -19,11 +18,15 @@ class DepartmentResource extends Resource
 {
     protected static ?string $model = Department::class;
 
-    protected static ?string $cluster = AcademicsCluster::class;
-
     protected static ?string $navigationIcon  = 'heroicon-o-building-library';
     protected static ?string $navigationLabel = 'Departments';
     protected static ?int    $navigationSort  = 1;
+
+    // Reached only via Website Pages → Academics → Departments → "Manage".
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     // ─── Form ────────────────────────────────────────────────────────────────
 

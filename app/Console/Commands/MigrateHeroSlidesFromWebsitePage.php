@@ -54,7 +54,7 @@ class MigrateHeroSlidesFromWebsitePage extends Command
         }
 
         $this->info("Migrated {$created} hero slide(s) into the new Homepage Slider module.");
-        $this->info('You can now review/reorder them at Website Management → Homepage Slider.');
+        $this->info('You can now review/reorder them at Website Pages → Home Page → Hero Slider → Manage.');
 
         return self::SUCCESS;
     }

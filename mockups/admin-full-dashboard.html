@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JDCA Admin — Full Dashboard Map (Functional Mockup)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --primary: #6B2D39;
+    --primary-light: #C57E90;
+    --primary-tint: rgba(107,45,57,0.18);
+    --sidebar-bg: #18181b;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --content-bg: #09090b;
+    --panel-bg: #18181b;
+    --panel-border: rgba(255,255,255,0.09);
+    --text: #e4e4e7;
+    --text-soft: #a1a1aa;
+    --text-faint: #71717a;
+    --good: #34d399;
+    --good-bg: rgba(52,211,153,0.14);
+    --warn: #fbbf24;
+    --warn-bg: rgba(251,191,36,0.14);
+    --danger: #f87171;
+    --danger-bg: rgba(248,113,113,0.14);
+    --gray-bg: rgba(255,255,255,0.08);
+    --off-bg: rgba(255,255,255,0.07);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--content-bg); color: var(--text); font-family: var(--font); font-size: 14px; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: var(--font); cursor: pointer; }
+
+  .app { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ─────────────────────────────────────────────────────── */
+  .sidebar { width: 18rem; flex: none; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; overflow-y: auto; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 18px 16px; border-bottom: 1px solid var(--sidebar-border); }
+  .brand-logo { width: 30px; height: 30px; border-radius: 7px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex: none; }
+  .brand-name { font-weight: 600; font-size: 14px; line-height: 1.3; }
+  .brand-name small { display: block; color: var(--text-faint); font-size: 11px; font-weight: 400; }
+
+  nav.nav { padding: 10px 8px 24px; flex: 1; }
+  .nav-items { display: flex; flex-direction: column; gap: 1px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 6px; font-size: 13.3px; color: var(--text-soft); border: none; background: none; width: 100%; text-align: left; }
+  .nav-item svg { width: 15px; height: 15px; flex: none; color: var(--text-faint); }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: var(--primary-tint); color: #fff; font-weight: 600; }
+  .nav-item.active svg { color: var(--primary-light); }
+  .nav-item.top { padding-left: 10px; }
+  .nav-item.sub { padding-left: 30px; font-size: 12.8px; }
+
+  .nav-group { margin-top: 2px; }
+  .nav-group-label { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint); cursor: pointer; border-radius: 6px; }
+  .nav-group-label:hover { background: rgba(255,255,255,0.03); }
+  .nav-group-label .chev { transition: transform .15s ease; color: var(--text-faint); flex: none; }
+  .nav-group.collapsed .chev { transform: rotate(-90deg); }
+  .nav-group.collapsed .nav-items { display: none; }
+
+  .cluster-badge { font-size: 8.5px; font-weight: 700; letter-spacing: 0.03em; padding: 1px 5px; border-radius: 999px; background: var(--primary); color: #fff; margin-left: 6px; }
+
+  /* ── Topbar ──────────────────────────────────────────────────────── */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar { height: 56px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid var(--panel-border); background: var(--sidebar-bg); }
+  .breadcrumb { font-size: 13px; color: var(--text-soft); }
+  .breadcrumb b { color: #fff; font-weight: 600; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; }
+
+  .content { padding: 26px 30px 60px; overflow-y: auto; max-width: 1180px; }
+  .page-head { margin-bottom: 18px; }
+  .page-head h1 { margin: 0 0 5px; font-size: 21px; font-weight: 650; }
+  .page-head p { margin: 0; color: var(--text-soft); font-size: 13.5px; max-width: 72ch; line-height: 1.55; }
+
+  .mock-banner { display: flex; gap: 10px; align-items: flex-start; background: rgba(217,180,78,0.1); border: 1px solid rgba(217,180,78,0.35); border-radius: 10px; padding: 11px 14px; font-size: 12.5px; color: #E9CE8E; margin-bottom: 22px; }
+  .unchanged-banner { display: flex; gap: 10px; align-items: flex-start; background: rgba(255,255,255,0.04); border: 1px solid var(--panel-border); border-radius: 10px; padding: 10px 14px; font-size: 12.5px; color: var(--text-soft); margin-bottom: 18px; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Tables ──────────────────────────────────────────────────────── */
+  .panel { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden; margin-bottom: 22px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th { text-align: left; padding: 10px 18px; font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-faint); border-bottom: 1px solid var(--panel-border); }
+  tbody td { padding: 12px 18px; border-bottom: 1px solid var(--panel-border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody tr.is-disabled { opacity: 0.5; }
+
+  .sec-name-wrap { display: flex; align-items: center; gap: 8px; }
+  .sec-name { font-weight: 600; color: #fff; cursor: text; padding: 3px 7px; border-radius: 6px; border: 1px solid transparent; }
+  .sec-name:hover { border-color: var(--panel-border); background: rgba(255,255,255,0.03); }
+  .sec-name input { background: rgba(255,255,255,0.05); border: 1px solid var(--primary-light); border-radius: 6px; padding: 3px 7px; color: #fff; font-size: 13.5px; font-weight: 600; font-family: var(--font); width: 100%; }
+  .rename-hint { color: var(--text-faint); font-size: 10.5px; }
+
+  .type-badge { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 999px; }
+  .type-badge.page { background: rgba(107,45,57,0.22); color: var(--primary-light); }
+  .type-badge.collection { background: rgba(255,255,255,0.08); color: var(--text-soft); }
+
+  .status-toggle { display: inline-flex; align-items: center; gap: 7px; border: none; background: none; padding: 0; color: var(--text-soft); font-size: 12.5px; font-weight: 600; }
+  .status-toggle .dot { width: 34px; height: 18px; border-radius: 999px; background: var(--good-bg); position: relative; flex: none; transition: background 0.15s; }
+  .status-toggle .dot::after { content: ""; position: absolute; top: 2px; right: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--good); transition: all 0.15s; }
+  .status-toggle.off .dot { background: var(--off-bg); }
+  .status-toggle.off .dot::after { background: var(--text-faint); left: 2px; right: auto; }
+  .status-toggle .label { color: var(--good); }
+  .status-toggle.off .label { color: var(--text-faint); }
+
+  .count-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-soft); }
+  .count-pill b { color: #fff; font-weight: 700; }
+  .manage-link { font-size: 12.5px; font-weight: 650; color: var(--primary-light); }
+  .manage-link:hover { text-decoration: underline; }
+
+  .row-actions { display: flex; gap: 12px; align-items: center; }
+  .icon-btn { display: inline-flex; border: none; background: none; color: var(--text-faint); padding: 4px; border-radius: 6px; }
+  .icon-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
+  .icon-btn svg { width: 17px; height: 17px; }
+
+  .not-live-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--danger-bg); color: var(--danger); margin-left: 8px; }
+  .cross-link-note { color: var(--text-faint); font-size: 11.5px; }
+
+  .badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; display: inline-block; }
+  .badge.good { background: var(--good-bg); color: var(--good); }
+  .badge.warn { background: var(--warn-bg); color: var(--warn); }
+  .badge.danger { background: var(--danger-bg); color: var(--danger); }
+  .badge.gray { background: var(--gray-bg); color: var(--text-soft); }
+  .badge.primary { background: var(--primary-tint); color: var(--primary-light); }
+
+  .note-card { background: var(--panel-bg); border: 1px dashed var(--panel-border); border-radius: 12px; padding: 30px; text-align: center; color: var(--text-faint); font-size: 13.5px; }
+
+  /* ── Dashboard stat/action cards ─────────────────────────────────── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; padding: 16px 18px; }
+  .stat-card .num { font-size: 24px; font-weight: 700; color: #fff; }
+  .stat-card .lbl { font-size: 12px; color: var(--text-faint); margin-top: 3px; }
+
+  .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 26px; }
+  .action-card { border-radius: 12px; padding: 16px 18px; border: 1px solid; }
+  .action-card.attn { background: var(--danger-bg); border-color: rgba(248,113,113,0.35); }
+  .action-card.ok { background: rgba(255,255,255,0.02); border-color: var(--panel-border); }
+  .action-card .num { font-size: 22px; font-weight: 700; }
+  .action-card.attn .num { color: var(--danger); }
+  .action-card.ok .num { color: var(--good); }
+  .action-card .lbl { font-size: 12px; color: var(--text-soft); margin-top: 3px; }
+
+  /* ── Modal ───────────────────────────────────────────────────────── */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+  .modal-backdrop.open { display: flex; }
+  .modal { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 14px; width: 560px; max-width: 100%; max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.6); }
+  .modal.drill-modal { width: 720px; }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--panel-border); }
+  .modal-head h3 { margin: 0; font-size: 15.5px; font-weight: 650; }
+  .modal-head .close-x { color: var(--text-faint); background: none; border: none; font-size: 18px; }
+  .modal-body { padding: 18px 20px; }
+  .drill-note { font-size: 12.5px; color: var(--text-faint); padding: 0 20px 14px; margin: 0; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 650; margin-bottom: 6px; color: var(--text); }
+  .field input, .field textarea { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); border-radius: 8px; padding: 9px 11px; color: var(--text); font-size: 13.5px; font-family: var(--font); }
+  .field .help { margin-top: 5px; font-size: 11.5px; color: var(--text-faint); }
+
+  .rep-item { background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 10px; padding: 12px 14px; margin-bottom: 9px; }
+  .rep-item .rep-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .rep-item .rep-head span { font-size: 12.5px; font-weight: 650; color: var(--text-soft); }
+  .rep-item .rep-remove { color: var(--danger); background: none; border: none; font-size: 11.5px; font-weight: 650; }
+  .add-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px dashed var(--panel-border); background: none; color: var(--text-soft); font-size: 12.5px; font-weight: 650; }
+  .add-btn:hover { color: #fff; border-color: var(--primary-light); }
+
+  .modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--panel-border); }
+  .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 650; border: none; }
+  .btn-ghost { background: none; color: var(--text-soft); }
+  .btn-ghost:hover { color: #fff; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { opacity: 0.9; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--good-bg); border: 1px solid rgba(52,211,153,0.4); color: var(--good); padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 650; opacity: 0; transform: translateY(8px); transition: all 0.2s; pointer-events: none; z-index: 200; max-width: 380px; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .dept-block { border-bottom: 1px solid var(--panel-border); }
+  .dept-block:last-child { border-bottom: none; }
+  .dept-row { display: flex; align-items: center; gap: 10px; padding: 11px 20px; cursor: pointer; }
+  .dept-row:hover { background: rgba(255,255,255,0.02); }
+  .dept-row .chev { width: 12px; height: 12px; color: var(--text-faint); transition: transform 0.15s; flex: none; }
+  .dept-row.expanded .chev { transform: rotate(90deg); }
+  .dept-row .dept-name { font-weight: 650; flex: 1; }
+  .dept-row .dept-count { font-size: 11.5px; color: var(--text-faint); }
+  .prog-list { display: none; padding: 0 20px 10px 46px; }
+  .dept-row.expanded + .prog-list { display: block; }
+  .prog-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; font-size: 13px; color: var(--text-soft); border-bottom: 1px dashed var(--panel-border); }
+  .prog-item:last-child { border-bottom: none; }
+
+  .flat-list { padding: 4px 0; }
+  .flat-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-bottom: 1px solid var(--panel-border); }
+  .flat-item:last-child { border-bottom: none; }
+  .flat-item .sec-name-wrap { flex: 1; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ══════════════════════════ SIDEBAR ══════════════════════════ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">JD</div>
+      <div class="brand-name">Jinnah Degree College Astore<small>Admin Panel — Full Map</small></div>
+    </div>
+
+    <nav class="nav" id="navRoot"><!-- rendered by JS from navConfig below --></nav>
+  </aside>
+
+  <!-- ══════════════════════════ MAIN ══════════════════════════ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="breadcrumb"><b id="breadcrumb-current">Dashboard</b></div>
+      <div class="avatar">SR</div>
+    </div>
+
+    <div class="content" id="contentRoot">
+
+      <div class="mock-banner">
+        <span>⚠</span>
+        <span><b>Functional mockup — not the live app.</b> Every sidebar item below is clickable. "Website Pages" now holds everything about the public site in one group — Home Page / About Us / Academics / Admission (fully interactive: rename, toggle, edit, drill into sub-lists) plus Notices / News / Events / Downloads / Other Pages (shown as-is, unchanged). Everything else below is shown "unchanged, for reference" so the full map is in one place.</span>
+      </div>
+
+      <!-- All screens get injected here by JS -->
+      <div id="screensRoot"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ EDIT MODAL ══════════════════════════ -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle">Edit Section</h3><button class="close-x" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveModal()">Save</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ DRILL-DOWN MODAL ══════════════════════════ -->
+<div class="modal-backdrop" id="drillBackdrop" onclick="if(event.target===this) closeDrill()">
+  <div class="modal drill-modal">
+    <div class="modal-head"><h3 id="drillTitle">Manage</h3><button class="close-x" onclick="closeDrill()">✕</button></div>
+    <p class="drill-note" id="drillNote"></p>
+    <div id="drillBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   1) SIDEBAR CONFIG — every group + item in the real admin, one place
+   ════════════════════════════════════════════════════════════════════ */
+const navConfig = [
+  { kind: 'single', tab: 'dashboard', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+  { kind: 'group', label: 'Website Pages', cluster: true, open: true, items: [
+    { tab: 'home', label: 'Home Page', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 8h16M4 4h16v16H4V4z' },
+    { tab: 'about', label: 'About Us', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { tab: 'academics', label: 'Academics', icon: 'M4 21V9l8-5 8 5v12M9 21v-6h6v6' },
+    { tab: 'admission', label: 'Admission', icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622' },
+    { tab: 'notices', label: 'Notices' },
+    { tab: 'news_admin', label: 'News' },
+    { tab: 'events_admin', label: 'Events' },
+    { tab: 'downloads_admin', label: 'Downloads' },
+    { tab: 'websitepages_other', label: 'Other Pages (Contact Us, etc.)' },
+  ]},
+  { kind: 'group', label: 'Students & Admissions', items: [
+    { tab: 'students', label: 'Students' },
+    { tab: 'admissions_inq', label: 'Admission Inquiries' },
+  ]},
+  { kind: 'group', label: 'Faculty & Staff', items: [
+    { tab: 'teachers', label: 'Teachers / Faculty' },
+    { tab: 'jobpostings', label: 'Job Postings' },
+    { tab: 'jobapps', label: 'Job Applications' },
+  ]},
+  { kind: 'group', label: 'Fees & Billing', items: [
+    { tab: 'feestructure', label: 'Fee Structure' },
+    { tab: 'feepayments', label: 'Fee Payments' },
+    { tab: 'proofreview', label: 'Proof Review' },
+    { tab: 'feereports', label: 'Fee Reports' },
+    { tab: 'studentledger', label: 'Student Account' },
+    { tab: 'refunds', label: 'Refunds' },
+    { tab: 'feeslip', label: 'Fee Slip Templates' },
+  ]},
+  { kind: 'group', label: 'Scholarships', items: [
+    { tab: 'scholarships_cat', label: 'Scholarships' },
+    { tab: 'scholarship_awards', label: 'Scholarship Awards' },
+  ]},
+  { kind: 'group', label: 'Payroll', items: [
+    { tab: 'teachersalaries', label: 'Teacher Salaries' },
+    { tab: 'payrollledger', label: 'Payroll Ledger' },
+  ]},
+  { kind: 'group', label: 'Communications', items: [
+    { tab: 'contactmessages', label: 'Contact Messages' },
+    { tab: 'emailtemplates', label: 'Email Templates' },
+  ]},
+  { kind: 'group', label: 'System', items: [
+    { tab: 'roles', label: 'Roles' },
+    { tab: 'activitylog', label: 'Activity Log' },
+    { tab: 'listitems', label: 'List Items' },
+    { tab: 'settings', label: 'Settings' },
+  ]},
+];
+
+/* ════════════════════════════════════════════════════════════════════
+   2) SECTIONS DATA — the 4 fully-interactive "Website Pages" screens
+   ════════════════════════════════════════════════════════════════════ */
+const sections = {
+  home: [
+    { id:'hero', name:'Hero Slider', type:'collection', count:3 },
+    { id:'msgdesk', name:'Message Desk Design', type:'page', status:true, kind:'text', fields:{ intro_title:'Leadership Message Desk', intro_text:'Template picker — controls which design shows the messages below.' } },
+    { id:'leadership_x', name:'Leadership Messages', type:'collection', count:3, crossLink:'Managed under About Us — shown here for reference only.' },
+    { id:'programs_teaser', name:'Featured Programmes (teaser)', type:'page', status:true, kind:'text', fields:{ intro_title:'Programmes Offered', intro_text:'Discover our comprehensive range of academic programs designed to prepare you for success.' } },
+    { id:'news', name:'Latest News', type:'collection', count:4 },
+    { id:'home_sections', name:'Home Sections (Elevate Learning / Campus Life / Testimonials)', type:'page', status:false, notLive:true, kind:'text', fields:{ intro_title:'', intro_text:'Decision pending — this currently edits data that never shows on the live site. Wire it in, or remove it?' } },
+  ],
+  about: [
+    { id:'about_intro', name:'About (intro)', type:'page', status:true, kind:'text', fields:{ intro_title:'About Jinnah Degree College', intro_text:'A premier college combining board-focused intermediate programmes with modern labs, digital learning, and pathways into Pakistan’s top universities.' } },
+    { id:'history', name:'History & Geography', type:'page', status:true, kind:'text', fields:{ intro_title:'History & Location', intro_text:'Institutional history, campus location in Astore, and how we connect with the region’s education landscape.' } },
+    { id:'mission', name:'Mission & Vision', type:'page', status:true, kind:'text', fields:{ intro_title:'Mission & Vision', intro_text:'Formal mission, vision, and graduate attributes aligned with national goals and educational quality themes.' } },
+    { id:'leadership', name:'Leadership Messages', type:'collection', count:3, detail:'Prof. Dr. Abdul Razaq (Vice Chancellor) · Prof. Muhammad Alam (Director Higher Education) · Arif Ali (Focal Person)' },
+    { id:'facilities', name:'Campus Facilities', type:'page', status:true, kind:'repeater', repItems:[
+        {title:'Classrooms', description:'Modern, well-ventilated classrooms equipped for effective teaching.'},
+        {title:'Library', description:'A growing collection of academic books and reference materials.'},
+        {title:'Computer Lab', description:'ICT-equipped lab supporting digital learning.'},
+      ] },
+    { id:'gallery', name:'Campus Gallery', type:'page', status:false, kind:'repeater', repItems:[] },
+  ],
+  academics: [
+    { id:'departments', name:'Departments', type:'collection', count:6 },
+    { id:'programs', name:'Academic Programs', type:'collection', count:12 },
+    { id:'faculty', name:'Faculty Profile', type:'collection', count:19, crossLink:'Managed under Faculty & Staff — shown here for reference only.' },
+    { id:'semester_rules', name:'Semester Rules', type:'page', status:true, kind:'text', fields:{ intro_title:'Semester Rules & Regulations', intro_text:'Academic rules, attendance requirements, and examination policies for all students of JDCA.' } },
+    { id:'course_outlines', name:'Course Outlines', type:'collection', count:12 },
+  ],
+  admission: [
+    { id:'procedure', name:'Admission Procedure', type:'page', status:true, kind:'repeater', repItems:[
+        {title:'Check Eligibility', description:'Review the eligibility criteria for your desired program.'},
+        {title:'Obtain Admission Form', description:'Download from Downloads or collect a printed copy.'},
+        {title:'Fill & Submit Form', description:'Submit with all required documents to the admissions office.'},
+      ] },
+    { id:'online_admission', name:'Online Admission Form (intro)', type:'page', status:true, kind:'text', fields:{ intro_title:'Online admission form', intro_text:'Multi-step application aligned with common Pakistani college portals.' } },
+    { id:'fee_structure', name:'Fee Structure (info page)', type:'page', status:true, kind:'text', fields:{ intro_title:'Fee Structure', intro_text:'Transparent fee information for all programmes offered at JDCA.' } },
+    { id:'scholarships', name:'Scholarships', type:'collection', count:4, crossLink:'Managed under the existing Scholarships group — shown here for reference only.' },
+  ],
+};
+
+const drillData = {
+  departments: { note:'This is the existing Departments list. Expand a department to see its programs (already managed here, not duplicated elsewhere).', kind:'nested', items:[
+    { name:'Department of Education', programs:['Associate Degree in Education','B.Ed 1.5 Year','B.Ed 2.5 Year','Bachelor of Education','Master of Education'] },
+    { name:'Department of Physical Education', programs:['Associate Degree in Health & Physical Education','Bachelor of Science in Physical Education'] },
+    { name:'Department of Computer Science', programs:['Bachelor of Science in Computer Science','Certificate in Computer Applications'] },
+    { name:'Department of English', programs:['Bachelor of Science in English'] },
+    { name:'Department of Sociology', programs:['Associate Degree in Sociology'] },
+    { name:'Department of Continuous Education', programs:['Diploma in Education'] },
+  ]},
+  programs: { note:'Same programs, flat — the Academic Programs list.', kind:'flat', items:['Associate Degree in Education','B.Ed 1.5 Year','B.Ed 2.5 Year','Bachelor of Education','Master of Education','Bachelor of Science in Computer Science','Certificate in Computer Applications'] },
+  faculty: { note:'Existing Teacher / Faculty list — stays owned by Faculty & Staff.', kind:'flat', items:['Mr. Ibrar Hussain — Associate Professor','Aurangzeb Ali — Lecturer','Fatima Niamat Khan — Lecturer','Arif Ali — Lecturer'] },
+  course_outlines: { note:'Existing Course Outlines list, grouped by department and semester.', kind:'flat', items:['Department of Education — Semester 1','Department of Education — Semester 2','Department of Computer Science — Semester 1'] },
+  leadership: { note:'Rename any of these and the "About Us" menu updates to match — try renaming "Focal Person".', kind:'rename-list', items:[
+    { name:'Prof. Dr. Abdul Razaq', designation:'Vice Chancellor' }, { name:'Prof. Muhammad Alam', designation:'Director Higher Education, GB' }, { name:'Arif Ali', designation:'Focal Person' },
+  ]},
+  leadership_x: { note:'Same list, managed once under About Us — this link just jumps there.', kind:'rename-list', items:[
+    { name:'Prof. Dr. Abdul Razaq', designation:'Vice Chancellor' }, { name:'Prof. Muhammad Alam', designation:'Director Higher Education, GB' }, { name:'Arif Ali', designation:'Focal Person' },
+  ]},
+  scholarships: { note:'Existing Scholarships list — stays owned by the Scholarships group.', kind:'rename-list', items:[
+    { name:'Merit Scholarship', designation:'Merit-Based' }, { name:'Need-Based Scholarship', designation:'Need-Based' }, { name:'Orphan Scholarship', designation:'Orphan' }, { name:'Special Category Scholarship', designation:'Special Category' },
+  ]},
+  news: { note:'Existing News Articles list.', kind:'flat', items:['Admissions Open — New Academic Session','Annual Prize Distribution Ceremony','New Computer Laboratory Inaugurated'] },
+  hero: { note:'Existing Homepage Slider list.', kind:'flat', items:["Shaping Minds for Tomorrow's World",'Excellence in Academic Achievement','Vibrant Campus & Student Life'] },
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   3) SIMPLE MODULES — the "unchanged, for reference" screens
+   ════════════════════════════════════════════════════════════════════ */
+const B = (text, color) => ({ badge: text, color });
+const simpleModules = {
+  dashboard: { kind:'dashboard', title:'Dashboard', desc:'Overview + the Action Center — cards that always read as a to-do list, not a wall of numbers.' },
+
+  students: { title:'Students', desc:'268 active students.', columns:['Roll No','Name','Program','Semester','Status'], rows:[
+    ['DEPT-CS-2026-0002','saqlain raza','BS Computer Science','S1',B('Active','good')],
+    ['JDCA-2026-0076','Tariq Hussain','B.Ed 1.5 Year','S1',B('Active','good')],
+    ['JDCA-2026-0001','Shafeeta Begum','Associate Degree in Education','S1',B('Active','good')],
+  ]},
+  admissions_inq: { title:'Admission Inquiries', desc:'1 new inquiry.', columns:['Applicant','Program Applied','Status','Date'], rows:[
+    ['Arif Ali','Associate Degree in Education',B('New','gray'),'28 Jul 2026'],
+  ]},
+
+  teachers: { title:'Teachers / Faculty', desc:'19 active teachers.', columns:['Name','Designation','Department','Status'], rows:[
+    ['Mr. Ibrar Hussain','Associate Professor','Department of Education',B('Active','good')],
+    ['Arif Ali','Lecturer','Department of Computer Science',B('Active','good')],
+    ['Zakia Batool','Lecturer','Department of English',B('Active','good')],
+  ]},
+  jobpostings: { title:'Job Postings', desc:'Already shipped — Live/Expired/Hidden status, and an "Extend" action to push out an expired apply-by date.', columns:['Title','Department','Type','Status','Apply By'], rows:[
+    ['Lecturer — Computer Science','Dept. of Computer Science',B('Full-time','primary'),B('Live','good'),'—'],
+    ['Office Assistant','Administration',B('Full-time','primary'),B('Expired','danger'),'20 Jul 2026'],
+  ]},
+  jobapps: { title:'Job Applications', desc:'1 new application.', columns:['Applicant','Position','Status','Date'], rows:[
+    ['M. Kamran','Lecturer — Computer Science',B('New','gray'),'29 Jul 2026'],
+  ]},
+
+  feestructure: { title:'Fee Structure', desc:'Real billing amounts per program/year (different from the "Fee Structure" info page under Admission, which is just descriptive text).', columns:['Program','Fee Type','Amount','Academic Year'], rows:[
+    ['B.Ed 1.5 Year','Tuition','Rs. 25,000','2026-2027'],
+    ['B.Ed 1.5 Year','Admission','Rs. 10,000','2026-2027'],
+  ]},
+  feepayments: { title:'Fee Payments', desc:'', columns:['Student','Challan #','Amount','Status'], rows:[
+    ['saqlain raza','CHN-CQ0NI7M3','Rs. 10,000',B('Pending','warn')],
+    ['Tariq Hussain','CHN-16AYC4IN','Rs. 23,000',B('Pending','warn')],
+  ]},
+  proofreview: { title:'Proof Review', desc:'Payment proofs students uploaded, awaiting confirmation.', columns:['Student','Challan','Claimed Amount','Uploaded'], rows:[
+    ['Abdul Baqi','CHN-ESDIBLIF','Rs. 10,000','27 Jul 2026'],
+  ]},
+  feereports: { title:'Fee Reports', desc:'Charts & collection summaries screen.', note:true },
+  studentledger: { title:'Student Account', desc:'Search a student to see every challan, in one place.', note:true },
+  refunds: { title:'Refunds', desc:'', columns:['Student','Amount','Reason','Status'], rows:[
+    ['Saqlain (#268)','Rs. 1,000','refund',B('Approved','good')],
+  ]},
+  feeslip: { title:'Fee Slip Templates', desc:'', columns:['Template Name','Variant','Active'], rows:[
+    ['KIU Style (Default)','kiu',B('Active','good')],
+  ]},
+
+  scholarships_cat: { title:'Scholarships', desc:'The 4 scholarship types — stays here (not moved), the Admission page just links to it.', columns:['Name','Type','Coverage','Active'], rows:[
+    ['Merit Scholarship','Merit','20%',B('Active','good')],
+    ['Need-Based Scholarship','Need-Based','Rs. 5,000',B('Active','good')],
+  ]},
+  scholarship_awards: { title:'Scholarship Awards', desc:'Who actually received an award.', columns:['Student','Scholarship','Status','Amount'], rows:[
+    ['saqlain raza (#270)','Merit Scholarship',B('Approved','good'),'20%'],
+  ]},
+
+  teachersalaries: { title:'Teacher Salaries', desc:'', columns:['Teacher','Month','Net Amount','Status'], rows:[
+    ['Ibrar Hussain','Jul 2026','Rs. 10,500',B('Paid','good')],
+    ['Aurangzeb Ali','Jul 2026','Rs. 17,000',B('Paid','good')],
+  ]},
+  payrollledger: { title:'Payroll Ledger', desc:'Per-teacher payment history screen.', note:true },
+
+  contactmessages: { title:'Contact Messages', desc:'3 unread.', columns:['Name','Subject','Status','Date'], rows:[
+    ['Pranab T','Mobile app proposal',B('Unread','warn'),'25 Jul 2026'],
+  ]},
+  emailtemplates: { title:'Email Templates', desc:'Wording for every automated email/notification.', columns:['Key','Name','Channel'], rows:[
+    ['fee_overdue','Fee Overdue — Student','Mail + In-app'],
+    ['scholarship_awarded','Scholarship Awarded — Student','Mail + In-app'],
+  ]},
+
+  notices: { title:'Notices', desc:'', columns:['Title','Priority','Published'], rows:[
+    ['Fee Submission Schedule Announced','Medium',B('Published','good')],
+  ]},
+  news_admin: { title:'News', desc:'', columns:['Title','Category','Date'], rows:[
+    ['Admissions Open — New Academic Session','Admissions','15 Jul 2026'],
+  ]},
+  websitepages_other: { title:'Other Pages', desc:'The remaining simple one-off pages that don\'t belong to Home/About/Academics/Admission — e.g. Contact Us.', columns:['Page','Section','Published'], rows:[
+    ['Downloads','Other',B('Published','good')],
+    ['Contact Us','Other',B('Published','good')],
+  ]},
+  events_admin: { title:'Events', desc:'', columns:['Title','Date','Published'], rows:[
+    ['Admission Test — New Session','25 Jul 2026',B('Published','good')],
+  ]},
+  downloads_admin: { title:'Downloads', desc:'', columns:['Title','File Type','Category'], rows:[
+    ['Admission Form 2026','PDF','Forms'],
+  ]},
+
+  roles: { title:'Roles', desc:'', columns:['Name','Users'], rows:[['super_admin','1'],['admin','0']] },
+  activitylog: { title:'Activity Log', desc:'', columns:['Actor','Event','Subject','Date'], rows:[['Admin','Created','Student','30 Jul 2026']] },
+  listitems: { title:'List Items', desc:'Dropdown option lists used across forms (provinces, qualifications, etc).', columns:['Category','Value','Label'], rows:[['province','gilgit_baltistan','Gilgit-Baltistan']] },
+  settings: { title:'Settings', desc:'General college settings form.', note:true },
+};
+
+const groupLabelByTab = {};
+navConfig.forEach(g => {
+  if (g.kind === 'single') { groupLabelByTab[g.tab] = g.label; return; }
+  g.items.forEach(it => groupLabelByTab[it.tab] = g.label + ' / ' + it.label);
+});
+
+/* ════════════════════════════════════════════════════════════════════
+   4) RENDER SIDEBAR
+   ════════════════════════════════════════════════════════════════════ */
+function renderSidebar() {
+  const root = document.getElementById('navRoot');
+  root.innerHTML = navConfig.map((g, gi) => {
+    if (g.kind === 'single') {
+      return `<div class="nav-items"><button class="nav-item top" data-tab="${g.tab}" onclick="showTab('${g.tab}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="${g.icon}"/></svg>${g.label}</button></div>`;
+    }
+    const collapsed = g.open ? '' : 'collapsed';
+    return `
+      <div class="nav-group ${collapsed}" id="grp-${gi}">
+        <div class="nav-group-label" onclick="document.getElementById('grp-${gi}').classList.toggle('collapsed')">
+          <span>${g.label}${g.cluster ? '<span class="cluster-badge">CLUSTER</span>' : ''}</span>
+          <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="nav-items">
+          ${g.items.map(it => `<button class="nav-item sub" data-tab="${it.tab}" onclick="showTab('${it.tab}')">${it.icon ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="${it.icon}"/></svg>` : ''}${it.label}</button>`).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   5) RENDER SCREENS
+   ════════════════════════════════════════════════════════════════════ */
+function iconEye() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>'; }
+function iconPencil() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>'; }
+
+const sectionsScreenText = {
+  home: { h1:'Home Page — Sections', p:'Every section that makes up the homepage, in the order it renders. Rename, hide, preview or edit any of them from one table.' },
+  about: { h1:'About Us — Sections', p:'Try it: click "Message from Principal" via Leadership Messages → Manage, and rename it — that\'s the exact change you asked about.' },
+  academics: { h1:'Academics — Sections', p:'Departments, Programs and Course Outlines are each a real list of records, so their rows show a count + "Manage" link instead of one on/off switch.' },
+  admission: { h1:'Admission — Sections', p:'"Download Fee Challan" isn\'t listed — it\'s a working self-service tool with nothing to edit, not page content.' },
+};
+
+function buildScreens() {
+  const root = document.getElementById('screensRoot');
+  let html = '';
+
+  // Dashboard
+  html += `<div class="screen" id="tab-dashboard">
+    <div class="page-head"><h1>Dashboard</h1><p>What's already built — stat overview plus an Action Center that reads as a to-do list.</p></div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">268</div><div class="lbl">Active Students</div></div>
+      <div class="stat-card"><div class="num">19</div><div class="lbl">Active Teachers</div></div>
+      <div class="stat-card"><div class="num">12</div><div class="lbl">Academic Programs</div></div>
+      <div class="stat-card"><div class="num">Rs. 33,000</div><div class="lbl">Collected This Month</div></div>
+    </div>
+    <div class="action-grid">
+      <div class="action-card attn"><div class="num">1</div><div class="lbl">Pending Proof Reviews</div></div>
+      <div class="action-card attn"><div class="num">3</div><div class="lbl">Overdue Fees</div></div>
+      <div class="action-card ok"><div class="num">0</div><div class="lbl">Pending Refund Requests</div></div>
+      <div class="action-card ok"><div class="num">0</div><div class="lbl">Pending Scholarship Approvals</div></div>
+    </div>
+  </div>`;
+
+  // 4 interactive Sections screens
+  ['home','about','academics','admission'].forEach(key => {
+    const t = sectionsScreenText[key];
+    html += `<div class="screen" id="tab-${key}">
+      <div class="page-head"><h1>${t.h1}</h1><p>${t.p}</p></div>
+      <div class="panel"><table>
+        <thead><tr><th style="width:34%">Section</th><th>Type</th><th>Status</th><th style="width:110px"></th></tr></thead>
+        <tbody id="rows-${key}"></tbody>
+      </table></div>
+    </div>`;
+  });
+
+  // Simple modules
+  Object.keys(simpleModules).forEach(key => {
+    if (key === 'dashboard') return;
+    const m = simpleModules[key];
+    html += `<div class="screen" id="tab-${key}">
+      <div class="page-head"><h1>${m.title}</h1><p>${m.desc || ''}</p></div>
+      <div class="unchanged-banner"><span>ℹ</span><span>Unchanged, existing screen — shown here just so the full sidebar map is in one place.</span></div>
+      ${m.note
+        ? `<div class="note-card">Existing screen — form / report / search UI, not a list, so no rows to preview here.</div>`
+        : `<div class="panel"><table>
+            <thead><tr>${m.columns.map(c => `<th>${c}</th>`).join('')}</tr></thead>
+            <tbody>${m.rows.map(r => `<tr>${r.map(cell => `<td>${typeof cell === 'object' ? `<span class="badge ${cell.color}">${cell.badge}</span>` : cell}</td>`).join('')}</tr>`).join('')}</tbody>
+          </table></div>`}
+    </div>`;
+  });
+
+  root.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   6) SECTIONS TABLE INTERACTIVITY (rename / toggle / edit / drill)
+   ════════════════════════════════════════════════════════════════════ */
+function renderRows(groupKey) {
+  const tbody = document.getElementById('rows-' + groupKey);
+  if (!tbody) return;
+  tbody.innerHTML = sections[groupKey].map((s, idx) => {
+    const rowClass = (s.type === 'page' && s.status === false) ? 'is-disabled' : '';
+    const nameCell = `
+      <div class="sec-name-wrap">
+        <span class="sec-name" data-group="${groupKey}" data-idx="${idx}" onclick="startRename(this)">${s.name}</span>
+        ${s.type === 'page' ? '<span class="rename-hint" title="Click name to rename">✎</span>' : ''}
+        ${s.notLive ? '<span class="not-live-tag">Not live yet</span>' : ''}
+      </div>
+      ${s.crossLink ? `<div class="cross-link-note">${s.crossLink}</div>` : ''}
+      ${s.detail ? `<div class="cross-link-note">${s.detail}</div>` : ''}
+    `;
+    const typeCell = `<span class="type-badge ${s.type}">${s.type === 'page' ? 'Page' : 'Collection'}</span>`;
+    let statusCell;
+    if (s.type === 'page') {
+      statusCell = `<button class="status-toggle ${s.status ? '' : 'off'}" data-group="${groupKey}" data-idx="${idx}" onclick="toggleStatus(this)"><span class="dot"></span><span class="label">${s.status ? 'Live' : 'Hidden'}</span></button>`;
+    } else {
+      statusCell = `<span class="count-pill"><b>${s.count}</b> active · <a href="#" class="manage-link" onclick="openDrill(event,'${s.id}','${s.name}')">Manage →</a></span>`;
+    }
+    const actionsCell = `<div class="row-actions">
+        <button class="icon-btn" title="Preview" onclick="fakePreview('${s.name}')">${iconEye()}</button>
+        ${s.type === 'page' ? `<button class="icon-btn" title="Edit" onclick="openModal('${groupKey}', ${idx})">${iconPencil()}</button>` : ''}
+      </div>`;
+    return `<tr class="${rowClass}"><td>${nameCell}</td><td>${typeCell}</td><td>${statusCell}</td><td>${actionsCell}</td></tr>`;
+  }).join('');
+}
+
+function startRename(span) {
+  if (span.querySelector('input')) return;
+  const group = span.dataset.group, idx = span.dataset.idx;
+  const current = sections[group][idx].name;
+  span.innerHTML = `<input type="text" value="${current}" onblur="commitRename(this,'${group}',${idx})" onkeydown="if(event.key==='Enter'){this.blur()}" />`;
+  const input = span.querySelector('input');
+  input.focus(); input.select();
+}
+function commitRename(input, group, idx) {
+  sections[group][idx].name = input.value.trim() || sections[group][idx].name;
+  renderRows(group);
+  showToast('Renamed — this is exactly what would change the live menu text, with no URL change.');
+}
+function toggleStatus(btn) {
+  const group = btn.dataset.group, idx = btn.dataset.idx;
+  sections[group][idx].status = !sections[group][idx].status;
+  renderRows(group);
+  showToast(sections[group][idx].status ? 'Section set to Live' : 'Section Hidden from the live site');
+}
+function fakePreview(name) { showToast(`Preview → would open the live "${name}" page in a new tab.`); }
+
+let modalCtx = null;
+function openModal(group, idx) {
+  const s = sections[group][idx];
+  modalCtx = { group, idx };
+  document.getElementById('modalTitle').textContent = 'Edit — ' + s.name;
+  const body = document.getElementById('modalBody');
+  if (s.kind === 'repeater') {
+    body.innerHTML = `<div id="repList">${(s.repItems || []).map((item, i) => repItemHtml(item, i)).join('')}</div><button class="add-btn" onclick="addRepItem()">+ Add Item</button>`;
+  } else {
+    body.innerHTML = `<div class="field"><label>Intro Title</label><input type="text" id="f_intro_title" value="${(s.fields && s.fields.intro_title) || ''}"></div>
+      <div class="field"><label>Intro Text</label><textarea id="f_intro_text" rows="4">${(s.fields && s.fields.intro_text) || ''}</textarea><p class="help">Shown near the top of this page.</p></div>`;
+  }
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+function repItemHtml(item, i) {
+  return `<div class="rep-item" data-i="${i}"><div class="rep-head"><span>Item ${i + 1}</span><button class="rep-remove" onclick="removeRepItem(${i})">Remove</button></div>
+    <div class="field" style="margin-bottom:8px;"><label>Title</label><input type="text" class="rep-title" value="${item.title}"></div>
+    <div class="field" style="margin-bottom:0;"><label>Description</label><textarea class="rep-desc" rows="2">${item.description}</textarea></div></div>`;
+}
+function addRepItem() {
+  const s = sections[modalCtx.group][modalCtx.idx];
+  s.repItems = s.repItems || [];
+  s.repItems.push({ title: 'New Item', description: '' });
+  document.getElementById('repList').innerHTML = s.repItems.map((item, i) => repItemHtml(item, i)).join('');
+}
+function removeRepItem(i) {
+  const s = sections[modalCtx.group][modalCtx.idx];
+  s.repItems.splice(i, 1);
+  document.getElementById('repList').innerHTML = s.repItems.map((item, i2) => repItemHtml(item, i2)).join('');
+}
+function closeModal() { document.getElementById('modalBackdrop').classList.remove('open'); modalCtx = null; }
+function saveModal() {
+  if (!modalCtx) return;
+  const s = sections[modalCtx.group][modalCtx.idx];
+  if (s.kind === 'repeater') {
+    s.repItems = Array.from(document.querySelectorAll('#repList .rep-item')).map(el => ({ title: el.querySelector('.rep-title').value, description: el.querySelector('.rep-desc').value }));
+  } else {
+    s.fields = { intro_title: document.getElementById('f_intro_title').value, intro_text: document.getElementById('f_intro_text').value };
+  }
+  closeModal();
+  showToast('Saved — on the real page this would show immediately on the live site.');
+}
+
+function openDrill(e, id, name) {
+  e.preventDefault();
+  const d = drillData[id];
+  if (!d) { showToast(`Manage → would open the existing "${name}" list screen.`); return; }
+  document.getElementById('drillTitle').textContent = name;
+  document.getElementById('drillNote').innerHTML = d.note;
+  const bodyEl = document.getElementById('drillBody');
+  if (d.kind === 'nested') {
+    bodyEl.innerHTML = d.items.map(dept => `<div class="dept-block">
+        <div class="dept-row" onclick="this.classList.toggle('expanded')">
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          <span class="dept-name">${dept.name}</span><span class="dept-count">${dept.programs.length} program${dept.programs.length === 1 ? '' : 's'}</span>
+          <button class="icon-btn" onclick="event.stopPropagation();showToast('Would open the Department edit form.')">${iconPencil()}</button>
+        </div>
+        <div class="prog-list">${dept.programs.map(p => `<div class="prog-item"><span>${p}</span><button class="icon-btn" onclick="showToast('Would open the Academic Program edit form.')">${iconPencil()}</button></div>`).join('')}</div>
+      </div>`).join('');
+  } else if (d.kind === 'rename-list') {
+    bodyEl.innerHTML = `<div class="flat-list">${d.items.map((item, i) => `<div class="flat-item">
+        <div class="sec-name-wrap"><span class="sec-name" onclick="startDrillRename(this,'${id}',${i})">${item.designation}</span><span class="rename-hint">✎</span><div class="cross-link-note">${item.name}</div></div>
+        <button class="icon-btn" onclick="showToast('Would open the full edit form for this record.')">${iconPencil()}</button>
+      </div>`).join('')}</div>`;
+  } else {
+    bodyEl.innerHTML = `<div class="flat-list">${d.items.map(item => `<div class="flat-item"><span>${item}</span><button class="icon-btn" onclick="showToast('Would open the full edit form for this record.')">${iconPencil()}</button></div>`).join('')}</div>`;
+  }
+  document.getElementById('drillBackdrop').classList.add('open');
+}
+function startDrillRename(span, id, i) {
+  if (span.querySelector('input')) return;
+  const current = drillData[id].items[i].designation;
+  span.innerHTML = `<input type="text" value="${current}" onblur="commitDrillRename(this,'${id}',${i})" onkeydown="if(event.key==='Enter'){this.blur()}" />`;
+  const input = span.querySelector('input'); input.focus(); input.select();
+}
+function commitDrillRename(input, id, i) {
+  drillData[id].items[i].designation = input.value.trim() || drillData[id].items[i].designation;
+  openDrill({ preventDefault(){} }, id, document.getElementById('drillTitle').textContent);
+  showToast('Renamed — the "About Us" nav link for this person now reads "Message from ' + drillData[id].items[i].designation + '".');
+}
+function closeDrill() { document.getElementById('drillBackdrop').classList.remove('open'); }
+
+/* ════════════════════════════════════════════════════════════════════
+   7) TAB SWITCHING + INIT
+   ════════════════════════════════════════════════════════════════════ */
+function showTab(key) {
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('tab-' + key);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-item[data-tab]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll(`.nav-item[data-tab="${key}"]`).forEach(el => el.classList.add('active'));
+  document.getElementById('breadcrumb-current').textContent = groupLabelByTab[key] || key;
+}
+
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3400);
+}
+
+renderSidebar();
+buildScreens();
+['home','about','academics','admission'].forEach(renderRows);
+showTab('dashboard');
+</script>
+
+</body>
+</html>
