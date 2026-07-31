@@ -19,6 +19,17 @@ trait ManagesPageSections
     abstract public function getSections(): array;
 
     /**
+     * Same role gate every other custom admin page in this app uses (see
+     * ProofReview/FeeReports/StudentLedger) — kept consistent rather than
+     * introducing a second, different access-control mechanism just for
+     * these 4 pages.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasAnyRole(['super_admin', 'admin', 'Developer', 'panel_user']) ?? false;
+    }
+
+    /**
      * A single-content section backed by one `WebsitePage` row. `$slug` must
      * match a `WebsitePage::STATIC_PAGES` key.
      */
@@ -60,6 +71,11 @@ trait ManagesPageSections
             return;
         }
 
+        // Same policy WebsitePageResource's own edit screen already enforces
+        // (update_website::page) — renaming here is just a faster path to the
+        // same mutation, so it needs the same permission, not a looser one.
+        abort_unless(auth()->user()?->can('update', $page), 403);
+
         $page->update(['menu_label' => trim($value) ?: null]);
 
         Notification::make()
@@ -76,6 +92,8 @@ trait ManagesPageSections
         if (! $page) {
             return;
         }
+
+        abort_unless(auth()->user()?->can('update', $page), 403);
 
         $page->update(['is_published' => ! $page->is_published]);
 

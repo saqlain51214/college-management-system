@@ -27,6 +27,11 @@ class MessageDeskSettings extends Page
         return false;
     }
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasAnyRole(['super_admin', 'admin', 'Developer', 'panel_user']) ?? false;
+    }
+
     protected static string $view = 'filament.pages.message-desk-settings';
 
     public string $template = 'cards';

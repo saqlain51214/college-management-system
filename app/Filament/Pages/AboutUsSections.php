@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Concerns\ManagesPageSections;
 use App\Filament\Resources\LeadershipMessageResource;
 use App\Models\LeadershipMessage;
@@ -12,7 +11,7 @@ class AboutUsSections extends Page
 {
     use ManagesPageSections;
 
-    protected static ?string $cluster = WebsitePagesCluster::class;
+    protected static ?string $navigationGroup = 'Website Pages';
 
     protected static ?string $navigationIcon = 'heroicon-o-information-circle';
 
