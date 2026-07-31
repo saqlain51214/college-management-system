@@ -87,4 +87,28 @@ class PublicNavAndPagesTest extends TestCase
         $response->assertOk();
         $response->assertSee('Custom Step One');
     }
+
+    public function test_semester_rules_page_renders_default_rule_sections_when_unedited(): void
+    {
+        $response = $this->get(route('admissions.semester-rules'));
+
+        $response->assertOk();
+        $response->assertSee('Attendance Policy');
+        $response->assertSee('Fee & Registration');
+    }
+
+    public function test_semester_rules_page_renders_admin_edited_rule_sections(): void
+    {
+        $page = WebsitePage::where('slug', 'semester-rules')->first();
+        $page->update(['content' => ['rule_sections' => [
+            ['title' => 'Custom Section', 'rules' => ['A brand new rule.']],
+        ]]]);
+
+        $response = $this->get(route('admissions.semester-rules'));
+
+        $response->assertOk();
+        $response->assertSee('Custom Section');
+        $response->assertSee('A brand new rule.');
+        $response->assertDontSee('Attendance Policy');
+    }
 }

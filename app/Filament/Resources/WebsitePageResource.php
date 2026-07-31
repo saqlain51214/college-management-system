@@ -184,6 +184,33 @@ class WebsitePageResource extends Resource
                         ->columnSpanFull(),
                 ]),
 
+            Forms\Components\Section::make('Rule Sections')
+                ->visible(fn (Get $get): bool => $get('slug') === 'semester-rules')
+                ->schema([
+                    Forms\Components\Repeater::make('content.rule_sections')
+                        ->label('Rule Sections')
+                        ->collapsed()
+                        ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                        ->schema([
+                            Forms\Components\TextInput::make('title')
+                                ->label('Section Title')
+                                ->required()
+                                ->placeholder('e.g. Attendance Policy')
+                                ->columnSpanFull(),
+                            Forms\Components\Repeater::make('rules')
+                                ->label('Rules')
+                                ->simple(
+                                    Forms\Components\Textarea::make('rule')->required()->rows(1)
+                                )
+                                ->addActionLabel('Add Rule')
+                                ->reorderable()
+                                ->columnSpanFull(),
+                        ])
+                        ->addActionLabel('Add Section')
+                        ->reorderable()
+                        ->columnSpanFull(),
+                ]),
+
             Forms\Components\Section::make('Page Intro & Content')
                 ->visible(fn (Get $get): bool => $get('slug') !== 'home')
                 ->columns(2)
