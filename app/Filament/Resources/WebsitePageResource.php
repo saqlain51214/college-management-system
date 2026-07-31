@@ -185,12 +185,15 @@ class WebsitePageResource extends Resource
                 ]),
 
             Forms\Components\Section::make('Rule Sections')
+                ->description('Each section below becomes its own numbered card on the public Semester Rules page — add, edit, reorder, or delete sections and individual rules here. Changes go live as soon as you click Save changes.')
+                ->icon('heroicon-o-clipboard-document-list')
                 ->visible(fn (Get $get): bool => $get('slug') === 'semester-rules')
                 ->schema([
                     Forms\Components\Repeater::make('content.rule_sections')
                         ->label('Rule Sections')
                         ->collapsed()
-                        ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                        ->itemLabel(fn (array $state): ?string => ($state['title'] ?: 'Untitled Section')
+                            . ' — ' . count($state['rules'] ?? []) . ' rule' . (count($state['rules'] ?? []) === 1 ? '' : 's'))
                         ->schema([
                             Forms\Components\TextInput::make('title')
                                 ->label('Section Title')
@@ -198,16 +201,23 @@ class WebsitePageResource extends Resource
                                 ->placeholder('e.g. Attendance Policy')
                                 ->columnSpanFull(),
                             Forms\Components\Repeater::make('rules')
-                                ->label('Rules')
+                                ->label('Rules in this section')
                                 ->simple(
-                                    Forms\Components\Textarea::make('rule')->required()->rows(1)
+                                    Forms\Components\Textarea::make('rule')
+                                        ->required()
+                                        ->rows(2)
+                                        ->placeholder('e.g. Students must maintain a minimum of 75% attendance in each subject per semester.')
+                                        ->autosize()
                                 )
-                                ->addActionLabel('Add Rule')
+                                ->addActionLabel('+ Add Rule')
                                 ->reorderable()
+                                ->reorderableWithButtons()
                                 ->columnSpanFull(),
                         ])
-                        ->addActionLabel('Add Section')
+                        ->addActionLabel('+ Add Rule Section')
                         ->reorderable()
+                        ->reorderableWithButtons()
+                        ->deleteAction(fn (Forms\Components\Actions\Action $action) => $action->requiresConfirmation())
                         ->columnSpanFull(),
                 ]),
 
