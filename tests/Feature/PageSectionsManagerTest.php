@@ -92,6 +92,15 @@ class PageSectionsManagerTest extends TestCase
         $this->assertNull(WebsitePage::where('slug', 'about-mission')->first()->menu_label);
     }
 
+    public function test_admission_sections_shows_semester_rules_section_and_rule_count(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(AdmissionSections::class)
+            ->assertSee('Semester Rules')
+            ->assertSee('5 sections')
+            ->assertSee('22 rules');
+    }
+
     public function test_academics_sections_shows_department_and_program_counts(): void
     {
         \App\Models\Department::create(['name' => 'Dept A', 'slug' => 'dept-a', 'type' => 'academic']);
