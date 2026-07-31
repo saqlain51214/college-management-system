@@ -11,6 +11,7 @@ use App\Models\AcademicProgram;
 use App\Models\CourseOutline;
 use App\Models\Department;
 use App\Models\Teacher;
+use App\Models\WebsitePage;
 use Filament\Pages\Page;
 
 class AcademicsSections extends Page
@@ -40,8 +41,17 @@ class AcademicsSections extends Page
                 TeacherResource::getUrl('index'),
                 ['crossLink' => 'Managed under Faculty & Staff — shown here for reference only.']
             ),
-            $this->pageRow('semester-rules', 'Semester Rules'),
+            $this->pageRow('semester-rules', 'Semester Rules', ['detail' => $this->semesterRulesDetail()]),
             $this->collectionRow('Course Outlines', CourseOutline::count(), CourseOutlineResource::getUrl('index')),
         ];
+    }
+
+    protected function semesterRulesDetail(): string
+    {
+        $page = WebsitePage::where('slug', 'semester-rules')->first();
+        $sections = $page?->content['rule_sections'] ?? WebsitePage::defaultContentFor('semester-rules')['rule_sections'];
+        $ruleCount = collect($sections)->sum(fn ($section) => count($section['rules'] ?? []));
+
+        return count($sections) . ' section' . (count($sections) === 1 ? '' : 's') . ' · ' . $ruleCount . ' rule' . ($ruleCount === 1 ? '' : 's') . ' — add/edit/delete inside Edit';
     }
 }

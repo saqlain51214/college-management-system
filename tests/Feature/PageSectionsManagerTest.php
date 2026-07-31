@@ -6,6 +6,7 @@ use App\Filament\Pages\AboutUsSections;
 use App\Filament\Pages\AcademicsSections;
 use App\Filament\Pages\AdmissionSections;
 use App\Filament\Pages\HomePageSections;
+use App\Filament\Resources\WebsitePageResource\Pages\EditWebsitePage;
 use App\Models\LeadershipMessage;
 use App\Models\User;
 use App\Models\WebsitePage;
@@ -92,13 +93,40 @@ class PageSectionsManagerTest extends TestCase
         $this->assertNull(WebsitePage::where('slug', 'about-mission')->first()->menu_label);
     }
 
-    public function test_admission_sections_shows_semester_rules_section_and_rule_count(): void
+    public function test_academics_sections_shows_semester_rules_section_and_rule_count(): void
     {
         Livewire::actingAs($this->admin)
-            ->test(AdmissionSections::class)
+            ->test(AcademicsSections::class)
             ->assertSee('Semester Rules')
             ->assertSee('5 sections')
             ->assertSee('22 rules');
+    }
+
+    public function test_semester_rules_is_not_duplicated_on_the_admission_sections_page(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(AdmissionSections::class)
+            ->assertDontSee('Semester Rules');
+    }
+
+    public function test_saving_a_semester_rules_edit_redirects_back_to_academics_sections(): void
+    {
+        $page = WebsitePage::where('slug', 'semester-rules')->first();
+
+        Livewire::actingAs($this->admin)
+            ->test(EditWebsitePage::class, ['record' => $page->getRouteKey()])
+            ->call('save')
+            ->assertRedirect(AcademicsSections::getUrl());
+    }
+
+    public function test_saving_a_campus_facilities_edit_redirects_back_to_about_us_sections(): void
+    {
+        $page = WebsitePage::where('slug', 'campus-facilities')->first();
+
+        Livewire::actingAs($this->admin)
+            ->test(EditWebsitePage::class, ['record' => $page->getRouteKey()])
+            ->call('save')
+            ->assertRedirect(AboutUsSections::getUrl());
     }
 
     public function test_academics_sections_shows_department_and_program_counts(): void
