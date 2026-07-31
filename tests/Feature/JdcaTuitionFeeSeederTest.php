@@ -36,6 +36,7 @@ class JdcaTuitionFeeSeederTest extends TestCase
         $this->assertTrue($fee->is_active);
         $this->assertSame('semester', $fee->frequency);
         $this->assertNull($fee->semester_number);
+        $this->assertNull($fee->academic_year_id);
     }
 
     public function test_running_it_twice_does_not_create_duplicates(): void
