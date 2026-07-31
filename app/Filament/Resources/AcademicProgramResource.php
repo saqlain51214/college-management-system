@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Enums\AdmissionCategoryEnum;
 use App\Enums\DegreeTypeEnum;
-use App\Filament\Clusters\AcademicsCluster;
 use App\Filament\Resources\AcademicProgramResource\Pages;
 use App\Helpers\ValidationHelper;
 use App\Models\AcademicProgram;
@@ -21,11 +20,15 @@ class AcademicProgramResource extends Resource
 {
     protected static ?string $model = AcademicProgram::class;
 
-    protected static ?string $cluster = AcademicsCluster::class;
-
     protected static ?string $navigationIcon  = 'heroicon-o-academic-cap';
     protected static ?string $navigationLabel = 'Academic Programs';
     protected static ?int    $navigationSort  = 2;
+
+    // Reached only via Website Pages → Academics → Academic Programs → "Manage".
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     // ─── Form ────────────────────────────────────────────────────────────────
 

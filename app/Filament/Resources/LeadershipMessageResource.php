@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\AboutUsCluster;
 use App\Filament\Resources\LeadershipMessageResource\Pages;
 use App\Models\LeadershipMessage;
 use Filament\Forms;
@@ -15,8 +14,6 @@ class LeadershipMessageResource extends Resource
 {
     protected static ?string $model = LeadershipMessage::class;
 
-    protected static ?string $cluster = AboutUsCluster::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     protected static ?string $navigationLabel = 'Message Desk';
@@ -24,6 +21,12 @@ class LeadershipMessageResource extends Resource
     protected static ?string $modelLabel = 'Leadership Message';
 
     protected static ?int $navigationSort = 4;
+
+    // Reached only via Website Pages → About Us → Leadership Messages → "Manage".
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {

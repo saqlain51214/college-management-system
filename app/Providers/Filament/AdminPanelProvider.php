@@ -75,10 +75,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
-                NavigationGroup::make('College Setup')
-                    ->icon('heroicon-o-building-office-2')
-                    ->collapsed(false),
-
                 NavigationGroup::make('Students & Admissions')
                     ->icon('heroicon-o-user-group')
                     ->collapsed(false),
@@ -101,10 +97,6 @@ class AdminPanelProvider extends PanelProvider
 
                 NavigationGroup::make('Communications')
                     ->icon('heroicon-o-envelope')
-                    ->collapsed(true),
-
-                NavigationGroup::make('Website Management')
-                    ->icon('heroicon-o-globe-alt')
                     ->collapsed(true),
 
                 NavigationGroup::make('System')

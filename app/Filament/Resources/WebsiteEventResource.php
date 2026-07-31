@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Resources\WebsiteEventResource\Pages;
 use App\Models\WebsiteEvent;
 use Filament\Forms;
@@ -15,10 +16,11 @@ class WebsiteEventResource extends Resource
 {
     protected static ?string $model = WebsiteEvent::class;
 
+    protected static ?string $cluster = WebsitePagesCluster::class;
+
     protected static ?string $navigationIcon  = 'heroicon-o-calendar-days';
-    protected static ?string $navigationGroup = 'Website Management';
     protected static ?string $navigationLabel = 'Events';
-    protected static ?int    $navigationSort  = 3;
+    protected static ?int    $navigationSort  = 7;
 
     public static function form(Form $form): Form
     {

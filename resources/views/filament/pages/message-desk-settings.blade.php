@@ -1,7 +1,7 @@
 <x-filament-panels::page>
     <p class="text-sm text-gray-500 dark:text-gray-400">
         Pick which design shows on the home page's "Leadership Message Desk" section. Manage the leaders themselves (names, photos, messages) under
-        <span class="font-semibold text-gray-700 dark:text-gray-200">Website Management &rarr; Message Desk</span>.
+        <span class="font-semibold text-gray-700 dark:text-gray-200">Website Pages &rarr; About Us &rarr; Leadership Messages &rarr; Manage</span>.
     </p>
 
     <form wire:submit.prevent="save" class="mt-6 space-y-6">

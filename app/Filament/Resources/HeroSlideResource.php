@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\HomePageCluster;
 use App\Filament\Resources\HeroSlideResource\Pages;
 use App\Models\HeroSlide;
 use Filament\Forms;
@@ -15,8 +14,6 @@ class HeroSlideResource extends Resource
 {
     protected static ?string $model = HeroSlide::class;
 
-    protected static ?string $cluster = HomePageCluster::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
     protected static ?string $navigationLabel = 'Homepage Slider';
@@ -24,6 +21,13 @@ class HeroSlideResource extends Resource
     protected static ?string $modelLabel = 'Hero Slide';
 
     protected static ?int $navigationSort = 0;
+
+    // Reached only via Website Pages → Home Page → Hero Slider → "Manage" —
+    // not a separate sidebar entry, to keep the sidebar to one "Website Pages" group.
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {

@@ -2,10 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AnnouncementResource;
-use App\Filament\Resources\HomeSectionResource;
-use App\Filament\Resources\NewsArticleResource;
-use App\Filament\Resources\WebsiteEventResource;
+use App\Filament\Clusters\WebsitePagesCluster;
 use App\Filament\Resources\WebsitePageResource\Pages;
 use App\Models\WebsitePage;
 use Filament\Forms\Components\Placeholder;
@@ -22,10 +19,11 @@ class WebsitePageResource extends Resource
 {
     protected static ?string $model = WebsitePage::class;
 
+    protected static ?string $cluster = WebsitePagesCluster::class;
+
     protected static ?string $navigationIcon  = 'heroicon-o-document-text';
-    protected static ?string $navigationGroup = 'Website Management';
-    protected static ?string $navigationLabel = 'Website Pages';
-    protected static ?int    $navigationSort  = 2;
+    protected static ?string $navigationLabel = 'Other Pages';
+    protected static ?int    $navigationSort  = 9;
 
     public static function form(Form $form): Form
     {
@@ -68,12 +66,8 @@ class WebsitePageResource extends Resource
                         ->label('Home Page Sections Guide')
                         ->content(fn (?WebsitePage $record): HtmlString => new HtmlString(
                             '<div class="space-y-2 text-sm leading-6">'
-                            . '<div><strong>1. Hero Slider</strong> - update at <a class="text-primary-600 underline" href="' . e(\App\Filament\Resources\HeroSlideResource::getUrl('index')) . '">Website Management &rarr; Homepage Slider</a></div>'
-                            . '<div><strong>2. Quick Access tiles</strong> - fixed links (Admissions, Fee Challan, etc.)</div>'
-                            . '<div><strong>3. Statistics band</strong> - numbers update automatically from live data</div>'
-                            . '<div><strong>4. Featured Programmes</strong> - headings below, cards from Academic Programs module</div>'
-                            . '<div><strong>5. Message Desk</strong> - update from the <strong>Message Desk</strong> module (leadership)</div>'
-                            . '<div><strong>6. Latest News</strong> - headings below, articles from <a class="text-primary-600 underline" href="' . e(NewsArticleResource::getUrl('index')) . '">News module</a></div>'
+                            . '<div>Every section of the home page — Hero Slider, Message Desk, Latest News, and this one — is now managed in one place: <a class="text-primary-600 underline" href="' . e(\App\Filament\Pages\HomePageSections::getUrl()) . '">Website Pages &rarr; Home Page</a>.</div>'
+                            . '<div><strong>Below:</strong> just the Featured Programmes / News / Events heading text — the cards themselves come from live data automatically.</div>'
                             . '</div>'
                         ))
                         ->columnSpanFull(),
@@ -214,6 +208,13 @@ class WebsitePageResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            // Home/About Us/Academics/Admission pages are now managed from their own
+            // Section Manager pages (see App\Filament\Pages\*Sections) — this list only
+            // shows what's left. Note: getEloquentQuery() below stays UNSCOPED so those
+            // Section Manager pages' "Edit" links (which point straight at this
+            // resource's edit route for a specific record) keep working for every slug,
+            // not just "Other" ones.
+            ->query(fn () => WebsitePage::query()->staticPages()->where('section', 'Other'))
             ->columns([
                 Tables\Columns\TextColumn::make('title')->searchable()->sortable()->wrap()->weight('bold'),
                 Tables\Columns\TextColumn::make('menu_label')->label('Menu Label')->placeholder('(same as Title)')->toggleable(),
@@ -221,10 +222,6 @@ class WebsitePageResource extends Resource
                 Tables\Columns\ToggleColumn::make('is_published')->label('Published')->onColor('success')->offColor('gray'),
                 Tables\Columns\TextColumn::make('updated_at')->label('Last Updated')->dateTime('d M Y')->sortable(),
             ])
-            ->groups([
-                Tables\Grouping\Group::make('section')->label('Page Area'),
-            ])
-            ->defaultGroup('section')
             ->filters([Tables\Filters\TernaryFilter::make('is_published'), Tables\Filters\TrashedFilter::make()])
             ->recordUrl(null)
             ->actions([

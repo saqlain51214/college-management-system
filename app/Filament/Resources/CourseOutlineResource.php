@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\AcademicsCluster;
 use App\Filament\Resources\CourseOutlineResource\Pages;
 use App\Models\AcademicProgram;
 use App\Models\CourseOutline;
@@ -17,13 +16,17 @@ class CourseOutlineResource extends Resource
 {
     protected static ?string $model = CourseOutline::class;
 
-    protected static ?string $cluster = AcademicsCluster::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationLabel = 'Course Outlines';
 
     protected static ?int $navigationSort = 3;
+
+    // Reached only via Website Pages → Academics → Course Outlines → "Manage".
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
