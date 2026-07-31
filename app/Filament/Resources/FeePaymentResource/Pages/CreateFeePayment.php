@@ -39,12 +39,14 @@ class CreateFeePayment extends CreateRecord
                     Forms\Components\Select::make('semester_number')
                         ->label('Semester')
                         ->options(collect(range(1, 8))->mapWithKeys(fn ($n) => [$n => "Semester $n"])->all())
-                        ->placeholder('N/A'),
+                        ->placeholder('N/A')
+                        ->live(),
 
                     Forms\Components\Select::make('academic_year_id')
                         ->label('Academic Year')
                         ->options(fn () => AcademicYear::selectOptions())
-                        ->searchable(),
+                        ->searchable()
+                        ->live(),
 
                     Forms\Components\DatePicker::make('due_date')
                         ->label('Due Date')->displayFormat('d M Y')->native(false)
@@ -72,6 +74,7 @@ class CreateFeePayment extends CreateRecord
                             ->visible(fn (Forms\Get $get) => in_array($type->value, $get('selected_fee_types') ?? []))
                             ->required(fn (Forms\Get $get) => in_array($type->value, $get('selected_fee_types') ?? []))
                             ->default(fn (Forms\Get $get) => static::suggestedAmount($get('student_id'), $type, $get('semester_number'), $get('academic_year_id')))
+                            ->helperText(fn (Forms\Get $get) => static::missingFeeStructureWarning($get('student_id'), $type, $get('semester_number'), $get('academic_year_id')))
                     )->all(),
                 ]),
 
@@ -89,6 +92,23 @@ class CreateFeePayment extends CreateRecord
         $summary = FeePayment::invoiceSummary($student, $type->value, $semester ? (int) $semester : null, $academicYearId ? (int) $academicYearId : null);
 
         return $summary['available'] > 0 ? $summary['available'] : null;
+    }
+
+    /** Warns before submit — not after — when this student's program/semester/year has no Fee Structure for this fee head. */
+    protected static function missingFeeStructureWarning($studentId, FeeTypeEnum $type, $semester, $academicYearId): ?string
+    {
+        $student = $studentId ? Student::find($studentId) : null;
+        if (! $student) {
+            return null;
+        }
+
+        $summary = FeePayment::invoiceSummary($student, $type->value, $semester ? (int) $semester : null, $academicYearId ? (int) $academicYearId : null);
+
+        if ($summary['has_fee_structure']) {
+            return null;
+        }
+
+        return "⚠ No active Fee Structure exists for {$type->label()} for this student's program/semester/year. Add one under Fee Structures, or this challan can't be created.";
     }
 
     protected function handleRecordCreation(array $data): Model

@@ -253,7 +253,9 @@ class StudentLedger extends Page
 
         $summary = FeePayment::invoiceSummary($student, $this->slipFeeType, $this->normalizeInt($this->slipSemester), $this->normalizeInt($this->slipAcademicYearId));
         if ($summary['available'] <= 0) {
-            $this->slipError = 'This period has already been fully invoiced — nothing left to generate.';
+            $this->slipError = $summary['has_fee_structure']
+                ? 'This period has already been fully invoiced — nothing left to generate.'
+                : 'No active Fee Structure is configured for this fee type / program / semester / year — add one under Fee Structures before generating a challan.';
             return;
         }
 

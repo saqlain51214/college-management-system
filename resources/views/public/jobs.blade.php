@@ -62,14 +62,11 @@
     {{-- Job openings --}}
     <h2 class="mb-6 font-display text-xl font-semibold text-ink sm:text-2xl">Current Openings</h2>
 
-    @php
-    $openings = [
-      ['title'=>'Lecturer — Computer Science',       'type'=>'Full-time', 'dept'=>'Department of Computer Science', 'quali'=>'MS / BS (Hons) Computer Science from HEC-recognised university'],
-      ['title'=>'Lecturer — Mathematics',            'type'=>'Full-time', 'dept'=>'Department of Mathematics',      'quali'=>'MS / BS (Hons) Mathematics from HEC-recognised university'],
-      ['title'=>'Lab Technician — Physics/Chemistry','type'=>'Full-time', 'dept'=>'Science Labs',                   'quali'=>'BSc with relevant lab experience preferred'],
-      ['title'=>'Office Assistant',                  'type'=>'Full-time', 'dept'=>'Administration',                 'quali'=>'Intermediate / FA with computer literacy'],
-    ];
-    @endphp
+    @if($openings->isEmpty())
+    <p class="rounded-xl border border-stone-200/80 bg-white p-6 text-sm text-stone-500 shadow-sm">
+      No open positions at the moment. Please check back later, or use the "General Enquiry" button below to send us your CV.
+    </p>
+    @endif
 
     <div class="space-y-4">
       @foreach($openings as $job)
@@ -78,17 +75,23 @@
           <div class="flex-1 min-w-0">
             <div class="flex flex-wrap items-center gap-2 mb-2">
               <span class="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white"
-                    style="background:var(--site-brand)">{{ $job['type'] }}</span>
-              <span class="text-xs text-stone-400">{{ $job['dept'] }}</span>
+                    style="background:var(--site-brand)">{{ $job->employment_type_label }}</span>
+              <span class="text-xs text-stone-400">{{ $job->department }}</span>
             </div>
-            <h3 class="font-semibold text-ink text-base sm:text-lg">{{ $job['title'] }}</h3>
+            <h3 class="font-semibold text-ink text-base sm:text-lg">{{ $job->title }}</h3>
             <p class="mt-1.5 text-sm text-stone-500">
-              <strong class="text-stone-700">Qualification:</strong> {{ $job['quali'] }}
+              <strong class="text-stone-700">Qualification:</strong> {{ $job->qualification }}
             </p>
+            @if($job->description)
+            <p class="mt-1.5 text-sm text-stone-500">{{ $job->description }}</p>
+            @endif
+            @if($job->closing_date)
+            <p class="mt-1.5 text-xs text-stone-400">Apply by {{ $job->closing_date->format('d M Y') }}</p>
+            @endif
           </div>
           <div class="shrink-0">
             <button type="button"
-                    @click="openFor('{{ addslashes($job['title']) }}')"
+                    @click="openFor('{{ addslashes($job->title) }}')"
                     class="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
                     style="background:var(--site-brand); --tw-ring-color:var(--site-brand)">
               Apply Now
