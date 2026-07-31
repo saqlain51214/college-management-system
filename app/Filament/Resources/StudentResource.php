@@ -159,6 +159,7 @@ class StudentResource extends Resource
                         ->searchable()
                         ->preload()
                         ->required()
+                        ->live()
                         ->placeholder('Select Program')
                         ->validationMessages(['required' => 'Program is required.']),
 
@@ -195,12 +196,28 @@ class StudentResource extends Resource
                         ->options(fn() => AcademicYear::selectOptions())
                         ->searchable()
                         ->preload()
+                        ->live()
                         ->placeholder('Select Year'),
 
                     Forms\Components\Select::make('current_semester')
                         ->label('Current Semester')
                         ->options(collect(range(1, 8))->mapWithKeys(fn($n) => [$n => "Semester $n"])->all())
                         ->default(1),
+
+                    Forms\Components\Placeholder::make('fee_structure_warning')
+                        ->hiddenLabel()
+                        ->columnSpanFull()
+                        ->visible(fn (Forms\Get $get) => filled($get('academic_program_id')) && ! \App\Models\FeeStructure::query()
+                            ->where('is_active', true)
+                            ->where(fn ($q) => $q->whereNull('academic_program_id')->orWhere('academic_program_id', $get('academic_program_id')))
+                            ->where(fn ($q) => $q->whereNull('academic_year_id')->orWhere('academic_year_id', $get('academic_year_id')))
+                            ->exists())
+                        ->content(fn (Forms\Get $get) => new \Illuminate\Support\HtmlString(
+                            '<div class="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">'
+                            . '⚠️ No active Fee Structure is configured yet for this Program' . ($get('academic_year_id') ? ' &amp; Academic Year' : '') . '. '
+                            . 'You can still save this student, but no fee challan can be generated for them until an admin adds one under <strong>Fees &amp; Billing → Fee Structures</strong>.'
+                            . '</div>'
+                        )),
                 ]),
 
             Forms\Components\Section::make('Scholarship')

@@ -190,7 +190,7 @@ class FeePayment extends Model
      * whether paid or still pending), and how much remains available to
      * invoice via a new self-chosen-amount slip.
      *
-     * @return array{total: float, already_invoiced: float, available: float}
+     * @return array{total: float, already_invoiced: float, available: float, has_fee_structure: bool}
      */
     public static function invoiceSummary(Student $student, string $feeType, ?int $semester, ?int $academicYearId): array
     {
@@ -204,10 +204,27 @@ class FeePayment extends Model
             ->sum('amount_due');
 
         return [
-            'total'            => $total,
-            'already_invoiced' => $alreadyInvoiced,
-            'available'        => max(0, round($total - $alreadyInvoiced, 2)),
+            'total'             => $total,
+            'already_invoiced'  => $alreadyInvoiced,
+            'available'         => max(0, round($total - $alreadyInvoiced, 2)),
+            // Distinguishes "already fully invoiced" (a real FeeStructure exists,
+            // total is just used up) from "nothing was ever configured" (no
+            // FeeStructure row matches this program/semester/year at all) — the
+            // two need very different admin-facing error messages.
+            'has_fee_structure' => static::feeStructureExists($student, $feeType, $semester, $academicYearId),
         ];
+    }
+
+    /** Whether ANY active FeeStructure row matches this student/fee-type/period, regardless of amount. */
+    protected static function feeStructureExists(Student $student, string $feeType, ?int $semester, ?int $academicYearId): bool
+    {
+        return FeeStructure::query()
+            ->where('is_active', true)
+            ->where('fee_type', $feeType)
+            ->where(fn ($q) => $q->whereNull('academic_program_id')->orWhere('academic_program_id', $student->academic_program_id))
+            ->where(fn ($q) => $q->whereNull('academic_year_id')->orWhere('academic_year_id', $academicYearId))
+            ->where(fn ($q) => $q->whereNull('semester_number')->orWhere('semester_number', $semester))
+            ->exists();
     }
 
     /**
@@ -231,6 +248,13 @@ class FeePayment extends Model
 
         $summary = static::invoiceSummary($student, $feeType, $semester, $academicYearId);
         if ($amount > $summary['available'] + 0.01) {
+            if (! $summary['has_fee_structure']) {
+                $feeTypeLabel = FeeTypeEnum::tryFrom($feeType)?->label() ?? $feeType;
+                throw new \InvalidArgumentException(
+                    "No active Fee Structure is configured for \"{$feeTypeLabel}\" for this student's program/semester/year — add one under Fee Structures before generating a challan."
+                );
+            }
+
             throw new \InvalidArgumentException(
                 'This amount exceeds the remaining balance that can still be invoiced for this period (Rs. ' . number_format($summary['available']) . ' available).'
             );

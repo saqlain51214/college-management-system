@@ -747,7 +747,8 @@ class PublicController extends Controller
     public function jobs()
     {
         $college = $this->college();
-        return view('public.jobs', compact('college'));
+        $openings = \App\Models\JobPosting::active()->orderBy('sort_order')->orderBy('id')->get();
+        return view('public.jobs', compact('college', 'openings'));
     }
 
     public function jobApply(Request $request)
