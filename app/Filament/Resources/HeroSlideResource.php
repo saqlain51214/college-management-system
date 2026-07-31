@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\HomePageCluster;
 use App\Filament\Resources\HeroSlideResource\Pages;
 use App\Models\HeroSlide;
 use Filament\Forms;
@@ -14,9 +15,9 @@ class HeroSlideResource extends Resource
 {
     protected static ?string $model = HeroSlide::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-photo';
+    protected static ?string $cluster = HomePageCluster::class;
 
-    protected static ?string $navigationGroup = 'Website Management';
+    protected static ?string $navigationIcon = 'heroicon-o-photo';
 
     protected static ?string $navigationLabel = 'Homepage Slider';
 

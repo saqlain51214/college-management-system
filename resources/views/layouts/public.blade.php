@@ -231,30 +231,50 @@
     </div>
 
     {{-- ── ROW 2: Nav bar — centered menu items ─────────────────────────── --}}
-    @php $deptList = \App\Models\Department::visible()->ordered()
-        ->with(['academicPrograms' => fn ($q) => $q->where('is_active', true)->where('show_on_website', true)->orderBy('sort_order')->orderBy('name')])
-        ->get(); @endphp
+    @php
+        $deptList = \App\Models\Department::visible()->ordered()
+            ->with(['academicPrograms' => fn ($q) => $q->where('is_active', true)->where('show_on_website', true)->orderBy('sort_order')->orderBy('name')])
+            ->get();
+
+        // Single source for every nav label backed by a Website Page row — renaming
+        // a page's "Menu Label" in the admin panel changes what's shown here on
+        // both desktop and mobile without touching any URL/route.
+        $navPages = \App\Models\WebsitePage::staticPages()->get()->keyBy('slug');
+        $navLabel = fn (string $slug, string $fallback) => optional($navPages->get($slug))->menu_label_display ?? $fallback;
+
+        // Leadership messages (VC/Director/Principal, or however many an admin has
+        // added) drive the About Us submenu directly — add one in Message Desk and
+        // it shows up here automatically, no code change needed.
+        $navLeaders = \App\Models\LeadershipMessage::active()->orderBy('sort_order')->get();
+
+        $navScholarshipTypes = [
+            'merit'   => 'Merit-Based Scholarship',
+            'need'    => 'Need-Based Scholarship',
+            'orphan'  => 'Orphan Scholarship',
+            'special' => 'Special Category Scholarship',
+        ];
+    @endphp
     <div class="relative border-t border-white/10" style="background:rgba(0,0,0,0.52); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
         <div class="mx-auto max-w-6xl px-4">
 
             {{-- Desktop nav --}}
             <ul class="hidden xl:flex items-center justify-center gap-0 list-none h-10 text-[11.5px]" role="menubar">
 
-                <li><a href="{{ route('home') }}" class="nav-link px-3">Home</a></li>
+                <li><a href="{{ route('home') }}" class="nav-link px-3">{{ $navLabel('home', 'Home') }}</a></li>
 
                 {{-- About Us --}}
                 <li class="group relative">
                     <a href="{{ route('about') }}" class="nav-link px-3 flex items-center gap-0.5">
-                        About Us<svg class="h-3 w-3 ml-0.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        {{ $navLabel('about', 'About Us') }}<svg class="h-3 w-3 ml-0.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                     </a>
                     <ul class="dd-menu w-60">
-                        <li><a href="{{ route('about.history') }}"   class="dropdown-link">History &amp; Geography</a></li>
-                        <li><a href="{{ route('about.mission') }}"   class="dropdown-link">Mission &amp; Vision</a></li>
-                        <li><a href="{{ route('about.message') }}"   class="dropdown-link">Message from VC</a></li>
-                        <li><a href="{{ route('about.director') }}"  class="dropdown-link">Message from Director</a></li>
-                        <li><a href="{{ route('about.principal') }}" class="dropdown-link">Message from Principal</a></li>
-                        <li><a href="{{ route('campus-facilities') }}" class="dropdown-link">Campus Facilities</a></li>
-                        <li><a href="{{ route('gallery') }}" class="dropdown-link">Campus Gallery</a></li>
+                        <li><a href="{{ route('about.history') }}"   class="dropdown-link">{{ $navLabel('about-history', 'History & Geography') }}</a></li>
+                        <li><a href="{{ route('about.mission') }}"   class="dropdown-link">{{ $navLabel('about-mission', 'Mission & Vision') }}</a></li>
+                        @foreach($navLeaders as $leader)
+                        <li><a href="{{ route('leadership.message', $leader) }}" class="dropdown-link">Message from {{ $leader->designation }}</a></li>
+                        @endforeach
+                        <li><a href="{{ route('campus-facilities') }}" class="dropdown-link">{{ $navLabel('campus-facilities', 'Campus Facilities') }}</a></li>
+                        <li><a href="{{ route('gallery') }}" class="dropdown-link">{{ $navLabel('gallery', 'Campus Gallery') }}</a></li>
                     </ul>
                 </li>
 
@@ -264,9 +284,10 @@
                         Academics<svg class="h-3 w-3 ml-0.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                     </a>
                     <ul class="dd-menu w-56">
+                        <li><a href="{{ route('programs') }}" class="dropdown-link">{{ $navLabel('programs', 'Academic Programmes') }}</a></li>
                         <li class="group/depts relative">
                             <a href="{{ route('departments') }}" class="dropdown-link flex items-center justify-between">
-                                Departments<svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                {{ $navLabel('departments', 'Departments') }}<svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                             </a>
                             <ul class="invisible absolute left-full top-0 z-50 w-72 list-none rounded-xl bg-white py-2 text-stone-800 shadow-xl pointer-events-none opacity-0 transition-all duration-200 group-hover/depts:pointer-events-auto group-hover/depts:visible group-hover/depts:opacity-100">
                                 @foreach($deptList as $dept)
@@ -289,8 +310,8 @@
                                 @if($deptList->isEmpty())<li class="px-4 py-2 text-xs text-stone-400">No departments yet</li>@endif
                             </ul>
                         </li>
-                        <li><a href="{{ route('faculty') }}"                   class="dropdown-link">Faculty Profile</a></li>
-                        <li><a href="{{ route('admissions.semester-rules') }}" class="dropdown-link">Semester Rules</a></li>
+                        <li><a href="{{ route('faculty') }}"                   class="dropdown-link">{{ $navLabel('faculty', 'Faculty Profile') }}</a></li>
+                        <li><a href="{{ route('admissions.semester-rules') }}" class="dropdown-link">{{ $navLabel('semester-rules', 'Semester Rules') }}</a></li>
                         <li><a href="{{ route('course-outlines') }}" class="dropdown-link">Course Outlines</a></li>
                     </ul>
                 </li>
@@ -301,20 +322,18 @@
                         Admission<svg class="h-3 w-3 ml-0.5 shrink-0 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                     </a>
                     <ul class="dd-menu w-56">
-                        <li><a href="{{ route('admissions.procedure') }}"    class="dropdown-link">Admission Procedure</a></li>
-                        <li><a href="{{ route('admissions') }}"              class="dropdown-link">Online Admission</a></li>
-                        <li><a href="{{ route('admissions') }}"              class="dropdown-link">Admission Form</a></li>
-                        <li><a href="{{ route('admissions.fee-structure') }}" class="dropdown-link">Fee Structure</a></li>
+                        <li><a href="{{ route('admissions.procedure') }}"    class="dropdown-link">{{ $navLabel('admission-procedure', 'Admission Procedure') }}</a></li>
+                        <li><a href="{{ route('admissions') }}"              class="dropdown-link">{{ $navLabel('admissions', 'Apply Online') }}</a></li>
+                        <li><a href="{{ route('admissions.fee-structure') }}" class="dropdown-link">{{ $navLabel('fee-structure', 'Fee Structure') }}</a></li>
                         <li><a href="{{ route('fee-challan.download') }}" class="dropdown-link">Download Fee Challan</a></li>
                         <li class="group/schol relative">
                             <a href="{{ route('scholarships') }}" class="dropdown-link flex items-center justify-between">
-                                Scholarships<svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                {{ $navLabel('scholarships', 'Scholarships') }}<svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                             </a>
                             <ul class="invisible absolute left-full top-0 z-50 w-64 list-none rounded-xl bg-white py-2 text-stone-800 shadow-xl pointer-events-none opacity-0 transition-all duration-200 group-hover/schol:pointer-events-auto group-hover/schol:visible group-hover/schol:opacity-100">
-                                <li><a href="{{ route('scholarships') }}" class="dropdown-link">Merit-Based Scholarship</a></li>
-                                <li><a href="{{ route('scholarships') }}" class="dropdown-link">Need-Based Scholarship</a></li>
-                                <li><a href="{{ route('scholarships') }}" class="dropdown-link">Orphan Scholarship</a></li>
-                                <li><a href="{{ route('scholarships') }}" class="dropdown-link">Special Category Scholarship</a></li>
+                                @foreach($navScholarshipTypes as $type => $label)
+                                <li><a href="{{ route('scholarships.show', $type) }}" class="dropdown-link">{{ $label }}</a></li>
+                                @endforeach
                             </ul>
                         </li>
                     </ul>
@@ -322,8 +341,8 @@
 
                 <li><a href="https://colleges.kiu.edu.pk/" target="_blank" rel="noopener" class="nav-link px-3">College LMS</a></li>
                 <li><a href="{{ route('jobs') }}"     class="nav-link px-3">Jobs</a></li>
-                <li><a href="{{ route('downloads') }}" class="nav-link px-3">Downloads</a></li>
-                <li><a href="{{ route('contact') }}"  class="nav-link px-3">Contact Us</a></li>
+                <li><a href="{{ route('downloads') }}" class="nav-link px-3">{{ $navLabel('downloads', 'Downloads') }}</a></li>
+                <li><a href="{{ route('contact') }}"  class="nav-link px-3">{{ $navLabel('contact', 'Contact Us') }}</a></li>
 
                 <li class="ml-2">
                     <a href="{{ route('admissions') }}" class="site-gold-gradient rounded-md px-3 py-1.5 text-[11px] font-semibold text-white shadow transition hover:opacity-90">Apply Now</a>
@@ -336,42 +355,41 @@
                  aria-label="Mobile navigation">
                 <div class="px-4">
                     <ul class="flex list-none flex-col gap-0.5 py-3 text-white text-sm">
-                        <li><a href="{{ route('home') }}" class="mob-link font-semibold">Home</a></li>
+                        <li><a href="{{ route('home') }}" class="mob-link font-semibold">{{ $navLabel('home', 'Home') }}</a></li>
 
-                        <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">About Us</li>
-                        <li><a href="{{ route('about.history') }}"   class="mob-link pl-7">History &amp; Geography</a></li>
-                        <li><a href="{{ route('about.mission') }}"   class="mob-link pl-7">Mission &amp; Vision</a></li>
-                        <li><a href="{{ route('about.message') }}"   class="mob-link pl-7">Message from VC</a></li>
-                        <li><a href="{{ route('about.director') }}"  class="mob-link pl-7">Message from Director</a></li>
-                        <li><a href="{{ route('about.principal') }}" class="mob-link pl-7">Message from Principal</a></li>
-                        <li><a href="{{ route('campus-facilities') }}" class="mob-link pl-7">Campus Facilities</a></li>
-                        <li><a href="{{ route('gallery') }}" class="mob-link pl-7">Campus Gallery</a></li>
+                        <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">{{ $navLabel('about', 'About Us') }}</li>
+                        <li><a href="{{ route('about.history') }}"   class="mob-link pl-7">{{ $navLabel('about-history', 'History & Geography') }}</a></li>
+                        <li><a href="{{ route('about.mission') }}"   class="mob-link pl-7">{{ $navLabel('about-mission', 'Mission & Vision') }}</a></li>
+                        @foreach($navLeaders as $leader)
+                        <li><a href="{{ route('leadership.message', $leader) }}" class="mob-link pl-7">Message from {{ $leader->designation }}</a></li>
+                        @endforeach
+                        <li><a href="{{ route('campus-facilities') }}" class="mob-link pl-7">{{ $navLabel('campus-facilities', 'Campus Facilities') }}</a></li>
+                        <li><a href="{{ route('gallery') }}" class="mob-link pl-7">{{ $navLabel('gallery', 'Campus Gallery') }}</a></li>
 
                         <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">Academics</li>
-                        <li><a href="{{ route('departments') }}" class="mob-link pl-7">Departments</a></li>
+                        <li><a href="{{ route('programs') }}" class="mob-link pl-7">{{ $navLabel('programs', 'Academic Programmes') }}</a></li>
+                        <li><a href="{{ route('departments') }}" class="mob-link pl-7">{{ $navLabel('departments', 'Departments') }}</a></li>
                         @foreach($deptList as $dept)
                         <li><a href="{{ route('departments.show', $dept->slug) }}" class="mob-link pl-12 text-white/70">{{ $dept->name }}</a></li>
                         @endforeach
-                        <li><a href="{{ route('faculty') }}"                   class="mob-link pl-7">Faculty Profile</a></li>
-                        <li><a href="{{ route('admissions.semester-rules') }}" class="mob-link pl-7">Semester Rules</a></li>
+                        <li><a href="{{ route('faculty') }}"                   class="mob-link pl-7">{{ $navLabel('faculty', 'Faculty Profile') }}</a></li>
+                        <li><a href="{{ route('admissions.semester-rules') }}" class="mob-link pl-7">{{ $navLabel('semester-rules', 'Semester Rules') }}</a></li>
                         <li><a href="{{ route('course-outlines') }}" class="mob-link pl-7">Course Outlines</a></li>
 
                         <li class="px-4 pt-3 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/40">Admission</li>
-                        <li><a href="{{ route('admissions.procedure') }}"     class="mob-link pl-7">Admission Procedure</a></li>
-                        <li><a href="{{ route('admissions') }}"               class="mob-link pl-7">Online Admission</a></li>
-                        <li><a href="{{ route('admissions') }}"               class="mob-link pl-7">Admission Form</a></li>
-                        <li><a href="{{ route('admissions.fee-structure') }}" class="mob-link pl-7">Fee Structure</a></li>
-                        <li class="px-4 pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/30">Scholarships</li>
-                        <li><a href="{{ route('scholarships') }}" class="mob-link pl-12 text-white/70">Merit-Based Scholarship</a></li>
-                        <li><a href="{{ route('scholarships') }}" class="mob-link pl-12 text-white/70">Need-Based Scholarship</a></li>
-                        <li><a href="{{ route('scholarships') }}" class="mob-link pl-12 text-white/70">Orphan Scholarship</a></li>
-                        <li><a href="{{ route('scholarships') }}" class="mob-link pl-12 text-white/70">Special Category Scholarship</a></li>
+                        <li><a href="{{ route('admissions.procedure') }}"     class="mob-link pl-7">{{ $navLabel('admission-procedure', 'Admission Procedure') }}</a></li>
+                        <li><a href="{{ route('admissions') }}"               class="mob-link pl-7">{{ $navLabel('admissions', 'Apply Online') }}</a></li>
+                        <li><a href="{{ route('admissions.fee-structure') }}" class="mob-link pl-7">{{ $navLabel('fee-structure', 'Fee Structure') }}</a></li>
+                        <li class="px-4 pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/30">{{ $navLabel('scholarships', 'Scholarships') }}</li>
+                        @foreach($navScholarshipTypes as $type => $label)
+                        <li><a href="{{ route('scholarships.show', $type) }}" class="mob-link pl-12 text-white/70">{{ $label }}</a></li>
+                        @endforeach
 
                         <li class="my-2 border-t border-white/10"></li>
                         <li><a href="https://colleges.kiu.edu.pk/" target="_blank" rel="noopener" class="mob-link">College LMS</a></li>
                         <li><a href="{{ route('jobs') }}"      class="mob-link">Jobs</a></li>
-                        <li><a href="{{ route('downloads') }}" class="mob-link">Downloads</a></li>
-                        <li><a href="{{ route('contact') }}"   class="mob-link">Contact Us</a></li>
+                        <li><a href="{{ route('downloads') }}" class="mob-link">{{ $navLabel('downloads', 'Downloads') }}</a></li>
+                        <li><a href="{{ route('contact') }}"   class="mob-link">{{ $navLabel('contact', 'Contact Us') }}</a></li>
                         <li class="my-2 border-t border-white/10"></li>
                         <li><a href="{{ route('portal.login') }}" class="mob-link text-white/70">Student Portal</a></li>
                         <li>

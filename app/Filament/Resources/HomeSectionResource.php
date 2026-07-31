@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\HomePageCluster;
 use App\Filament\Resources\HomeSectionResource\Pages;
 use App\Models\HomeSection;
 use Filament\Forms;
@@ -17,8 +18,9 @@ class HomeSectionResource extends Resource
 {
     protected static ?string $model = HomeSection::class;
 
+    protected static ?string $cluster = HomePageCluster::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
-    protected static ?string $navigationGroup = 'Website Management';
     protected static ?string $navigationLabel = 'Home Sections';
     protected static ?int $navigationSort = 3;
 

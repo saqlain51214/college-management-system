@@ -69,4 +69,41 @@ class JobPostingModuleTest extends TestCase
 
         $this->assertDatabaseHas('job_postings', ['title' => 'Lab Technician']);
     }
+
+    public function test_admin_can_extend_an_expired_postings_deadline_via_the_table_action(): void
+    {
+        \Spatie\Permission\Models\Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
+        $admin = \App\Models\User::factory()->create();
+        $admin->assignRole('super_admin');
+
+        $posting = JobPosting::create([
+            'title' => 'Office Assistant', 'employment_type' => 'full_time',
+            'department' => 'Administration', 'qualification' => 'Intermediate',
+            'closing_date' => now()->subDays(3)->toDateString(), 'is_active' => true,
+        ]);
+
+        $newDate = now()->addDays(30)->toDateString();
+
+        \Livewire\Livewire::actingAs($admin)
+            ->test(\App\Filament\Resources\JobPostingResource\Pages\ListJobPostings::class)
+            ->callTableAction('extend', $posting, data: ['closing_date' => $newDate]);
+
+        $this->assertSame($newDate, $posting->refresh()->closing_date->toDateString());
+    }
+
+    public function test_expired_but_active_posting_counts_toward_the_navigation_badge(): void
+    {
+        JobPosting::create([
+            'title' => 'Expired Role', 'employment_type' => 'full_time',
+            'department' => 'Administration', 'qualification' => 'N/A',
+            'closing_date' => now()->subDay()->toDateString(), 'is_active' => true,
+        ]);
+        JobPosting::create([
+            'title' => 'Live Role', 'employment_type' => 'full_time',
+            'department' => 'Administration', 'qualification' => 'N/A',
+            'closing_date' => now()->addDay()->toDateString(), 'is_active' => true,
+        ]);
+
+        $this->assertSame('1', \App\Filament\Resources\JobPostingResource::getNavigationBadge());
+    }
 }

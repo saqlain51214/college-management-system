@@ -81,7 +81,9 @@
                 <h3 class="font-bold text-stone-800 mb-3">Explore More</h3>
                 <ul class="space-y-2 text-sm">
                     <li><a href="{{ route('about.mission') }}" class="flex items-center gap-2 hover:site-brand-text transition-colors" style="color:var(--site-brand)"><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Mission &amp; Vision</a></li>
-                    <li><a href="{{ route('about.message') }}" class="flex items-center gap-2 hover:site-brand-text transition-colors" style="color:var(--site-brand)"><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Message from Principal</a></li>
+                    @if($firstLeader ?? null)
+                    <li><a href="{{ route('leadership.message', $firstLeader) }}" class="flex items-center gap-2 hover:site-brand-text transition-colors" style="color:var(--site-brand)"><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Leadership Messages</a></li>
+                    @endif
                     <li><a href="{{ route('departments') }}" class="flex items-center gap-2 hover:site-brand-text transition-colors" style="color:var(--site-brand)"><svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Departments</a></li>
                 </ul>
             </div>

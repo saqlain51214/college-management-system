@@ -24,6 +24,27 @@ class JobPostingResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    public static function getNavigationBadge(): ?string
+    {
+        $expired = static::getModel()::query()
+            ->where('is_active', true)
+            ->whereNotNull('closing_date')
+            ->where('closing_date', '<', now()->toDateString())
+            ->count();
+
+        return $expired > 0 ? (string) $expired : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Postings past their apply-by date — still marked Active, extend or close them.';
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -95,16 +116,55 @@ class JobPostingResource extends Resource
                     ->label('Type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => JobPosting::employmentTypeOptions()[$state] ?? $state),
-                Tables\Columns\TextColumn::make('closing_date')->label('Apply By')->date('d M Y')->placeholder('Open-ended'),
+                Tables\Columns\TextColumn::make('closing_date')
+                    ->label('Apply By')
+                    ->date('d M Y')
+                    ->placeholder('Open-ended')
+                    ->color(fn (JobPosting $record) => $record->closing_date?->isPast() ? 'danger' : null),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->state(fn (JobPosting $record) => match (true) {
+                        ! $record->is_active => 'Hidden',
+                        $record->closing_date?->isPast() => 'Expired',
+                        default => 'Live',
+                    })
+                    ->badge()
+                    ->color(fn (string $state) => match ($state) {
+                        'Live' => 'success',
+                        'Expired' => 'danger',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('sort_order')->label('Order')->sortable()->alignCenter(),
                 Tables\Columns\ToggleColumn::make('is_active')->label('Active'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('employment_type')->options(JobPosting::employmentTypeOptions()),
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
+                Tables\Filters\Filter::make('expired')
+                    ->label('Expired only')
+                    ->query(fn ($query) => $query->whereNotNull('closing_date')->where('closing_date', '<', now()->toDateString())),
             ])
             ->recordUrl(null)
             ->actions([
+                Tables\Actions\Action::make('extend')
+                    ->label('Extend')
+                    ->icon('heroicon-o-calendar-days')
+                    ->color('warning')
+                    ->visible(fn (JobPosting $record) => filled($record->closing_date))
+                    ->form([
+                        Forms\Components\DatePicker::make('closing_date')
+                            ->label('New Apply-By Date')
+                            ->native(false)
+                            ->displayFormat('d M Y')
+                            ->default(fn (JobPosting $record) => $record->closing_date->isPast()
+                                ? now()->addDays(30)->toDateString()
+                                : $record->closing_date->addDays(30)->toDateString())
+                            ->required(),
+                    ])
+                    ->action(function (JobPosting $record, array $data) {
+                        $record->update(['closing_date' => $data['closing_date']]);
+                    })
+                    ->successNotificationTitle('Deadline extended'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])

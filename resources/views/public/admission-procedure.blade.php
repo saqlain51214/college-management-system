@@ -38,20 +38,15 @@
             <section>
                 <h2 class="text-xl font-bold text-stone-800 pb-2 mb-6 border-b-2" style="border-color:var(--site-brand)">How to Apply</h2>
                 <div class="space-y-6">
-                    @foreach([
-                        ['Check Eligibility','Review the eligibility criteria for your desired program. Ensure you meet the minimum qualification requirements before applying.'],
-                        ['Obtain Admission Form','Download the admission form from our Downloads page or collect a printed copy from the college administration office.'],
-                        ['Fill & Submit Form','Complete the form with accurate personal and academic information. Submit it along with all required documents to the admissions office.'],
-                        ['Pay Admission Fee','Deposit the admission fee at the designated bank and attach the bank receipt with your application.'],
-                        ['Document Verification','Our admissions team will verify your submitted documents. You may be called for an interview or additional verification if required.'],
-                        ['Merit List & Confirmation','Admission is granted on merit. Check the merit list on the college notice board or website. Confirm your admission within the specified deadline.'],
-                        ['Enrollment','Complete the enrollment process by paying the semester fee and obtaining your college ID and roll number.'],
-                    ] as $i => [$title, $desc])
+                    @php
+                        $steps = data_get($cmsPage ?? null, 'content.steps') ?: \App\Models\WebsitePage::defaultContentFor('admission-procedure')['steps'];
+                    @endphp
+                    @foreach($steps as $i => $step)
                     <div class="flex gap-4">
                         <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm font-bold shadow" style="background:var(--site-brand)">{{ $i + 1 }}</div>
                         <div class="pt-1">
-                            <h3 class="font-bold text-stone-800 text-base">{{ $title }}</h3>
-                            <p class="text-sm text-stone-600 mt-1 leading-relaxed">{{ $desc }}</p>
+                            <h3 class="font-bold text-stone-800 text-base">{{ $step['title'] ?? '' }}</h3>
+                            <p class="text-sm text-stone-600 mt-1 leading-relaxed">{{ $step['description'] ?? '' }}</p>
                         </div>
                     </div>
                     @endforeach

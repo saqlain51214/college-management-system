@@ -36,11 +36,17 @@ class WebsitePageResource extends Resource
                     Forms\Components\TextInput::make('title')
                         ->required()
                         ->maxLength(200)
-                        ->disabled(),
+                        ->helperText('The page\'s own heading. Does not change its web address.'),
+                    Forms\Components\TextInput::make('menu_label')
+                        ->label('Menu Label (Optional)')
+                        ->maxLength(255)
+                        ->placeholder('Leave blank to use the Title above')
+                        ->helperText('What visitors see in the navigation menu. Changing this does NOT change the page\'s web address — safe to rename anytime.'),
                     Forms\Components\TextInput::make('slug')
                         ->required()
                         ->maxLength(200)
-                        ->disabled(),
+                        ->disabled()
+                        ->helperText('The page\'s web address — fixed, cannot be changed here.'),
                     Forms\Components\Toggle::make('is_published')
                         ->label('Published (show on website)')
                         ->helperText('ON: page is live on the website and its menu link appears. OFF: page shows a 404 and its menu is hidden (you can still Preview it).')
@@ -140,6 +146,51 @@ class WebsitePageResource extends Resource
                         ]),
                 ]),
 
+            Forms\Components\Section::make('Facilities List')
+                ->visible(fn (Get $get): bool => $get('slug') === 'campus-facilities')
+                ->schema([
+                    Forms\Components\Repeater::make('content.facilities')
+                        ->label('Facilities')
+                        ->collapsed()
+                        ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                        ->schema([
+                            Forms\Components\TextInput::make('title')->required()->columnSpanFull(),
+                            Forms\Components\Textarea::make('description')->rows(2)->required()->columnSpanFull(),
+                            Forms\Components\Select::make('icon')
+                                ->options([
+                                    'classrooms' => 'Classrooms',
+                                    'library'    => 'Library',
+                                    'computer'   => 'Computer Lab',
+                                    'admin'      => 'Administrative Block',
+                                    'sports'     => 'Sports Area',
+                                    'prayer'     => 'Prayer Area',
+                                    'canteen'    => 'Canteen',
+                                    'security'   => 'Safe Environment',
+                                    'wifi'       => 'Wi-Fi Campus',
+                                ])
+                                ->default('classrooms')
+                                ->required(),
+                        ])
+                        ->addActionLabel('Add Facility')
+                        ->columnSpanFull(),
+                ]),
+
+            Forms\Components\Section::make('How to Apply — Steps')
+                ->visible(fn (Get $get): bool => $get('slug') === 'admission-procedure')
+                ->schema([
+                    Forms\Components\Repeater::make('content.steps')
+                        ->label('Steps')
+                        ->collapsed()
+                        ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                        ->schema([
+                            Forms\Components\TextInput::make('title')->required()->columnSpanFull(),
+                            Forms\Components\Textarea::make('description')->rows(2)->required()->columnSpanFull(),
+                        ])
+                        ->addActionLabel('Add Step')
+                        ->reorderable()
+                        ->columnSpanFull(),
+                ]),
+
             Forms\Components\Section::make('Page Intro & Content')
                 ->visible(fn (Get $get): bool => $get('slug') !== 'home')
                 ->columns(2)
@@ -164,12 +215,16 @@ class WebsitePageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('sort_order')->label('#')->sortable()->alignCenter(),
-                Tables\Columns\TextColumn::make('title')->searchable()->sortable()->wrap(),
-                Tables\Columns\TextColumn::make('slug')->searchable(),
+                Tables\Columns\TextColumn::make('title')->searchable()->sortable()->wrap()->weight('bold'),
+                Tables\Columns\TextColumn::make('menu_label')->label('Menu Label')->placeholder('(same as Title)')->toggleable(),
+                Tables\Columns\TextColumn::make('slug')->searchable()->toggleable(),
                 Tables\Columns\ToggleColumn::make('is_published')->label('Published')->onColor('success')->offColor('gray'),
                 Tables\Columns\TextColumn::make('updated_at')->label('Last Updated')->dateTime('d M Y')->sortable(),
             ])
+            ->groups([
+                Tables\Grouping\Group::make('section')->label('Page Area'),
+            ])
+            ->defaultGroup('section')
             ->filters([Tables\Filters\TernaryFilter::make('is_published'), Tables\Filters\TrashedFilter::make()])
             ->recordUrl(null)
             ->actions([

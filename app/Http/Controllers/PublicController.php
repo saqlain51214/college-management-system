@@ -484,7 +484,8 @@ class PublicController extends Controller
     {
         $college = $this->college();
         $cmsPage = $this->cmsPage('about-history');
-        return view('public.about-history', compact('college', 'cmsPage'));
+        $firstLeader = \App\Models\LeadershipMessage::active()->orderBy('sort_order')->first();
+        return view('public.about-history', compact('college', 'cmsPage', 'firstLeader'));
     }
 
     public function aboutMission()
@@ -492,25 +493,6 @@ class PublicController extends Controller
         $college = $this->college();
         $cmsPage = $this->cmsPage('about-mission');
         return view('public.about-mission', compact('college', 'cmsPage'));
-    }
-
-    public function aboutMessage()
-    {
-        $college = $this->college();
-        $cmsPage = $this->cmsPage('about-message');
-        return view('public.about-message', compact('college', 'cmsPage'));
-    }
-
-    public function aboutDirector()
-    {
-        $college = $this->college();
-        return view('public.about-director', compact('college'));
-    }
-
-    public function aboutPrincipal()
-    {
-        $college = $this->college();
-        return view('public.about-principal', compact('college'));
     }
 
     // ─── Academics sub-pages ────────────────────────────────────────────────
