@@ -180,17 +180,42 @@
                     <p class="mb-2 mt-4 text-xs font-bold uppercase tracking-[0.14em]" style="color:var(--site-gold)">{{ $sem ? 'Semester ' . $sem : 'General' }}</p>
                     <div class="grid gap-3 sm:grid-cols-2">
                         @foreach($items as $o)
-                            <a href="{{ $o->url ?: '#' }}" @if($o->url) target="_blank" @endif
-                               class="group flex items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-4 py-3 transition hover:bg-white hover:shadow-sm">
-                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white" style="background:var(--site-brand)">
-                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V4a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg>
-                                </span>
-                                <span class="min-w-0 flex-1">
-                                    <span class="block text-sm font-semibold text-stone-800 truncate">{{ $o->title }}</span>
-                                    @if($o->academicProgram)<span class="block text-xs text-stone-400 truncate">{{ $o->academicProgram->name }}</span>@endif
-                                </span>
-                                <span class="shrink-0 text-xs font-semibold" style="color:var(--site-gold)">{{ count($o->files) ? (count($o->files) > 1 ? count($o->files) . ' PDFs ↓' : 'PDF ↓') : 'Open ↗' }}</span>
-                            </a>
+                            @if(count($o->files) > 1)
+                                <div x-data="{ open: false }" class="relative">
+                                    <button type="button" @click="open = !open" @click.outside="open = false"
+                                       class="group flex w-full items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-4 py-3 text-left transition hover:bg-white hover:shadow-sm">
+                                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white" style="background:var(--site-brand)">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V4a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg>
+                                        </span>
+                                        <span class="min-w-0 flex-1">
+                                            <span class="block text-sm font-semibold text-stone-800 truncate">{{ $o->title }}</span>
+                                            @if($o->academicProgram)<span class="block text-xs text-stone-400 truncate">{{ $o->academicProgram->name }}</span>@endif
+                                        </span>
+                                        <span class="shrink-0 text-xs font-semibold transition" :class="open ? 'rotate-180' : ''" style="color:var(--site-gold)">{{ count($o->files) }} PDFs ↓</span>
+                                    </button>
+                                    <div x-show="open" x-cloak x-transition class="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-lg">
+                                        @foreach($o->files as $i => $file)
+                                            <a href="{{ $file['url'] }}" target="_blank" rel="noopener"
+                                               class="flex items-center gap-2 px-4 py-2.5 text-sm text-stone-700 transition hover:bg-stone-50 {{ $i > 0 ? 'border-t border-stone-100' : '' }}">
+                                                <svg class="h-4 w-4 shrink-0 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6a2 2 0 012-2h6l6 6v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/></svg>
+                                                <span class="truncate">{{ $file['name'] }}</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <a href="{{ $o->url ?: '#' }}" @if($o->url) target="_blank" @endif
+                                   class="group flex items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-4 py-3 transition hover:bg-white hover:shadow-sm">
+                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white" style="background:var(--site-brand)">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V4a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg>
+                                    </span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block text-sm font-semibold text-stone-800 truncate">{{ $o->title }}</span>
+                                        @if($o->academicProgram)<span class="block text-xs text-stone-400 truncate">{{ $o->academicProgram->name }}</span>@endif
+                                    </span>
+                                    <span class="shrink-0 text-xs font-semibold" style="color:var(--site-gold)">{{ count($o->files) ? 'PDF ↓' : 'Open ↗' }}</span>
+                                </a>
+                            @endif
                         @endforeach
                     </div>
                 @endforeach
