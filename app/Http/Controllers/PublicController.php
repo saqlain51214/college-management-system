@@ -158,7 +158,7 @@ class PublicController extends Controller
         $cmsPage  = $this->cmsPage('home');
         $pageContent = $cmsPage->content;
         $homeSections = $this->homeSections();
-        $programs = AcademicProgram::active()->limit(6)->get();
+        $programs = AcademicProgram::visible()->ordered()->limit(6)->get();
         $news     = NewsArticle::where('is_published', true)->orderByDesc('published_date')->limit(3)->get();
         $events   = WebsiteEvent::published()->orderBy('start_datetime')->limit(4)->get();
         $notices  = Announcement::where('is_published', true)
@@ -168,7 +168,7 @@ class PublicController extends Controller
         $stats = [
             'students' => Student::where('status', 'active')->count(),
             'teachers' => Teacher::where('is_active', true)->count(),
-            'programs' => AcademicProgram::active()->count(),
+            'programs' => AcademicProgram::visible()->count(),
             'departments' => Department::where('is_active', true)->where('show_on_website', true)->count(),
             'years_of_excellence' => max(0, now()->year - $establishedYear),
         ];
@@ -193,7 +193,7 @@ class PublicController extends Controller
         $stats   = [
             'students' => Student::where('status', 'active')->count(),
             'teachers' => Teacher::where('is_active', true)->count(),
-            'programs' => AcademicProgram::active()->count(),
+            'programs' => AcademicProgram::visible()->count(),
         ];
         if (isset($pageContent['stats'])) {
             $pageContent['stats'][0]['value'] = number_format($stats['students']) . '+';
@@ -207,7 +207,7 @@ class PublicController extends Controller
         $college  = $this->college();
         $cmsPage  = $this->cmsPage('programs');
         $pageContent = $cmsPage->content;
-        $programs = AcademicProgram::active()->orderBy('sort_order')->orderBy('name')->get();
+        $programs = AcademicProgram::visible()->ordered()->get();
         return view('public.programs', compact('college', 'cmsPage', 'pageContent', 'programs'));
     }
 

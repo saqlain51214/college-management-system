@@ -35,62 +35,47 @@
 
 <section class="py-12 md:py-16">
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
-    <h2 class="mb-8 text-center font-display text-2xl font-semibold text-ink sm:text-3xl">Programmes</h2>
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      @if($programs->count())
-      @foreach($programs->take(6) as $program)
-      <article class="rounded-xl border border-stone-200/80 bg-white p-6 shadow-md transition hover:shadow-lg">
-        <h3 class="font-semibold text-brand">{{ $program->name }}</h3>
-        <p class="mt-2 text-sm text-stone-600">{{ $program->description ?? 'Structured preparation for board and university exams.' }}</p>
-        @if($program->duration_years || $program->total_semesters)
-        <p class="mt-3 text-xs font-medium text-stone-500">
-          Duration:
-          @if($program->duration_years){{ $program->duration_years }} {{ Str::plural('Year', $program->duration_years) }}@endif
-          @if($program->total_semesters) ({{ $program->total_semesters }} Semesters)@endif
-        </p>
-        @endif
-        <a href="{{ route('admissions') }}" class="mt-4 inline-block text-sm font-semibold text-brand hover:underline">Apply →</a>
-      </article>
-      @endforeach
-      @else
-      <article class="rounded-xl border border-stone-200/80 bg-white p-6 shadow-md">
-        <h3 class="font-semibold text-brand">FSc Pre-Medical</h3>
-        <p class="mt-2 text-sm text-stone-600">Biology, Chemistry, Physics — preparation for medical entry tests.</p>
-        <p class="mt-3 text-xs font-medium text-stone-500">Duration: 2 years</p>
-        <a href="{{ route('admissions') }}" class="mt-4 inline-block text-sm font-semibold text-brand hover:underline">Apply →</a>
-      </article>
-      <article class="rounded-xl border border-stone-200/80 bg-white p-6 shadow-md transition hover:shadow-lg">
-        <h3 class="font-semibold text-brand">FSc Pre-Engineering</h3>
-        <p class="mt-2 text-sm text-stone-600">Mathematics, Physics, Chemistry — ECAT and engineering pathways.</p>
-        <p class="mt-3 text-xs font-medium text-stone-500">Duration: 2 years</p>
-        <a href="{{ route('admissions') }}" class="mt-4 inline-block text-sm font-semibold text-brand hover:underline">Apply →</a>
-      </article>
-      <article class="rounded-xl border border-stone-200/80 bg-white p-6 shadow-md transition hover:shadow-lg">
-        <h3 class="font-semibold text-brand">ICS / Computer Science</h3>
-        <p class="mt-2 text-sm text-stone-600">Computer science with mathematics or statistics options.</p>
-        <p class="mt-3 text-xs font-medium text-stone-500">Duration: 2 years</p>
-        <a href="{{ route('admissions') }}" class="mt-4 inline-block text-sm font-semibold text-brand hover:underline">Apply →</a>
-      </article>
-      <article class="rounded-xl border border-stone-200/80 bg-white p-6 shadow-md transition hover:shadow-lg">
-        <h3 class="font-semibold text-brand">I.Com</h3>
-        <p class="mt-2 text-sm text-stone-600">Accounting, commerce, and business foundations.</p>
-        <p class="mt-3 text-xs font-medium text-stone-500">Duration: 2 years</p>
-        <a href="{{ route('admissions') }}" class="mt-4 inline-block text-sm font-semibold text-brand hover:underline">Apply →</a>
-      </article>
-      <article class="rounded-xl border border-stone-200/80 bg-white p-6 shadow-md transition hover:shadow-lg">
-        <h3 class="font-semibold text-brand">FA (Arts / Humanities)</h3>
-        <p class="mt-2 text-sm text-stone-600">General arts combinations; support for law and social sciences.</p>
-        <p class="mt-3 text-xs font-medium text-stone-500">Duration: 2 years</p>
-        <a href="{{ route('admissions') }}" class="mt-4 inline-block text-sm font-semibold text-brand hover:underline">Apply →</a>
-      </article>
-      <article class="rounded-xl border border-stone-200/80 bg-white p-6 shadow-md transition hover:shadow-lg">
-        <h3 class="font-semibold text-brand">Undergraduate (BS / ADP)</h3>
-        <p class="mt-2 text-sm text-stone-600">Four-year BS and two-year ADP streams where affiliated.</p>
-        <p class="mt-3 text-xs font-medium text-stone-500">4 years / 2 years</p>
-        <a href="{{ route('contact') }}" class="mt-4 inline-block text-sm font-semibold text-brand hover:underline">Enquire →</a>
-      </article>
-      @endif
-    </div>
+    <h2 class="mb-8 text-center font-display text-2xl font-semibold text-ink sm:text-3xl">Programmes Offered</h2>
+    @if($programs->isEmpty())
+      <div class="rounded-2xl border border-dashed border-stone-300 p-16 text-center">
+        <p class="text-stone-500 font-medium text-lg">Programmes are being set up.</p>
+        <p class="text-stone-400 mt-1">Please check back soon.</p>
+      </div>
+    @else
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        @foreach($programs as $program)
+        <article id="{{ $program->slug }}" class="group rounded-xl border border-stone-200/80 bg-white shadow-md overflow-hidden transition hover:shadow-lg hover:-translate-y-0.5">
+          @if($program->banner_image_url)
+            <div class="h-32 overflow-hidden">
+              <img src="{{ $program->banner_image_url }}" alt="{{ $program->name }}"
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            </div>
+          @else
+            <div class="h-32 site-brand-gradient flex items-center justify-center">
+              <svg class="w-10 h-10 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.42A12.02 12.02 0 0121 15.5V17a2 2 0 01-2 2H5a2 2 0 01-2-2v-1.5a12.02 12.02 0 012.84-4.92L12 14z"/></svg>
+            </div>
+          @endif
+          <div class="p-6">
+            @if($program->degree_type)
+              <span class="inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide bg-brand/10 text-brand">{{ $program->degree_type->shortLabel() }}</span>
+            @endif
+            <h3 class="mt-2 font-semibold text-ink">{{ $program->name }}</h3>
+            <p class="mt-2 text-sm text-stone-600 line-clamp-2">{{ $program->description ?? 'Structured preparation for board and university exams.' }}</p>
+            @if($program->duration_years || $program->total_semesters)
+            <p class="mt-3 text-xs font-medium text-stone-500">
+              @if($program->duration_years){{ $program->duration_years }} {{ Str::plural('Year', $program->duration_years) }}@endif
+              @if($program->total_semesters) ({{ $program->total_semesters }} Semesters)@endif
+            </p>
+            @endif
+            <a href="{{ route('admissions') }}" class="mt-4 inline-flex items-center text-sm font-semibold text-brand hover:underline">
+              Apply Now
+              <svg class="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+        @endforeach
+      </div>
+    @endif
   </div>
 </section>
 
