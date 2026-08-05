@@ -56,8 +56,8 @@
             </div>
           @endif
           <div class="p-6">
-            @if($program->degree_type)
-              <span class="inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide bg-brand/10 text-brand">{{ $program->degree_type->shortLabel() }}</span>
+            @if($program->short_name || $program->degree_type)
+              <span class="inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide bg-brand/10 text-brand">{{ $program->short_name ?: $program->degree_type->shortLabel() }}</span>
             @endif
             <h3 class="mt-2 font-semibold text-ink">{{ $program->name }}</h3>
             <p class="mt-2 text-sm text-stone-600 line-clamp-2">{{ $program->description ?? 'Structured preparation for board and university exams.' }}</p>

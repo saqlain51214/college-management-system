@@ -22,17 +22,6 @@
             </a>
         </div>
 
-        @if(!empty($s['stats']))
-        <div class="mt-5 flex flex-wrap gap-6">
-            @foreach($s['stats'] as $stat)
-            <div>
-                <p class="font-display text-xl font-bold text-stone-900">{{ $stat['value'] ?? '' }}</p>
-                <p class="text-xs text-stone-500">{{ $stat['label'] ?? '' }}</p>
-            </div>
-            @endforeach
-        </div>
-        @endif
-
         @if(($programs ?? collect())->isNotEmpty())
         <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             @foreach($programs->take(4) as $i => $program)
@@ -52,8 +41,8 @@
                     </div>
                 @endif
                 <div class="p-4">
-                    @if($program->degree_type)
-                        <span class="inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-brand/10" style="color:var(--site-brand)">{{ $program->degree_type->shortLabel() }}</span>
+                    @if($program->short_name || $program->degree_type)
+                        <span class="inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-brand/10" style="color:var(--site-brand)">{{ $program->short_name ?: $program->degree_type->shortLabel() }}</span>
                     @endif
                     <h3 class="mt-1.5 text-sm font-bold text-stone-900 leading-snug line-clamp-2">{{ $program->name }}</h3>
                     @if($program->duration_years)
