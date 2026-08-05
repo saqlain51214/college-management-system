@@ -22,66 +22,83 @@
             </a>
         </div>
 
-        @if(($programs ?? collect())->isNotEmpty())
-        <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            @foreach($programs->take(4) as $i => $program)
-            @if($i === 0)
-                {{-- Featured card with image overlay --}}
-                <a href="{{ route('programs') }}#{{ $program->slug }}"
-                   class="group relative rounded-lg overflow-hidden shadow-lg transition hover:shadow-xl hover:-translate-y-1 sm:col-span-1 lg:row-span-2 lg:col-span-1" data-reveal style="aspect-ratio: auto; min-height: 280px;">
-                    @if($program->banner_image_url)
-                        <img src="{{ $program->banner_image_url }}" alt="{{ $program->name }}"
-                             class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+        @php $featuredHero = ($programs ?? collect())->first(); $featuredRest = ($programs ?? collect())->skip(1)->take(3); @endphp
+
+        @if($featuredHero)
+        <div class="mt-8 grid gap-4 sm:gap-6 lg:grid-cols-5">
+
+            {{-- Hero program --}}
+            <a href="{{ route('programs') }}#{{ $featuredHero->slug }}"
+               class="group relative flex flex-col overflow-hidden rounded-2xl bg-stone-900 lg:col-span-3" data-reveal>
+                <div class="relative h-56 sm:h-72 lg:h-80 overflow-hidden">
+                    @if($featuredHero->banner_image_url)
+                        <img src="{{ $featuredHero->banner_image_url }}" alt="{{ $featuredHero->name }}"
+                             class="h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105 group-hover:opacity-90"
+                             loading="lazy" decoding="async">
                     @else
-                        <div class="absolute inset-0 site-brand-gradient"></div>
+                        <div class="h-full w-full site-brand-gradient"></div>
                     @endif
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                    <div class="relative h-full flex flex-col justify-between p-5">
-                        @if($program->is_featured)
-                            <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white w-fit" style="background:var(--site-gold)">Featured</span>
-                        @else
-                            <span></span>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+                </div>
+                <div class="absolute inset-x-0 bottom-0 flex flex-col p-5 sm:p-7">
+                    <div class="mb-2 sm:mb-3 flex flex-wrap items-center gap-2">
+                        @if($featuredHero->is_featured)
+                            <span class="rounded-full px-2.5 py-0.5 font-bold uppercase tracking-wide text-white text-[10px]" style="background:var(--site-gold)">Featured</span>
                         @endif
-                        <div>
-                            @if($program->short_name || $program->degree_type)
-                                <span class="inline-block rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white mb-2" style="background:rgba(255,255,255,0.25)">{{ $program->short_name ?: $program->degree_type->shortLabel() }}</span>
-                            @endif
-                            <h3 class="text-base font-bold text-white leading-snug">{{ $program->name }}</h3>
-                            <p class="mt-2 text-xs text-white/85 line-clamp-2">{{ $program->description ?? 'Structured preparation for board and university exams.' }}</p>
-                            @if($program->duration_years)
-                                <p class="mt-2 text-xs text-white/70">{{ $program->duration_years }} {{ Str::plural('Year', $program->duration_years) }}</p>
-                            @endif
-                            <span class="mt-3 inline-flex items-center text-xs font-semibold text-white">
-                                Details
-                                <svg class="h-3 w-3 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                            </span>
-                        </div>
+                        @if($featuredHero->short_name || $featuredHero->degree_type)
+                            <span class="rounded-full px-2.5 py-0.5 font-semibold uppercase tracking-wide text-white text-[10px]" style="background:rgba(255,255,255,0.2)">{{ $featuredHero->short_name ?: $featuredHero->degree_type->shortLabel() }}</span>
+                        @endif
                     </div>
-                </a>
-            @else
-                {{-- Standard cards --}}
+                    <h3 class="mb-1.5 sm:mb-2 font-display text-lg sm:text-xl lg:text-2xl font-bold leading-snug text-white group-hover:text-white/90">
+                        {{ $featuredHero->name }}
+                    </h3>
+                    <p class="text-xs sm:text-sm leading-relaxed text-white/70 line-clamp-2">
+                        {{ Str::limit($featuredHero->description ?? 'Structured preparation for board and university exams.', 130) }}
+                    </p>
+                    <span class="mt-3 sm:mt-4 inline-flex items-center gap-1 text-xs font-semibold text-white/90 transition group-hover:gap-2">
+                        Details
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            {{-- Remaining programs --}}
+            <div class="flex flex-col gap-3 sm:gap-4 lg:col-span-2">
+                @forelse($featuredRest as $program)
                 <a href="{{ route('programs') }}#{{ $program->slug }}"
-                   class="group rounded-lg border border-stone-200/80 bg-white shadow-md overflow-hidden transition hover:shadow-lg hover:-translate-y-0.5" data-reveal>
-                    <div class="h-32 site-brand-gradient flex items-center justify-center">
-                        <svg class="w-10 h-10 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.42A12.02 12.02 0 0121 15.5V17a2 2 0 01-2 2H5a2 2 0 01-2-2v-1.5a12.02 12.02 0 012.84-4.92L12 14z"/></svg>
+                   class="group flex gap-3 sm:gap-4 rounded-xl p-3 sm:p-4 ring-1 ring-stone-200/70 transition hover:ring-stone-300" data-reveal
+                   style="background:var(--site-surface)">
+                    <div class="h-16 w-20 sm:h-20 sm:w-24 shrink-0 overflow-hidden rounded-lg">
+                        @if($program->banner_image_url)
+                            <img src="{{ $program->banner_image_url }}" alt="{{ $program->name }}"
+                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                                 loading="lazy" decoding="async">
+                        @else
+                            <div class="h-full w-full site-brand-gradient flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.42A12.02 12.02 0 0121 15.5V17a2 2 0 01-2 2H5a2 2 0 01-2-2v-1.5a12.02 12.02 0 012.84-4.92L12 14z"/></svg>
+                            </div>
+                        @endif
                     </div>
-                    <div class="p-5">
-                        @if($program->short_name || $program->degree_type)
-                            <span class="inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide" style="background:var(--site-brand)/10;color:var(--site-brand)">{{ $program->short_name ?: $program->degree_type->shortLabel() }}</span>
-                        @endif
-                        <h3 class="mt-2 text-sm font-bold text-stone-900">{{ $program->name }}</h3>
-                        <p class="mt-2 text-xs text-stone-600 line-clamp-2">{{ $program->description ?? 'Structured preparation for board and university exams.' }}</p>
-                        @if($program->duration_years)
-                            <p class="mt-3 text-xs text-stone-500">{{ $program->duration_years }} {{ Str::plural('Year', $program->duration_years) }}</p>
-                        @endif
-                        <span class="mt-3 inline-flex items-center text-xs font-semibold" style="color:var(--site-brand)">
-                            Learn more
-                            <svg class="h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </span>
+                    <div class="min-w-0 flex-1">
+                        <p class="mb-0.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-stone-400">
+                            @if($program->is_featured)
+                                <span class="font-bold" style="color:var(--site-gold)">Featured</span> ·
+                            @endif
+                            {{ $program->short_name ?: ($program->degree_type?->shortLabel() ?? 'Programme') }}
+                        </p>
+                        <h3 class="font-display text-sm font-bold leading-snug text-stone-900 transition group-hover:text-[var(--site-brand)] line-clamp-2">
+                            {{ $program->name }}
+                        </h3>
+                        <p class="mt-0.5 text-xs leading-relaxed text-stone-500 line-clamp-1 sm:line-clamp-2">
+                            {{ Str::limit($program->description ?? 'Structured preparation for board and university exams.', 80) }}
+                        </p>
                     </div>
                 </a>
-            @endif
-            @endforeach
+                @empty
+                <p class="text-sm text-stone-400 py-4">No additional programmes.</p>
+                @endforelse
+            </div>
+
         </div>
         @endif
 
