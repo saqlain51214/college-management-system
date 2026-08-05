@@ -182,6 +182,11 @@ class FeePayment extends Model
             'fee_type'     => $feeType,
             'payment_date' => optional($this->payment_date)->format('d M Y') ?? now()->format('d M Y'),
         ]);
+
+        if (filled($this->student->email)) {
+            \Illuminate\Support\Facades\Mail::to($this->student->email)
+                ->queue(new \App\Mail\FeePaymentReceiptMail($this));
+        }
     }
 
     /**

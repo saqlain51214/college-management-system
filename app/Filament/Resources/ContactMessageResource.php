@@ -53,6 +53,29 @@ class ContactMessageResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->after(fn(ContactMessage $r) => $r->update(['is_read'=>true])),
+
+                Tables\Actions\Action::make('reply')
+                    ->label('Reply')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('primary')
+                    ->form([
+                        \Filament\Forms\Components\Textarea::make('reply')
+                            ->label('Your reply')
+                            ->required()
+                            ->rows(5)
+                            ->default(fn (ContactMessage $r) => $r->reply),
+                    ])
+                    ->action(function (ContactMessage $r, array $data) {
+                        $r->update(['reply' => $data['reply'], 'is_read' => true]);
+
+                        \Illuminate\Support\Facades\Mail::to($r->email)
+                            ->queue(new \App\Mail\ContactMessageReplyMail($r));
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Reply sent to ' . $r->email)
+                            ->success()->send();
+                    }),
+
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])])

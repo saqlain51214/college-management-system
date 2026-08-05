@@ -59,6 +59,14 @@ class FeeRefund extends Model
             $this->remarks = $remarks;
         }
         $this->save();
+
+        if ($this->student) {
+            app(NotificationService::class)->send($this->student, 'refund_rejected', [
+                'student_name' => $this->student->name,
+                'amount'       => number_format((float) $this->amount),
+                'reason'       => $this->remarks ?: 'Not specified.',
+            ]);
+        }
     }
 
     protected static function booted(): void

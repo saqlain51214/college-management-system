@@ -776,6 +776,7 @@ class PublicController extends Controller
         $officeEmail  = $college->email ?? CollegeSetting::get('college_email', 'jinnahschooldegreecollege@gmail.com');
 
         Mail::to($officeEmail)->queue(new \App\Mail\JobApplicationOfficeNotificationMail($application));
+        Mail::to($application->email)->queue(new \App\Mail\JobApplicationStatusMail($application));
 
         $this->notifyAdminsOfNewSubmission(
             title: 'New Job Application',

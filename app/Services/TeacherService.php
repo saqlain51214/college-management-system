@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Mail\TeacherWelcomeMail;
 use App\Models\Teacher;
 use App\Repositories\Interfaces\TeacherRepositoryInterface;
+use Illuminate\Support\Facades\Mail;
 
 class TeacherService
 {
@@ -16,7 +18,13 @@ class TeacherService
             $data['employee_id'] = sprintf('EMP-%04d', $seq);
         }
 
-        return $this->repo->create($data);
+        $teacher = $this->repo->create($data);
+
+        if (filled($teacher->email) && config('platform.notifications.send_teacher_welcome_email', true)) {
+            Mail::to($teacher->email)->queue(new TeacherWelcomeMail($teacher));
+        }
+
+        return $teacher;
     }
 
     public function updateTeacher(Teacher $teacher, array $data): Teacher

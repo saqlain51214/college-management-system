@@ -156,6 +156,26 @@ class FeeStructureResource extends Resource
                         $r->amount = $data['new_amount'];
                         $r->save();
 
+                        // Only query roles that actually exist for this guard — mirrors
+                        // the same pattern used by FeeRefund's admin alert.
+                        $existingRoles = \Spatie\Permission\Models\Role::whereIn('name', ['super_admin', 'Developer'])
+                            ->where('guard_name', 'web')->pluck('name')->all();
+                        $otherAdmins = $existingRoles
+                            ? \App\Models\User::role($existingRoles)->where('id', '!=', auth()->id())->get()
+                            : collect();
+
+                        if ($otherAdmins->isNotEmpty()) {
+                            \Filament\Notifications\Notification::make()
+                                ->info()
+                                ->title('Fee Structure Amount Changed')
+                                ->body(
+                                    ($r->name ?? 'A fee structure') . ' changed from Rs. ' . number_format($oldAmount) .
+                                    ' to Rs. ' . number_format((float) $data['new_amount']) . ' by ' . (auth()->user()->name ?? 'an admin') .
+                                    '. Reason: ' . $data['reason']
+                                )
+                                ->sendToDatabase($otherAdmins);
+                        }
+
                         \Filament\Notifications\Notification::make()
                             ->title('Amount updated')
                             ->body('Already-generated challans keep their original amount — this only applies to new challans from now on.')

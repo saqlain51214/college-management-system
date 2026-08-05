@@ -92,6 +92,32 @@ class NotificationTemplateSeeder extends Seeder
             ],
 
             [
+                'key'          => 'refund_rejected',
+                'name'         => 'Refund Rejected — Student',
+                'description'  => 'Sent when the accounts office rejects a student\'s refund request.',
+                'channel'      => 'both',
+                'subject'      => 'Refund Request Update — JDCA',
+                'body'         => "Dear {{student_name}},\n\nYour refund request for PKR {{amount}} could not be approved.\n\n**Reason:** {{reason}}\n\nPlease contact the accounts office if you have any questions.",
+                'action_label' => null,
+                'action_url'   => null,
+                'in_app_icon'  => 'x-circle',
+                'variables'    => ['student_name', 'amount', 'reason'],
+            ],
+
+            [
+                'key'          => 'fee_proof_rejected',
+                'name'         => 'Payment Proof Rejected — Student',
+                'description'  => 'Sent when the accounts office rejects an uploaded bank deposit/payment proof.',
+                'channel'      => 'both',
+                'subject'      => 'Payment Proof Not Accepted — Challan {{challan}} — JDCA',
+                'body'         => "Dear {{student_name}},\n\nThe payment proof you uploaded for challan **{{challan}}** could not be accepted.\n\n**Reason:** {{reason}}\n\nPlease upload a clear, valid proof again from your student portal, or contact the accounts office for help.",
+                'action_label' => 'Upload Again',
+                'action_url'   => '/portal/fees',
+                'in_app_icon'  => 'exclamation-triangle',
+                'variables'    => ['student_name', 'challan', 'reason'],
+            ],
+
+            [
                 'key'          => 'scholarship_awarded',
                 'name'         => 'Scholarship Awarded — Student',
                 'description'  => 'Sent when a scholarship is awarded to a student.',
