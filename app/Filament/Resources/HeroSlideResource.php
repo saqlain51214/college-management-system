@@ -57,24 +57,30 @@ class HeroSlideResource extends Resource
                 ])->columns(2),
 
             Forms\Components\Section::make('Buttons (Optional)')
-                ->description('Route name to link to — e.g. "admissions", "programs", "departments", "contact". Leave blank to hide a button.')
+                ->description('Pick which existing page each button opens. Leave "Page to link to" empty to hide that button entirely.')
                 ->schema([
                     Forms\Components\TextInput::make('primary_btn_text')
                         ->label('Primary Button Text')
                         ->maxLength(60)
-                        ->placeholder('e.g. Apply for Admission'),
-                    Forms\Components\TextInput::make('primary_btn_link')
-                        ->label('Primary Button Route')
-                        ->maxLength(100)
-                        ->placeholder('e.g. admissions'),
+                        ->placeholder('e.g. Apply for Admission')
+                        ->helperText('The words shown on the button, e.g. "Apply for Admission".'),
+                    Forms\Components\Select::make('primary_btn_link')
+                        ->label('Primary Button — Page to Link To')
+                        ->options(fn () => static::pageOptions())
+                        ->searchable()
+                        ->native(false)
+                        ->helperText('Only real, working pages are listed — pick one and the button always works. Nothing here → button is hidden.'),
                     Forms\Components\TextInput::make('secondary_btn_text')
                         ->label('Secondary Button Text')
                         ->maxLength(60)
-                        ->placeholder('e.g. Explore Programs'),
-                    Forms\Components\TextInput::make('secondary_btn_link')
-                        ->label('Secondary Button Route')
-                        ->maxLength(100)
-                        ->placeholder('e.g. programs'),
+                        ->placeholder('e.g. Explore Programs')
+                        ->helperText('The words shown on the button, e.g. "Explore Programs".'),
+                    Forms\Components\Select::make('secondary_btn_link')
+                        ->label('Secondary Button — Page to Link To')
+                        ->options(fn () => static::pageOptions())
+                        ->searchable()
+                        ->native(false)
+                        ->helperText('Only real, working pages are listed — pick one and the button always works. Nothing here → button is hidden.'),
                 ])->columns(2),
 
             Forms\Components\Section::make('Display')
@@ -89,6 +95,43 @@ class HeroSlideResource extends Resource
                         ->default(true),
                 ])->columns(2),
         ]);
+    }
+
+    /**
+     * Curated list of param-free public routes safe to use as a slide button
+     * target — deliberately NOT every named route in the app (portal/admin/
+     * pdf routes, or routes needing an {id}/{slug} like a single news article,
+     * are excluded since a hero button can't supply one). Keeping this as a
+     * fixed list (rather than a free-text field) is what makes an invalid
+     * link impossible instead of just validated — the button either links to
+     * a real page or doesn't appear, never a dead "#" link.
+     */
+    public static function pageOptions(): array
+    {
+        return [
+            'home'                          => 'Home',
+            'about'                         => 'About Us',
+            'about.history'                 => 'About — History',
+            'about.mission'                 => 'About — Mission & Vision',
+            'programs'                      => 'Academic Programs',
+            'departments'                   => 'Departments',
+            'faculty'                       => 'Faculty',
+            'course-outlines'                => 'Course Outlines',
+            'campus-facilities'              => 'Campus Facilities',
+            'gallery'                       => 'Gallery',
+            'downloads'                     => 'Downloads',
+            'admissions'                    => 'Admissions — Overview',
+            'admissions.procedure'          => 'Admissions — Procedure',
+            'admissions.fee-structure'      => 'Admissions — Fee Structure',
+            'admissions.semester-rules'     => 'Admissions — Semester Rules',
+            'scholarships'                  => 'Scholarships',
+            'jobs'                          => 'Careers / Job Openings',
+            'news'                          => 'News',
+            'events'                        => 'Events',
+            'notices'                       => 'Notices',
+            'contact'                       => 'Contact Us',
+            'fee-challan.download'          => 'Fee Challan Lookup',
+        ];
     }
 
     public static function table(Table $table): Table
