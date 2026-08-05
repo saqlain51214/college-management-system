@@ -34,6 +34,7 @@ class AcademicProgram extends Model
         'banner_image',
         'is_active',
         'show_on_website',
+        'is_featured',
         'sort_order',
     ];
 
@@ -42,6 +43,7 @@ class AcademicProgram extends Model
         'admission_category' => AdmissionCategoryEnum::class,
         'is_active'          => 'boolean',
         'show_on_website'    => 'boolean',
+        'is_featured'        => 'boolean',
         'sort_order'         => 'integer',
         'duration_years'     => 'integer',
         'total_semesters'    => 'integer',

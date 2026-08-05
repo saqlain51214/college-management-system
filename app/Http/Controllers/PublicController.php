@@ -158,7 +158,7 @@ class PublicController extends Controller
         $cmsPage  = $this->cmsPage('home');
         $pageContent = $cmsPage->content;
         $homeSections = $this->homeSections();
-        $programs = AcademicProgram::visible()->ordered()->limit(6)->get();
+        $programs = AcademicProgram::visible()->orderByDesc('is_featured')->ordered()->limit(4)->get();
         $news     = NewsArticle::where('is_published', true)->orderByDesc('published_date')->limit(3)->get();
         $events   = WebsiteEvent::published()->orderBy('start_datetime')->limit(4)->get();
         $notices  = Announcement::where('is_published', true)
