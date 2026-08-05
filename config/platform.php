@@ -24,6 +24,7 @@ return [
         'admissions_recipient' => env('ADMISSIONS_NOTIFICATION_EMAIL', env('MAIL_FROM_ADDRESS')),
         'student_support_email' => env('STUDENT_SUPPORT_EMAIL', env('MAIL_FROM_ADDRESS')),
         'send_student_welcome_email' => (bool) env('SEND_STUDENT_WELCOME_EMAIL', true),
+        'send_teacher_welcome_email' => (bool) env('SEND_TEACHER_WELCOME_EMAIL', true),
     ],
 
     'logs' => [

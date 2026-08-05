@@ -68,6 +68,24 @@ class TeacherPortalController extends Controller
         return view('teacher.profile', compact('teacher'));
     }
 
+    public function notifications()
+    {
+        $teacher = $this->teacher();
+
+        $notifications = $teacher->notifications()->paginate(15);
+
+        return view('teacher.notifications', compact('teacher', 'notifications'));
+    }
+
+    public function markNotificationRead(string $id)
+    {
+        $teacher = $this->teacher();
+
+        $teacher->unreadNotifications()->where('id', $id)->first()?->markAsRead();
+
+        return back();
+    }
+
     public function updatePassword(Request $request)
     {
         $teacher = $this->teacher();

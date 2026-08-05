@@ -390,7 +390,11 @@ class ImportStudentsFromExcelAction extends Action
                             if ($exists) unset($cleanAttrs[$unique]);
                         }
                     }
-                    Student::create(array_merge(['is_active' => true, 'portal_password' => '123456'], $cleanAttrs));
+                    $newStudent = Student::create(array_merge(['is_active' => true, 'portal_password' => '123456'], $cleanAttrs));
+                    if (filled($newStudent->email) && config('platform.notifications.send_student_welcome_email', true)) {
+                        \Illuminate\Support\Facades\Mail::to($newStudent->email)
+                            ->queue(new \App\Mail\StudentPortalWelcomeMail($newStudent));
+                    }
                     $created++;
                 }
 

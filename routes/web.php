@@ -109,6 +109,8 @@ Route::prefix('teacher')->name('teacher.')->group(function () {
         Route::get('/',                   [TeacherPortalController::class, 'dashboard'])->name('dashboard');
         Route::get('/salary',             [TeacherPortalController::class, 'salary'])->name('salary');
         Route::get('/notices',            [TeacherPortalController::class, 'notices'])->name('notices');
+        Route::get('/notifications',      [TeacherPortalController::class, 'notifications'])->name('notifications');
+        Route::post('/notifications/{id}/read', [TeacherPortalController::class, 'markNotificationRead'])->name('notifications.read');
         Route::get('/profile',            [TeacherPortalController::class, 'profile'])->name('profile');
         Route::post('/profile/password',  [TeacherPortalController::class, 'updatePassword'])->name('profile.password');
     });

@@ -438,6 +438,12 @@ class TeacherResource extends Resource
                         // The model mutator hashes it — do NOT bcrypt again.
                         $record->portal_password = $data['password'];
                         $record->save();
+
+                        if (filled($record->email)) {
+                            \Illuminate\Support\Facades\Mail::to($record->email)
+                                ->queue(new \App\Mail\TeacherPortalPasswordChangedMail($record));
+                        }
+
                         \Filament\Notifications\Notification::make()->success()->title('Portal password updated.')->send();
                     }),
 

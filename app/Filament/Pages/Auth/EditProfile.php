@@ -176,11 +176,17 @@ class EditProfile extends BaseEditProfile
             'avatar' => $data['avatar'] ?? null,
         ];
 
-        if (! empty($data['password'])) {
+        $passwordChanged = ! empty($data['password']);
+        if ($passwordChanged) {
             $update['password'] = Hash::make($data['password']);
         }
 
         $record->update($update);
+
+        if ($passwordChanged && filled($record->email)) {
+            \Illuminate\Support\Facades\Mail::to($record->email)
+                ->queue(new \App\Mail\AdminPasswordChangedMail($record));
+        }
 
         return $record;
     }

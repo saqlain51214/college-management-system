@@ -492,6 +492,14 @@ class FeePaymentResource extends Resource
                     $r->proof_claimed_date    = null;
                     $r->save();
 
+                    if ($r->student) {
+                        app(\App\Services\NotificationService::class)->send($r->student, 'fee_proof_rejected', [
+                            'student_name' => $r->student->name,
+                            'challan'      => $r->challan_number,
+                            'reason'       => $data['reason'],
+                        ]);
+                    }
+
                     \Filament\Notifications\Notification::make()->title('Proof rejected')->success()->send();
                 }),
         ];

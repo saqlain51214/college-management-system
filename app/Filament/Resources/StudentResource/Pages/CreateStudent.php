@@ -68,7 +68,13 @@ class CreateStudent extends CreateRecord
     protected function afterCreate(): void
     {
         if ($this->fromInquiryId) {
-            AdmissionInquiry::where('id', $this->fromInquiryId)->update(['status' => 'enrolled']);
+            $inquiry = AdmissionInquiry::find($this->fromInquiryId);
+            $inquiry?->update(['status' => 'enrolled']);
+
+            if ($inquiry && filled($inquiry->email)) {
+                \Illuminate\Support\Facades\Mail::to($inquiry->email)
+                    ->queue(new \App\Mail\AdmissionInquiryStatusMail($inquiry));
+            }
         }
 
         if ($this->scholarshipId) {

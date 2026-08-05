@@ -683,6 +683,12 @@ class StudentResource extends Resource
                         // The model mutator hashes it — do NOT bcrypt again (double-hash breaks login).
                         $record->portal_password = $data['password'];
                         $record->save();
+
+                        if (filled($record->email)) {
+                            \Illuminate\Support\Facades\Mail::to($record->email)
+                                ->queue(new \App\Mail\StudentPortalPasswordChangedMail($record));
+                        }
+
                         \Filament\Notifications\Notification::make()->success()->title('Portal password updated.')->send();
                     }),
 
@@ -733,27 +739,33 @@ class StudentResource extends Resource
                                 ->placeholder('e.g. Spring 2026 Semester Fee'),
                         ])
                         ->action(function (\Illuminate\Support\Collection $records, array $data) {
+                            // Routed through FeePayment::generateSlip() — the same path
+                            // Fee Payments module uses — so scholarship snapshotting, the
+                            // 3-installment cap, and the student/admin notifications all
+                            // behave identically no matter which screen generated the challan.
                             $created = 0;
+                            $failed  = [];
                             foreach ($records as $student) {
-                                FeePayment::create([
-                                    'student_id'       => $student->id,
-                                    'challan_number'   => 'CHN-' . strtoupper(Str::random(8)),
-                                    'fee_type'         => $data['fee_type'],
-                                    'amount_due'       => $data['amount_due'],
-                                    'fine_amount'      => 0,
-                                    'discount_amount'  => 0,
-                                    'amount_paid'      => 0,
-                                    'payment_status'   => PaymentStatusEnum::Pending->value,
-                                    'due_date'         => $data['due_date'],
-                                    'semester_number'  => $data['semester_number'] ?? null,
-                                    'academic_year_id' => $data['academic_year_id'] ?? null,
-                                    'remarks'          => $data['remarks'] ?? null,
-                                ]);
-                                $created++;
+                                try {
+                                    FeePayment::generateSlip($student, [
+                                        'fee_type'         => $data['fee_type'],
+                                        'amount'           => $data['amount_due'],
+                                        'due_date'         => $data['due_date'],
+                                        'semester_number'  => $data['semester_number'] ?? null,
+                                        'academic_year_id' => $data['academic_year_id'] ?? null,
+                                        'remarks'          => $data['remarks'] ?? null,
+                                    ]);
+                                    $created++;
+                                } catch (\InvalidArgumentException $e) {
+                                    $failed[] = "{$student->name}: {$e->getMessage()}";
+                                }
                             }
+
                             \Filament\Notifications\Notification::make()
-                                ->title("{$created} fee challans generated successfully.")
-                                ->success()->send();
+                                ->title("{$created} fee challan(s) generated" . ($failed ? ', ' . count($failed) . ' skipped' : ''))
+                                ->body($failed ? implode("\n", array_slice($failed, 0, 5)) : null)
+                                ->color($failed ? 'warning' : 'success')
+                                ->send();
                         }),
 
                     Tables\Actions\BulkAction::make('downloadFeeChallans')

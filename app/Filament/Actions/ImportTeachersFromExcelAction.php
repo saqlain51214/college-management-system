@@ -414,7 +414,11 @@ class ImportTeachersFromExcelAction extends Action
                             if ($exists) unset($cleanAttrs[$unique]);
                         }
                     }
-                    Teacher::create(array_merge(['is_active' => true, 'status' => 'active'], $cleanAttrs));
+                    $newTeacher = Teacher::create(array_merge(['is_active' => true, 'status' => 'active'], $cleanAttrs));
+                    if (filled($newTeacher->email) && config('platform.notifications.send_teacher_welcome_email', true)) {
+                        \Illuminate\Support\Facades\Mail::to($newTeacher->email)
+                            ->queue(new \App\Mail\TeacherWelcomeMail($newTeacher));
+                    }
                     $created++;
                 }
 
