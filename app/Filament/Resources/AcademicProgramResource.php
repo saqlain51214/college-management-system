@@ -272,7 +272,7 @@ class AcademicProgramResource extends Resource
 
             // ── Section 4: Display Settings ───────────────────────────────────
             Forms\Components\Section::make('Display Settings')
-                ->columns(3)
+                ->columns(4)
                 ->schema([
 
                     Forms\Components\TextInput::make('sort_order')
@@ -295,6 +295,12 @@ class AcademicProgramResource extends Resource
                         ->default(true)
                         ->onColor('success')
                         ->helperText('Hide from public website only.'),
+
+                    Forms\Components\Toggle::make('is_featured')
+                        ->label('Featured on Homepage')
+                        ->default(false)
+                        ->onColor('warning')
+                        ->helperText('Shown in the "Featured Programs" section on the homepage. The first featured program gets the large image card.'),
                 ]),
         ]);
     }
@@ -358,6 +364,11 @@ class AcademicProgramResource extends Resource
                     ->offColor('danger')
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                Tables\Columns\ToggleColumn::make('is_featured')
+                    ->label('Featured')
+                    ->onColor('warning')
+                    ->offColor('gray'),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created')
                     ->date('d M Y')
@@ -382,6 +393,11 @@ class AcademicProgramResource extends Resource
 
                 Tables\Filters\TernaryFilter::make('show_on_website')
                     ->label('Website Visibility'),
+
+                Tables\Filters\TernaryFilter::make('is_featured')
+                    ->label('Featured on Homepage')
+                    ->trueLabel('Featured Only')
+                    ->falseLabel('Not Featured'),
 
                 Tables\Filters\TrashedFilter::make(),
             ])

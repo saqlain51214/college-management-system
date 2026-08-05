@@ -37,7 +37,11 @@
                     @endif
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                     <div class="relative h-full flex flex-col justify-between p-5">
-                        <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white w-fit" style="background:var(--site-gold)">Featured</span>
+                        @if($program->is_featured)
+                            <span class="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white w-fit" style="background:var(--site-gold)">Featured</span>
+                        @else
+                            <span></span>
+                        @endif
                         <div>
                             @if($program->short_name || $program->degree_type)
                                 <span class="inline-block rounded px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white mb-2" style="background:rgba(255,255,255,0.25)">{{ $program->short_name ?: $program->degree_type->shortLabel() }}</span>
