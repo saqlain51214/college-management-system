@@ -118,7 +118,7 @@ class NotificationTemplateResource extends Resource
                         default => $state,
                     })
                     ->color(fn (string $state) => match ($state) {
-                        'mail' => 'info',
+                        'mail' => 'primary',
                         'database' => 'gray',
                         'both' => 'success',
                         default => 'gray',
