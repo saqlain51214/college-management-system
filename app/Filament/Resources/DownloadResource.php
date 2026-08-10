@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class DownloadResource extends Resource
 {
@@ -48,15 +49,24 @@ class DownloadResource extends Resource
                     ->directory('downloads')
                     ->required()
                     ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                    ->maxSize(5120)
+                    ->helperText('Maximum file size: 5 MB.')
                     ->afterStateUpdated(function ($state, callable $set) {
-                        if ($state) {
-                            $filename = is_array($state) ? array_key_first($state) : $state;
-                            if ($filename) {
-                                $extension = strtoupper(pathinfo($filename, PATHINFO_EXTENSION));
-                                $set('original_filename', $filename);
-                                $set('file_type', $extension ?: 'PDF');
-                            }
+                        if (! $state) {
+                            return;
                         }
+
+                        $file = is_array($state) ? reset($state) : $state;
+
+                        if (! $file instanceof TemporaryUploadedFile) {
+                            return;
+                        }
+
+                        $originalName = $file->getClientOriginalName();
+                        $extension = strtoupper($file->getClientOriginalExtension() ?: pathinfo($originalName, PATHINFO_EXTENSION));
+
+                        $set('original_filename', $originalName);
+                        $set('file_type', $extension ?: 'PDF');
                     })
                     ->reactive(),
 

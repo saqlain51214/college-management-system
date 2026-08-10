@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Slider Mockup — real images, same classes as hero.blade.php</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  html,body{background:#000}
+  :root{ --site-header-offset:0rem; --site-brand:#8b1e2d; --site-brand-dark:#5c1420; --site-gold:#c4973a; }
+  @keyframes jdca-mq-up   { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+  @keyframes jdca-mq-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .jdca-vtrack { animation: jdca-mq-up var(--vdur, 30s) linear infinite; }
+  .jdca-htrack { animation: jdca-mq-left var(--hdur, 40s) linear infinite; will-change: transform; }
+  .jdca-mq:hover .jdca-vtrack, .jdca-mq:hover .jdca-htrack { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) { .jdca-vtrack, .jdca-htrack { animation: none; } }
+</style>
+</head>
+<body>
+
+<div class="text-white text-xs bg-neutral-900 p-2">
+  Mockup — same markup/classes as <code>resources/views/components/home/hero.blade.php</code>, using the real production images. Resize the window / open on your phone to test mobile fit.
+</div>
+
+<div class="flex w-full overflow-hidden
+            h-[58dvh] min-h-[400px] max-h-[540px]
+            lg:h-[calc(100dvh_-_var(--site-header-offset,6rem))] lg:min-h-[520px] lg:max-h-[880px]"
+     id="hero">
+
+    {{-- SLIDER --}}
+    <div class="relative flex-1 overflow-hidden" style="background:radial-gradient(ellipse at center, #3a0d15 0%, #0a0a0a 75%)">
+
+        <!-- Slide images -->
+        <img data-slide="0" src="https://jdca.edu.pk/storage/hero-slides/01KZB2G482RDBC32YJD46ZEN2X.jpg" alt="Slide 1"
+             class="absolute inset-0 h-full w-full object-contain transition-opacity duration-1000 opacity-100"
+             style="object-position:center center">
+        <img data-slide="1" src="https://jdca.edu.pk/storage/website/pages/01KYB2VA5YPSRCW7BQ7A1NNT7M.jpeg" alt="Slide 2"
+             class="absolute inset-0 h-full w-full object-contain transition-opacity duration-1000 opacity-0"
+             style="object-position:center center">
+        <img data-slide="2" src="https://jdca.edu.pk/storage/hero-slides/01KZB2656DK6NB507ZRRKZSRNB.jpeg" alt="Slide 3"
+             class="absolute inset-0 h-full w-full object-contain transition-opacity duration-1000 opacity-0"
+             style="object-position:center center">
+        <img data-slide="3" src="https://jdca.edu.pk/storage/website/pages/01KYB2VABYNP4K2C2GD3JB6GM7.jpeg" alt="Slide 4"
+             class="absolute inset-0 h-full w-full object-contain transition-opacity duration-1000 opacity-0"
+             style="object-position:center center">
+
+        <!-- Gradients -->
+        <div class="absolute inset-0 pointer-events-none"
+             style="background:linear-gradient(to right,rgba(0,0,0,.62) 0%,rgba(0,0,0,.28) 55%,rgba(0,0,0,.04) 100%)"></div>
+        <div class="absolute inset-0 pointer-events-none"
+             style="background:linear-gradient(to top,rgba(0,0,0,.45) 0%,transparent 38%)"></div>
+
+        <!-- Slide text content -->
+        <div class="absolute inset-0 flex flex-col justify-end px-4 pb-20 sm:px-7 lg:px-12 lg:pb-12 xl:px-14">
+            <div>
+                <h1 id="title" class="mb-3 font-display font-bold text-white leading-[1.2] max-w-xl"
+                    style="font-size:clamp(1.6rem,3.5vw,2.9rem); text-shadow:0 2px 20px rgba(0,0,0,.5)">Slide 1</h1>
+                <p id="desc" class="mb-6 text-white/70 leading-relaxed max-w-lg text-sm sm:text-[.92rem] line-clamp-2">Mockup slide description text.</p>
+                <div class="flex flex-wrap gap-3">
+                    <a href="#" class="rounded-lg px-5 py-2.5 text-sm font-bold text-white transition hover:opacity-90" style="background:var(--site-brand)">Apply for Admission</a>
+                    <a href="#" class="rounded-lg border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/20">Explore Programs</a>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center gap-2.5 mt-5">
+                <button onclick="prevSlide()" class="h-11 w-11 sm:h-9 sm:w-9 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition" aria-label="Previous slide">
+                    <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <div class="flex items-center" id="dots">
+                    <button onclick="goTo(0)" class="flex items-center justify-center px-1.5 py-3 -my-1"><span class="dot block h-1.5 rounded-full transition-all duration-300 w-6 bg-white"></span></button>
+                    <button onclick="goTo(1)" class="flex items-center justify-center px-1.5 py-3 -my-1"><span class="dot block h-1.5 rounded-full transition-all duration-300 w-2 bg-white/35"></span></button>
+                    <button onclick="goTo(2)" class="flex items-center justify-center px-1.5 py-3 -my-1"><span class="dot block h-1.5 rounded-full transition-all duration-300 w-2 bg-white/35"></span></button>
+                    <button onclick="goTo(3)" class="flex items-center justify-center px-1.5 py-3 -my-1"><span class="dot block h-1.5 rounded-full transition-all duration-300 w-2 bg-white/35"></span></button>
+                </div>
+                <button onclick="nextSlide()" class="h-11 w-11 sm:h-9 sm:w-9 flex items-center justify-center rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/20 transition" aria-label="Next slide">
+                    <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LATEST UPDATES PANEL (desktop only, matches hero.blade.php) -->
+    <aside class="hidden lg:flex w-72 xl:w-80 shrink-0 flex-col" style="background:#111; border-left:1px solid rgba(255,255,255,.08);">
+        <div class="shrink-0 px-5 pt-5 pb-4">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="relative flex h-2 w-2 shrink-0">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background:#f87171"></span>
+                    <span class="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                </span>
+                <span class="text-[11px] font-bold uppercase tracking-[.16em] text-white/50">Latest Updates</span>
+            </div>
+            <div class="h-px w-full mt-3" style="background:rgba(255,255,255,.07)"></div>
+        </div>
+        <div class="flex-1 overflow-hidden px-3 pb-3">
+            <div class="flex flex-col items-center justify-center py-12 text-center">
+                <p class="text-xs text-white/20">(mockup — updates list omitted)</p>
+            </div>
+        </div>
+        <div class="shrink-0 p-4 border-t" style="border-color:rgba(255,255,255,.07)">
+            <a href="#" class="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-[12.5px] font-bold text-white transition hover:opacity-90" style="background:var(--site-brand)">Apply for Admission</a>
+        </div>
+    </aside>
+</div>
+
+<!-- MOBILE BOTTOM BAR -->
+<div class="relative z-10 lg:hidden" style="background:linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 100%); margin-top:-1px;">
+    <div class="flex items-center gap-2 px-3 py-2.5">
+        <span class="flex-1 min-w-0 truncate text-[11px] font-semibold text-white/75">Admissions are open — apply now</span>
+        <a href="#" class="shrink-0 rounded-full px-4 py-2 text-[11px] font-bold text-white transition hover:opacity-90" style="background:var(--site-brand)">Apply Now</a>
+    </div>
+</div>
+
+<script>
+const titles = ["Slide 1 — hero-slides/01KZB2G482RDBC32YJD46ZEN2X","Slide 2 — website/pages/01KYB2VA5YPSRCW7BQ7A1NNT7M","Slide 3 — hero-slides/01KZB2656DK6NB507ZRRKZSRNB","Slide 4 — website/pages/01KYB2VABYNP4K2C2GD3JB6GM7"];
+const descs  = ["Testing full image visibility on mobile — image 1.","Testing full image visibility on mobile — image 2.","Testing full image visibility on mobile — image 3.","Testing full image visibility on mobile — image 4."];
+let active = 0;
+const slides = document.querySelectorAll('[data-slide]');
+const dots = document.querySelectorAll('#dots .dot');
+function render(){
+  slides.forEach((img,i)=>{
+    img.classList.toggle('opacity-100', i===active);
+    img.classList.toggle('opacity-0', i!==active);
+  });
+  dots.forEach((d,i)=>{
+    d.classList.toggle('w-6', i===active);
+    d.classList.toggle('bg-white', i===active);
+    d.classList.toggle('w-2', i!==active);
+    d.classList.toggle('bg-white/35', i!==active);
+  });
+  document.getElementById('title').textContent = titles[active];
+  document.getElementById('desc').textContent = descs[active];
+}
+function goTo(i){ active=i; render(); }
+function nextSlide(){ active=(active+1)%slides.length; render(); }
+function prevSlide(){ active=(active-1+slides.length)%slides.length; render(); }
+render();
+</script>
+
+</body>
+</html>

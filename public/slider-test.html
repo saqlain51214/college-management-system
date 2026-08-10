@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Slider — Mobile Fit Test</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:sans-serif;background:#0a0a0a;color:#fff}
+  .banner{padding:10px;background:#111;position:sticky;top:0;z-index:50}
+  .banner strong{font-size:14px}
+  .banner span{color:#888;font-size:12px;display:block;margin-top:4px}
+  .case{margin-bottom:2px}
+  .case h2{color:#4ade80;font-size:13px;padding:8px 10px;background:#111;margin:0}
+  .case p{color:#aaa;font-size:11.5px;padding:0 10px 8px;margin:0}
+
+  /* box: the slider frame itself */
+  .box{
+    display:flex;
+    width:100%;
+    overflow:hidden;
+    background:#171717;
+    height:58dvh;
+    min-height:400px;
+    max-height:540px;
+  }
+  @media (min-width:1024px){
+    .box{ height:70dvh; min-height:520px; max-height:880px; }
+  }
+  .box--aspect{
+    height:auto;
+    aspect-ratio:16/9;
+    max-height:540px;
+  }
+  @media (min-width:1024px){
+    .box--aspect{ height:70dvh; min-height:520px; max-height:880px; aspect-ratio:auto; }
+  }
+
+  .imgWrap{position:relative;flex:1;overflow:hidden;background:#171717}
+
+  .imgFill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
+  .imgFillTop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
+  .imgFit{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center center}
+  .imgBackdrop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.15);filter:blur(30px) brightness(.55)}
+
+  /* backdrop + contain: hide backdrop and force cover on desktop */
+  @media (min-width:1024px){
+    .imgBackdrop{display:none}
+    .imgFit{object-fit:cover}
+  }
+
+  .footer{padding:14px 10px;color:#888;font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <strong>Real slider images — resize browser / open on phone to test.</strong>
+  <span>3 real images currently used on the homepage. Each box below is one candidate CSS approach. No internet/CDN needed — plain CSS only.</span>
+</div>
+
+<!-- ================= CASE A: object-contain + blurred backdrop (mobile), object-cover (desktop) ================= -->
+<div class="case">
+  <h2>A — object-contain (mobile) + blurred backdrop fill, object-cover (desktop lg:)</h2>
+  <p>Full image always visible on mobile, no crop. Sides filled with blurred copy of same image. Desktop crops to fill.</p>
+  <div class="box">
+    <div class="imgWrap">
+      <img class="imgBackdrop" src="https://jdca.edu.pk/assets/images/photo-1562774053-701939374585.jpg" aria-hidden="true">
+      <img class="imgFit" src="https://jdca.edu.pk/assets/images/photo-1562774053-701939374585.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- ================= CASE B: object-cover everywhere, center ================= -->
+<div class="case">
+  <h2>B — object-cover everywhere (center) — ORIGINAL behavior before any fix</h2>
+  <p>Crops sides on mobile if the box aspect ratio doesn't match the image. This is what looked "cut off".</p>
+  <div class="box">
+    <div class="imgWrap">
+      <img class="imgFill" src="https://jdca.edu.pk/assets/images/photo-1523050854058-8df90110c9f1.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- ================= CASE C: object-cover, object-position top ================= -->
+<div class="case">
+  <h2>C — object-cover, object-position:top (keeps top of image, crops bottom)</h2>
+  <p>Good when the important subject (faces/building) is near the top of the photo.</p>
+  <div class="box">
+    <div class="imgWrap">
+      <img class="imgFillTop" src="https://jdca.edu.pk/assets/images/photo-1541339907198-e08756dedf3f.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- ================= CASE D: mobile aspect-ratio box instead of fixed dvh, object-cover ================= -->
+<div class="case">
+  <h2>D — mobile height driven by aspect-ratio (16:9) instead of fixed dvh, object-cover</h2>
+  <p>Box height adapts to a standard photo ratio so cover crops much less aggressively than a tall 58dvh box.</p>
+  <div class="box box--aspect">
+    <div class="imgWrap">
+      <img class="imgFill" src="https://jdca.edu.pk/assets/images/photo-1562774053-701939374585.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- ================= CASE E: object-contain, no blurred backdrop (plain bg) ================= -->
+<div class="case">
+  <h2>E — object-contain (mobile) + plain solid background (no blur), object-cover (desktop)</h2>
+  <p>Simplest / cheapest option: full image visible on mobile, empty space is just a solid dark bar (no extra image load).</p>
+  <div class="box">
+    <div class="imgWrap" style="background:#050505">
+      <img class="imgFit" src="https://jdca.edu.pk/assets/images/photo-1523050854058-8df90110c9f1.jpg">
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Resize the browser window (or open this page on your phone at your-domain/slider-test.html) and compare A–E for all 3 images by scrolling.
+  Tell me which case number looks best and I'll apply it to the real slider for all images.
+</div>
+
+</body>
+</html>

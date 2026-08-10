@@ -50,10 +50,10 @@ class CourseOutlineResource extends Resource
                         ->placeholder('e.g. Semester 1 — Course Outline'),
                     Forms\Components\FileUpload::make('file_paths')
                         ->label('Upload PDF(s)')->disk('public')->directory('course-outlines')
-                        ->acceptedFileTypes(['application/pdf'])->maxSize(20480)
+                        ->acceptedFileTypes(['application/pdf'])->maxSize(5120)
                         ->multiple()->reorderable()->maxFiles(10)
                         ->preserveFilenames()
-                        ->helperText('Upload one or more PDFs (up to 20 MB each) — use the + button to add more. Or use a link below instead.')
+                        ->helperText('Upload one or more PDFs (up to 5 MB each) — use the + button to add more. Or use a link below instead.')
                         ->columnSpanFull(),
                     Forms\Components\TextInput::make('external_url')
                         ->label('…or External Link (optional)')->url()->maxLength(500)

@@ -122,10 +122,11 @@ class FeePaymentResource extends Resource
                         ->disk('public')
                         ->directory('payment-proofs')
                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                        ->maxSize(5120)
                         ->downloadable()
                         ->openable()
                         ->columnSpanFull()
-                        ->helperText('Student-uploaded bank receipt or payment proof'),
+                        ->helperText('Student-uploaded bank receipt or payment proof (max 5 MB)'),
                 ]),
         ]);
     }

@@ -56,25 +56,80 @@
 @media (prefers-reduced-motion: reduce) { .jdca-vtrack, .jdca-htrack { animation: none; } }
 </style>
 
-<div class="flex w-full overflow-hidden
-            h-[58dvh] min-h-[400px] max-h-[540px]
-            lg:h-[calc(100dvh_-_var(--site-header-offset,6rem))] lg:min-h-[520px] lg:max-h-[880px]"
-     x-data="heroSlider()"
+<div x-data="heroSlider()"
      x-init="startAutoPlay()"
      @mouseenter="stopAutoPlay()"
      @mouseleave="startAutoPlay()"
      @touchstart.passive="onTouchStart($event)"
      @touchend="onTouchEnd($event)">
 
-    {{-- ══ SLIDER — flex-1, image fills this area only ══ --}}
-    <div class="relative flex-1 overflow-hidden">
+    {{-- ══════════════════════════ MOBILE / TABLET ONLY (< lg) ══════════════════════════
+         Only the ACTIVE slide's image is in the layout at any time (x-show, not opacity) —
+         so the box height always matches that exact image, no forced size, no gaps. ══ --}}
+    <div class="w-full lg:hidden">
 
-        {{-- Slide images --}}
+        <div class="relative w-full overflow-hidden">
+            <template x-for="(s,i) in slides" :key="'m-img'+i">
+                <img x-show="activeSlide===i" x-transition:enter="transition-opacity duration-500" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                     :src="s.image" :alt="s.alt"
+                     class="w-full h-auto block"
+                     :fetchpriority="i===0?'high':'auto'"
+                     onerror="this.onerror=null;this.src='{{ asset('assets/images/default/slider-1.jpeg') }}'">
+            </template>
+        </div>
+
+        {{-- Text / buttons — below the image, own background, own spacing --}}
+        <div class="px-5 py-6" style="background:linear-gradient(135deg, var(--site-brand,#8b1e2d) 0%, var(--site-brand-dark,#3a0d15) 100%)">
+            <template x-for="(s,i) in slides" :key="'m-txt'+i">
+                <div :class="activeSlide===i?'opacity-100 block':'hidden'">
+                    <h1 class="mb-2 font-display font-bold text-white leading-[1.2]"
+                        style="font-size:clamp(1.4rem,5.5vw,1.9rem)"
+                        x-html="s.title"></h1>
+                    <p class="mb-4 text-white/85 leading-relaxed text-sm line-clamp-2"
+                       x-text="s.description"></p>
+                    <div class="flex flex-wrap gap-2.5">
+                        <template x-if="s.primaryBtnText && s.primaryBtnLink && s.primaryBtnLink!=='#'">
+                            <a :href="s.primaryBtnLink"
+                               class="rounded-lg px-4 py-2 text-sm font-bold text-white shadow-lg transition hover:opacity-90"
+                               style="background:var(--site-brand)"
+                               x-text="s.primaryBtnText"></a>
+                        </template>
+                        <template x-if="s.secondaryBtnText && s.secondaryBtnLink && s.secondaryBtnLink!=='#'">
+                            <a :href="s.secondaryBtnLink"
+                               class="rounded-lg border border-white/40 bg-white/10 px-4 py-2 text-sm font-bold text-white shadow-lg transition hover:bg-white/20"
+                               x-text="s.secondaryBtnText"></a>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            {{-- Dots --}}
+            <div class="mt-4 flex items-center justify-center gap-2">
+                <template x-for="(_,i) in slides" :key="'m-d'+i">
+                    <button @click="goToSlide(i)" class="flex items-center justify-center px-1 py-3" :aria-label="'Go to slide '+(i+1)">
+                        <span :class="activeSlide===i?'w-6 bg-white':'w-2 bg-white/35'"
+                              class="block h-1.5 rounded-full transition-all duration-300"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    {{-- ══════════════════════════ DESKTOP ONLY (lg+) ══════════════════════════
+         Same approach as mobile: only the active slide's image is in the layout (x-show),
+         so the row's height always matches that exact image — no crop, no forced box,
+         no gaps. The side panel stretches to match via flex. ══ --}}
+    <div class="hidden lg:flex w-full overflow-hidden">
+
+    {{-- ══ SLIDER — flex-1, image fills this area only (self-start: never stretched by the side panel) ══ --}}
+    <div class="relative flex-1 overflow-hidden self-start" x-ref="imgBox"
+         x-init="$nextTick(()=>{syncSideHeight(); new ResizeObserver(()=>syncSideHeight()).observe($refs.imgBox)})">
+
+        {{-- Slide image — only the active one is in flow, so this box sizes to it --}}
         <template x-for="(s,i) in slides" :key="'img'+i">
-            <img :src="s.image" :alt="s.alt"
-                 class="absolute inset-0 h-full w-full object-cover transition-opacity duration-1000"
-                 style="object-position:center center"
-                 :class="activeSlide===i?'opacity-100':'opacity-0'"
+            <img x-show="activeSlide===i" x-transition:enter="transition-opacity duration-500" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                 :src="s.image" :alt="s.alt"
+                 class="w-full h-auto block"
                  :fetchpriority="i===0?'high':'auto'"
                  onerror="this.onerror=null;this.src='{{ asset('assets/images/default/slider-1.jpeg') }}'">
         </template>
@@ -135,22 +190,9 @@
         </div>
     </div>
 
-    {{-- ══ MOBILE BOTTOM BAR — persistent Apply CTA (updates shown in ticker below), hidden on lg+ ══ --}}
-    <div class="absolute bottom-0 left-0 right-0 z-10 lg:hidden"
-         style="background:linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 100%)">
-        <div class="flex items-center gap-2 px-3 py-2.5">
-            <span class="flex-1 min-w-0 truncate text-[11px] font-semibold text-white/75">Admissions are open — apply now</span>
-            <a href="{{ route('admissions') }}"
-               class="shrink-0 rounded-full px-4 py-2 text-[11px] font-bold text-white transition hover:opacity-90"
-               style="background:var(--site-brand)">
-                Apply Now
-            </a>
-        </div>
-    </div>
-
-    {{-- ══ LATEST UPDATES PANEL — fixed width, solid dark ══ --}}
-    <aside class="hidden lg:flex w-72 xl:w-80 shrink-0 flex-col"
-           style="background:#111; border-left:1px solid rgba(255,255,255,.08);">
+    {{-- ══ LATEST UPDATES PANEL — fixed width, solid dark, height synced to the image via JS ══ --}}
+    <aside class="hidden lg:flex w-72 xl:w-80 shrink-0 flex-col overflow-hidden"
+           :style="'background:#111; border-left:1px solid rgba(255,255,255,.08);' + (sideH ? ('height:'+sideH+'px;') : '')">
 
         {{-- Header --}}
         <div class="shrink-0 px-5 pt-5 pb-4">
@@ -202,6 +244,7 @@
             </a>
         </div>
     </aside>
+    </div>
 </div>
 
 {{-- ══ HORIZONTAL UPDATES TICKER — below the slider, mobile/tablet only (desktop uses the side panel) ══ --}}
@@ -230,7 +273,10 @@
 <script>
 document.addEventListener('alpine:init',()=>{
     Alpine.data('heroSlider',()=>({
-        activeSlide:0, _t:null, _tx:null,
+        activeSlide:0, _t:null, _tx:null, sideH:null,
+        syncSideHeight(){
+            if(this.$refs.imgBox){ this.sideH = this.$refs.imgBox.offsetHeight || null; }
+        },
         slides:[
             @foreach($heroSlides as $slide)
             {
