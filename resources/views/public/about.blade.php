@@ -71,14 +71,29 @@
         <section class="border-y border-stone-200/80 bg-white py-12 md:py-16">
             <div class="mx-auto max-w-6xl px-4 sm:px-6">
                 <h2 class="mb-8 font-display text-2xl font-semibold text-ink sm:text-3xl">Leadership</h2>
-                <div class="flex max-w-xl flex-col gap-6 rounded-xl border border-stone-200/80 bg-surface p-6 shadow-md sm:flex-row sm:items-center sm:p-8">
-                    <img src="{{ asset('assets/images/photo-1573496359142-b8d87734a5a2.jpg') }}" alt="Principal portrait" class="h-28 w-28 shrink-0 rounded-lg object-cover sm:h-32 sm:w-32" width="200" height="200" loading="lazy" decoding="async" />
-                    <div>
-                        <p class="font-display text-lg font-semibold text-ink">{{ $college->principal_name ?? 'Principal Name' }}</p>
-                        <p class="text-sm font-medium text-brand">Principal</p>
-                        <p class="mt-2 text-sm leading-relaxed text-stone-600">Oversees academic quality, student welfare, liaison with boards and universities, and implementation of national student safety policies on campus.</p>
+                @if($leaders->isNotEmpty())
+                    <div class="grid gap-6 sm:grid-cols-2">
+                        @foreach($leaders as $leader)
+                            @php $initials = collect(explode(' ', trim($leader->name)))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode(''); @endphp
+                            <a href="{{ route('leadership.message', $leader) }}" class="flex flex-col gap-6 rounded-xl border border-stone-200/80 bg-surface p-6 shadow-md transition hover:shadow-lg sm:flex-row sm:items-center sm:p-8">
+                                <span class="h-28 w-28 shrink-0 overflow-hidden rounded-lg sm:h-32 sm:w-32" style="background:linear-gradient(135deg,var(--site-brand),var(--site-gold))">
+                                    @if($leader->photo_url)
+                                        <img src="{{ $leader->photo_url }}" alt="{{ $leader->name }}" class="h-full w-full object-cover" loading="lazy" decoding="async" />
+                                    @else
+                                        <span class="flex h-full w-full items-center justify-center font-display text-2xl font-bold text-white">{{ $initials ?: 'JD' }}</span>
+                                    @endif
+                                </span>
+                                <div>
+                                    <p class="font-display text-lg font-semibold text-ink">{{ $leader->name }}</p>
+                                    <p class="text-sm font-medium text-brand">{{ $leader->designation }}</p>
+                                    <p class="mt-2 text-sm leading-relaxed text-stone-600">{{ \Illuminate\Support\Str::limit(strip_tags($leader->message), 160) }}</p>
+                                </div>
+                            </a>
+                        @endforeach
                     </div>
-                </div>
+                @else
+                    <p class="text-sm text-stone-500">Leadership information will be published soon.</p>
+                @endif
             </div>
         </section>
 

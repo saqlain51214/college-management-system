@@ -199,7 +199,8 @@ class PublicController extends Controller
             $pageContent['stats'][0]['value'] = number_format($stats['students']) . '+';
             $pageContent['stats'][2]['value'] = number_format($stats['teachers']) . '+';
         }
-        return view('public.about', compact('college', 'cmsPage', 'pageContent', 'stats'));
+        $leaders = \App\Models\LeadershipMessage::active()->orderBy('sort_order')->get();
+        return view('public.about', compact('college', 'cmsPage', 'pageContent', 'stats', 'leaders'));
     }
 
     public function programs()
