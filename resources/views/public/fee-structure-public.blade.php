@@ -25,7 +25,9 @@
                 <span class="text-white/90">Fee Structure</span>
             </p>
             <h1 class="text-2xl sm:text-3xl font-bold text-white">Fee Structure</h1>
-            <p class="text-white/70 text-sm mt-1">Academic Year 2024–25</p>
+            @if($academicYear?->name)
+                <p class="text-white/70 text-sm mt-1">Academic Year {{ $academicYear->name }}</p>
+            @endif
         </div>
     </div>
 </div>

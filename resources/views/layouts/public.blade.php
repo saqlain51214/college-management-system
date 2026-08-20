@@ -247,12 +247,9 @@
         // it shows up here automatically, no code change needed.
         $navLeaders = \App\Models\LeadershipMessage::active()->orderBy('sort_order')->get();
 
-        $navScholarshipTypes = [
-            'merit'   => 'Merit-Based Scholarship',
-            'need'    => 'Need-Based Scholarship',
-            'orphan'  => 'Orphan Scholarship',
-            'special' => 'Special Category Scholarship',
-        ];
+        // Scholarships submenu mirrors whatever the admin has published via
+        // Scholarships → Manage — add/rename one there and it shows up here.
+        $navScholarships = \App\Models\Scholarship::active()->orderBy('name')->get();
     @endphp
     <div class="relative border-t border-white/10" style="background:rgba(0,0,0,0.52); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
         <div class="mx-auto max-w-6xl px-4">
@@ -331,8 +328,8 @@
                                 {{ $navLabel('scholarships', 'Scholarships') }}<svg class="h-3 w-3 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                             </a>
                             <ul class="invisible absolute left-full top-0 z-50 w-64 list-none rounded-xl bg-white py-2 text-stone-800 shadow-xl pointer-events-none opacity-0 transition-all duration-200 group-hover/schol:pointer-events-auto group-hover/schol:visible group-hover/schol:opacity-100">
-                                @foreach($navScholarshipTypes as $type => $label)
-                                <li><a href="{{ route('scholarships.show', $type) }}" class="dropdown-link">{{ $label }}</a></li>
+                                @foreach($navScholarships as $scholarship)
+                                <li><a href="{{ route('scholarships.show', $scholarship) }}" class="dropdown-link">{{ $scholarship->name }}</a></li>
                                 @endforeach
                             </ul>
                         </li>
@@ -381,8 +378,8 @@
                         <li><a href="{{ route('admissions') }}"               class="mob-link pl-7">{{ $navLabel('admissions', 'Apply Online') }}</a></li>
                         <li><a href="{{ route('admissions.fee-structure') }}" class="mob-link pl-7">{{ $navLabel('fee-structure', 'Fee Structure') }}</a></li>
                         <li class="px-4 pt-1 pb-0.5 text-[10px] font-bold uppercase tracking-widest text-white/30">{{ $navLabel('scholarships', 'Scholarships') }}</li>
-                        @foreach($navScholarshipTypes as $type => $label)
-                        <li><a href="{{ route('scholarships.show', $type) }}" class="mob-link pl-12 text-white/70">{{ $label }}</a></li>
+                        @foreach($navScholarships as $scholarship)
+                        <li><a href="{{ route('scholarships.show', $scholarship) }}" class="mob-link pl-12 text-white/70">{{ $scholarship->name }}</a></li>
                         @endforeach
 
                         <li class="my-2 border-t border-white/10"></li>

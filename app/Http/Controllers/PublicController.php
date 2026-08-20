@@ -182,6 +182,10 @@ class PublicController extends Controller
             ['value' => $pageContent['about']['stats'][1]['value'] ?? '98%', 'label' => $pageContent['about']['stats'][1]['label'] ?? 'Success'],
             ['value' => number_format($stats['teachers']) . '+', 'label' => 'Faculty'],
         ];
+        $homeSections['elevate-learning']['content']['stats'] = [
+            ['value' => number_format($stats['students']) . '+', 'label' => 'Active Students'],
+            ['value' => number_format($stats['programs']) . '+', 'label' => 'Programs Offered'],
+        ];
         return view('public.home', compact('college', 'cmsPage', 'pageContent', 'homeSections', 'programs', 'news', 'events', 'notices', 'stats'));
     }
 
@@ -612,6 +616,7 @@ class PublicController extends Controller
     {
         $college = $this->college();
         $cmsPage = $this->cmsPage('fee-structure');
+        $academicYear = \App\Models\AcademicYear::getCurrent();
 
         $feeGroups = collect();
         if (\Illuminate\Support\Facades\Schema::hasTable('fee_structures')) {
@@ -622,7 +627,7 @@ class PublicController extends Controller
                 ->groupBy(fn ($f) => $f->academicProgram?->name ?? 'General Fees');
         }
 
-        return view('public.fee-structure-public', compact('college', 'cmsPage', 'feeGroups'));
+        return view('public.fee-structure-public', compact('college', 'cmsPage', 'feeGroups', 'academicYear'));
     }
 
     public function semesterRules()
@@ -636,17 +641,17 @@ class PublicController extends Controller
     {
         $college = $this->college();
         $cmsPage = $this->cmsPage('scholarships');
-        return view('public.scholarships', compact('college', 'cmsPage'));
+        $scholarships = \App\Models\Scholarship::active()->orderBy('name')->get();
+        return view('public.scholarships', compact('college', 'cmsPage', 'scholarships'));
     }
 
-    public function scholarshipDetail(string $type)
+    public function scholarshipDetail(\App\Models\Scholarship $scholarship)
     {
+        abort_unless($scholarship->is_active, 404);
         $college = $this->college();
-        $types   = ['merit', 'need', 'orphan', 'special'];
-        if (! in_array($type, $types)) {
-            abort(404);
-        }
-        return view('public.scholarship-detail', compact('college', 'type'));
+        $others  = \App\Models\Scholarship::active()
+            ->where('id', '!=', $scholarship->id)->orderBy('name')->get();
+        return view('public.scholarship-detail', compact('college', 'scholarship', 'others'));
     }
 
     // ─── Fee Challan self-service download ────────────────────────────────────

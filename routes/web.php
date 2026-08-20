@@ -54,8 +54,8 @@ Route::get('/admissions/fee-structure', [PublicController::class, 'feeStructureP
 Route::get('/admissions/semester-rules', [PublicController::class, 'semesterRules'])->name('admissions.semester-rules');
 
 // Scholarships
-Route::get('/scholarships',           [PublicController::class, 'scholarships'])->name('scholarships');
-Route::get('/scholarships/{type}',    [PublicController::class, 'scholarshipDetail'])->name('scholarships.show');
+Route::get('/scholarships',                    [PublicController::class, 'scholarships'])->name('scholarships');
+Route::get('/scholarships/{scholarship:slug}', [PublicController::class, 'scholarshipDetail'])->name('scholarships.show');
 
 // Jobs
 Route::get('/jobs',                         [PublicController::class, 'jobs'])->name('jobs');
