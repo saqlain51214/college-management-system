@@ -24,6 +24,21 @@ class HeroSlide extends Model
         return $query->where('is_active', true);
     }
 
+    protected static function booted(): void
+    {
+        static::updating(function (self $slide) {
+            if ($slide->isDirty('image') && $slide->getOriginal('image') && ! str_starts_with($slide->getOriginal('image'), 'assets/')) {
+                Storage::disk('public')->delete($slide->getOriginal('image'));
+            }
+        });
+
+        static::deleted(function (self $slide) {
+            if ($slide->image && ! str_starts_with($slide->image, 'assets/')) {
+                Storage::disk('public')->delete($slide->image);
+            }
+        });
+    }
+
     public function getImageUrlAttribute(): ?string
     {
         if (! $this->image) {

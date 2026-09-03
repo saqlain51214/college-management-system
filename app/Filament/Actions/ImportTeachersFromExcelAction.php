@@ -60,9 +60,16 @@ class ImportTeachersFromExcelAction extends Action
                                 if (is_object($file) && method_exists($file, 'getRealPath')) {
                                     $path = $file->getRealPath();
                                 } else {
-                                    // Case 2: string identifier — files are in public disk / livewire-tmp/
+                                    // Case 2: string identifier — Livewire always stages the raw
+                                    // upload on the 'public' disk under livewire-tmp/ first; once
+                                    // the field itself has stored it, it lives on this field's own
+                                    // disk ('local') under imports/teachers/ instead.
                                     $name = basename((string) $file);
                                     $path = storage_path('app/public/livewire-tmp/' . $name);
+
+                                    if (!file_exists($path)) {
+                                        $path = \Illuminate\Support\Facades\Storage::disk('local')->path((string) $file);
+                                    }
 
                                     if (!file_exists($path)) {
                                         $path = \Illuminate\Support\Facades\Storage::disk('public')->path((string) $file);

@@ -9,6 +9,11 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Runs the queue every minute (piggybacking on the existing `schedule:run` cron
+// entry) so mail jobs process in the background instead of blocking web
+// requests — needed now that QUEUE_CONNECTION is 'database', not 'sync'.
+Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
+
 Schedule::command('fees:check-overdue')->dailyAt('01:00');
 Schedule::command('fees:send-due-reminders')->dailyAt('08:00');
 Schedule::command('scholarships:expire-awards')->dailyAt('01:15');
