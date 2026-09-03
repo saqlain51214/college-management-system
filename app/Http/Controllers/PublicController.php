@@ -221,7 +221,7 @@ class PublicController extends Controller
         $college  = $this->college();
         $cmsPage  = $this->cmsPage('faculty');
         $pageContent = $cmsPage->content;
-        $teachers = Teacher::where('is_active', true)->orderBy('designation')->orderBy('name')->get();
+        $teachers = Teacher::where('is_active', true)->with('department')->orderBy('designation')->orderBy('name')->get();
         return view('public.faculty', compact('college', 'cmsPage', 'pageContent', 'teachers'));
     }
 

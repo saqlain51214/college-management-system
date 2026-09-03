@@ -41,6 +41,7 @@ class AcademicsSections extends Page
                 TeacherResource::getUrl('index'),
                 ['crossLink' => 'Managed under Faculty & Staff — shown here for reference only.']
             ),
+            $this->pageRow('faculty', 'Faculty & Leadership'),
             $this->pageRow('semester-rules', 'Semester Rules', ['detail' => $this->semesterRulesDetail()]),
             $this->collectionRow('Course Outlines', CourseOutline::count(), CourseOutlineResource::getUrl('index')),
         ];
