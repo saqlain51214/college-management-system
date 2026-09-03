@@ -230,6 +230,12 @@ class TeacherResource extends Resource
                         ->searchable()
                         ->placeholder('Select Qualification'),
 
+                    Forms\Components\TextInput::make('professional_qualification')
+                        ->label('Professional Teaching Qualification')
+                        ->maxLength(100)
+                        ->placeholder('e.g. B.Ed, M.Ed, CT, PTC')
+                        ->helperText('Teaching-specific qualification, if any — common alongside a BS/MA degree.'),
+
                     Forms\Components\TextInput::make('specialization')
                         ->label('Specialization / Subject')
                         ->maxLength(150)
@@ -336,7 +342,7 @@ class TeacherResource extends Resource
                 Tables\Columns\TextColumn::make('highest_qualification')
                     ->label('Qualification')
                     ->placeholder('—')
-                    ->description(fn(Teacher $r) => $r->specialization)
+                    ->description(fn(Teacher $r) => trim(collect([$r->professional_qualification, $r->specialization])->filter()->implode(' · ')))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('experience_years')

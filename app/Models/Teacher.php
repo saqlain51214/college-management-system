@@ -39,6 +39,7 @@ class Teacher extends Model implements AuthenticatableContract
         'province',
         'photo',
         'highest_qualification',
+        'professional_qualification',
         'specialization',
         'qualification_institution',
         'qualification_year',
